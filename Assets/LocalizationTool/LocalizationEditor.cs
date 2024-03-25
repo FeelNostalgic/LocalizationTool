@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace LocalizationTool.Editor
 {
@@ -27,6 +29,8 @@ namespace LocalizationTool.Editor
         private Data.LANGUAGES _addLanguageValue;
         private string _addLanguageFeedbackLabelText = "";
 
+        private Dictionary<string, string> _currentKeyValueDictionary = new Dictionary<string, string>();
+
         #endregion
 
         #region DIMENSION VARIABLES
@@ -44,13 +48,18 @@ namespace LocalizationTool.Editor
 
         #region PUBLIC VARIABLES
         
+        public string AddValueFeedbackLabelText
+        {
+            set => _addValueFeedbackLabelText = value;
+        }
+        
         public string AddLanguageFeedbackLabelText
         {
             set => _addLanguageFeedbackLabelText = value;
         }
 
         #endregion
-
+        
         [MenuItem("Tool/LocalizationEditor")]
         public static void ShowWindow()
         {
@@ -132,7 +141,8 @@ namespace LocalizationTool.Editor
 
             if (GUILayout.Button("ADD", ButtonStyle()))
             {
-                //TODO: 
+               if(Enum.TryParse(_currentLanguage, out Data.LANGUAGES language)) LocalizationManager.Instance.AddNewKeyValue(_addKeyValue, _addGroupValue, "", this);
+               ControlTextAreaFeedbackDuration(1f, Data.GUI_SECTIONS.valueFeedback);
             }
 
             GUILayout.Space(10);
@@ -202,28 +212,37 @@ namespace LocalizationTool.Editor
 
         private void GenerateCenterScrollViewContent()
         {
-            //TODO
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
-            for (int i = 0; i < 25; i++)
+            foreach (var (key, interDic) in LocalizationManager.Instance.Dictionary)
             {
-                UnitCenterScrollViewContent();
+                 if(Enum.TryParse(_currentLanguage, out Data.LANGUAGES language)) UnitCenterScrollViewContent(key, interDic[language]);
             }
-
+            
             EditorGUILayout.EndScrollView();
         }
 
-        private void UnitCenterScrollViewContent()
+        private void UnitCenterScrollViewContent(string key, (Data.GROUPS group, string value) pair)
         {
+            if(!_currentKeyValueDictionary.ContainsKey(key)) _currentKeyValueDictionary.Add(key, pair.value);
+            
             GUILayout.Space(10);
 
             GUILayout.BeginHorizontal();
 
             GUILayout.Space(10);
-            EditorGUILayout.LabelField("mainMenu_OK", KeyLabelStyle(), MinHeightOption(24));
+            
+            EditorGUILayout.SelectableLabel(key, KeyLabelStyle(), MaxHeightOption(24));
+            
             GUILayout.Space(10);
-            _searchGroupValue = (Data.GROUPS)EditorGUILayout.EnumPopup(_searchGroupValue, GroupSelectionStyle(), MinHeightOption(24), GUILayout.MaxWidth(250));
+            
+            var t = (Data.GROUPS) EditorGUILayout.EnumPopup(pair.group, GroupSelectionStyle(), GUILayout.MaxWidth(250));
+            
             GUILayout.Space(10);
-            EditorGUILayout.TextField("Ok", TextFieldValueStyle(), MinHeightOption(24));
+            
+            _currentKeyValueDictionary[key] = EditorGUILayout.DelayedTextField(pair.value, TextFieldValueStyle(), MinHeightOption(24));
+            if(Enum.TryParse(_currentLanguage, out Data.LANGUAGES language)) 
+                LocalizationManager.Instance.ChangeValue(key, _currentKeyValueDictionary[key], language);
+            
             GUILayout.Space(10);
 
             GUILayout.EndHorizontal();
@@ -256,7 +275,6 @@ namespace LocalizationTool.Editor
 
             if (GUILayout.Button("Add new language", ButtonStyle()))
             {
-                //TODO: 
                 LocalizationManager.Instance.AddNewLanguageToCSV(_addLanguageValue, this);
                 ControlTextAreaFeedbackDuration(0.75f, Data.GUI_SECTIONS.languageFeedback);
             }
@@ -345,6 +363,7 @@ namespace LocalizationTool.Editor
             switch (feedback)
             {
                 case Data.GUI_SECTIONS.valueFeedback:
+                    _addValueFeedbackLabelText = "";
                     break;
                 case Data.GUI_SECTIONS.removeFeedback:
                     break;
@@ -402,6 +421,11 @@ namespace LocalizationTool.Editor
         private GUILayoutOption MinHeightOption(float height)
         {
             return GUILayout.MinHeight(height);
+        }
+        
+        private GUILayoutOption MaxHeightOption(float height)
+        {
+            return GUILayout.MaxHeight(height);
         }
 
         #region Styles
@@ -516,6 +540,7 @@ namespace LocalizationTool.Editor
             var style = new GUIStyle(EditorStyles.popup)
             {
                 alignment = TextAnchor.MiddleCenter,
+                fixedHeight = 24,
                 fontSize = 13,
                 normal =
                 {
