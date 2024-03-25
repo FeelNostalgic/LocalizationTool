@@ -29,7 +29,8 @@ namespace LocalizationTool.Editor
         private Data.LANGUAGES _addLanguageValue;
         private string _addLanguageFeedbackLabelText = "";
 
-        private Dictionary<string, string> _currentKeyValueDictionary = new Dictionary<string, string>();
+        private Dictionary<string, string> _currentKeyValueDictionary = new ();
+        private Dictionary<string, Data.GROUPS> _currentKeyGroupDictionary = new ();
 
         #endregion
 
@@ -187,7 +188,23 @@ namespace LocalizationTool.Editor
         private void ShowCenterSection()
         {
             GUILayout.BeginVertical();
+            
+            GUILayout.Space(5);
+            GUILayout.BeginHorizontal(GUILayout.ExpandHeight(false));
+            if (GUILayout.Button(new GUIContent(){text = "Refresh", tooltip = "Refresh data loading from CSV"}, GUILayout.MaxWidth(65)))
+            {
+                LocalizationManager.Instance.RefreshData();
+            }
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+           
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
             ShowHeader(_currentLanguage);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            
+            GUILayout.Space(5);
 
             ShowHorizontalLine(5);
 
@@ -213,17 +230,18 @@ namespace LocalizationTool.Editor
         private void GenerateCenterScrollViewContent()
         {
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
-            foreach (var (key, interDic) in LocalizationManager.Instance.Dictionary)
+            foreach (var ((key, group), interDic) in LocalizationManager.Instance.Dictionary)
             {
-                 if(Enum.TryParse(_currentLanguage, out Data.LANGUAGES language)) UnitCenterScrollViewContent(key, interDic[language]);
+                 if(Enum.TryParse(_currentLanguage, out Data.LANGUAGES language)) UnitCenterScrollViewContent(key, group,interDic[language]);
             }
             
             EditorGUILayout.EndScrollView();
         }
 
-        private void UnitCenterScrollViewContent(string key, (Data.GROUPS group, string value) pair)
+        private void UnitCenterScrollViewContent(string key, Data.GROUPS group, string value)
         {
-            if(!_currentKeyValueDictionary.ContainsKey(key)) _currentKeyValueDictionary.Add(key, pair.value);
+            if(!_currentKeyValueDictionary.ContainsKey(key)) _currentKeyValueDictionary.Add(key, value);
+            if(!_currentKeyGroupDictionary.ContainsKey(key)) _currentKeyGroupDictionary.Add(key, group);
             
             GUILayout.Space(10);
 
@@ -234,14 +252,14 @@ namespace LocalizationTool.Editor
             EditorGUILayout.SelectableLabel(key, KeyLabelStyle(), MaxHeightOption(24));
             
             GUILayout.Space(10);
-            
-            var t = (Data.GROUPS) EditorGUILayout.EnumPopup(pair.group, GroupSelectionStyle(), GUILayout.MaxWidth(250));
-            
+            _currentKeyGroupDictionary[key] = (Data.GROUPS)EditorGUILayout.EnumPopup(_currentKeyGroupDictionary[key], GroupSelectionStyle(), GUILayout.MaxWidth(250));
+            LocalizationManager.Instance.ChangeGroup(key, _currentKeyGroupDictionary[key]);
+
             GUILayout.Space(10);
             
-            _currentKeyValueDictionary[key] = EditorGUILayout.DelayedTextField(pair.value, TextFieldValueStyle(), MinHeightOption(24));
+            _currentKeyValueDictionary[key] = EditorGUILayout.DelayedTextField(value, TextFieldValueStyle(), MinHeightOption(24));
             if(Enum.TryParse(_currentLanguage, out Data.LANGUAGES language)) 
-                LocalizationManager.Instance.ChangeValue(key, _currentKeyValueDictionary[key], language);
+                LocalizationManager.Instance.ChangeValue(key, group, _currentKeyValueDictionary[key], language);
             
             GUILayout.Space(10);
 
@@ -328,10 +346,10 @@ namespace LocalizationTool.Editor
 
         #region BASE
 
-        private void ShowHeader(string name)
+        private void ShowHeader(string name, params GUILayoutOption[] options)
         {
             GUILayout.Space(10);
-            GUILayout.Label(name, HeaderStyle());
+            GUILayout.Label(name, HeaderStyle(), options);
             GUILayout.Space(15);
         }
 
