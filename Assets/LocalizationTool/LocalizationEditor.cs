@@ -42,6 +42,15 @@ namespace LocalizationTool.Editor
 
         #endregion
 
+        #region PUBLIC VARIABLES
+        
+        public string AddLanguageFeedbackLabelText
+        {
+            set => _addLanguageFeedbackLabelText = value;
+        }
+
+        #endregion
+
         [MenuItem("Tool/LocalizationEditor")]
         public static void ShowWindow()
         {
@@ -49,13 +58,18 @@ namespace LocalizationTool.Editor
             var window = GetWindow(typeof(LocalizationEditor));
             window.minSize = _windowSize;
             window.titleContent = new GUIContent("Localization Tool");
-            LocalizationManager.Instance.Init();
-            if (LocalizationManager.ActiveLanguages.Count > 0) _currentLanguage = LocalizationManager.ActiveLanguages[0].ToString();
         }
 
         private void OnGUI()
         {
+            LoadData();
             ShowLayout();
+        }
+
+        private void LoadData()
+        {
+            LocalizationManager.Instance.Init();
+            if (LocalizationManager.Instance.ActiveLanguages.Count > 0 && _currentLanguage == null) _currentLanguage = LocalizationManager.Instance.ActiveLanguages[0].ToString();
         }
 
         private void ShowLayout()
@@ -194,6 +208,7 @@ namespace LocalizationTool.Editor
             {
                 UnitCenterScrollViewContent();
             }
+
             EditorGUILayout.EndScrollView();
         }
 
@@ -225,59 +240,52 @@ namespace LocalizationTool.Editor
             GUILayout.EndVertical();
         }
 
-        private async void ShowLanguageSection()
+        private void ShowLanguageSection()
         {
-            try
+            GUILayout.BeginVertical();
+
+            ShowHeader("Languages");
+
+            ShowHorizontalLine(5);
+
+            GUILayout.BeginVertical();
+            GUILayout.Space(10);
+            ShowLabelEnumPopupSelection("LANGUAGE", ref _addLanguageValue);
+
+            GUILayout.Space(10);
+
+            if (GUILayout.Button("Add new language", ButtonStyle()))
             {
-                GUILayout.BeginVertical();
-
-                ShowHeader("Languages");
-
-                ShowHorizontalLine(5);
-
-                GUILayout.BeginVertical();
-                GUILayout.Space(10);
-                ShowLabelEnumPopupSelection("LANGUAGE", ref _addLanguageValue);
-
-                GUILayout.Space(10);
-
-                if (GUILayout.Button("Add new language", ButtonStyle()))
-                {
-                    //TODO: 
-                    _addLanguageFeedbackLabelText = await LocalizationManager.Instance.AddNewLanguageToCSV(_addLanguageValue);
-
-                    var durationInSeconds = 1f;
-                    _addLanguageFeedbackLabelText = await ControlTextAreaFeedbackDuration((int)(durationInSeconds * 1000));
-                }
-
-                GUILayout.Space(10);
-
-                ShowTextAreaFeedback(_addLanguageFeedbackLabelText);
-
-                GUILayout.EndVertical();
-
-                ShowHorizontalLine(5);
-
-                GenerateRightScrollViewContent();
-                
-                GUILayout.EndVertical();
+                //TODO: 
+                LocalizationManager.Instance.AddNewLanguageToCSV(_addLanguageValue, this);
+                ControlTextAreaFeedbackDuration(0.75f, Data.GUI_SECTIONS.languageFeedback);
             }
-            catch (Exception e)
-            {
-            }
+
+            GUILayout.Space(10);
+
+            ShowTextAreaFeedback(_addLanguageFeedbackLabelText);
+
+            GUILayout.EndVertical();
+
+            ShowHorizontalLine(5);
+
+            GenerateLanguageSelectorScrollViewContent();
+
+            GUILayout.EndVertical();
         }
 
-        private void GenerateRightScrollViewContent()
+        private void GenerateLanguageSelectorScrollViewContent()
         {
             _scrollRight = EditorGUILayout.BeginScrollView(_scrollRight);
-            foreach (var t in LocalizationManager.ActiveLanguages)
+            foreach (var t in LocalizationManager.Instance.ActiveLanguages)
             {
-                UnitRightScrollViewContent(t.ToString());
+                LanguageSelectorScrollViewContent(t.ToString());
             }
+
             EditorGUILayout.EndScrollView();
         }
 
-        private void UnitRightScrollViewContent(string language)
+        private void LanguageSelectorScrollViewContent(string language)
         {
             GUILayout.Space(10);
 
@@ -285,14 +293,14 @@ namespace LocalizationTool.Editor
 
             if (GUILayout.Button(language))
             {
-                //TODO
+                //TODO: Load current dictionary to center section
                 _currentLanguage = language;
             }
 
             if (GUILayout.Button("Delete", GUILayout.MaxWidth(65)))
             {
                 //TODO: mostrar popup para confirmar eliminacion
-                if (Enum.TryParse(language, out Data.LANGUAGES languageToRemove)) LocalizationManager.Instance.RemoveLanguageFromCVS(languageToRemove);
+                if (Enum.TryParse(language, out Data.LANGUAGES languageToRemove)) LocalizationManager.Instance.RemoveLanguageFromCSV(languageToRemove);
             }
 
             GUILayout.EndHorizontal();
@@ -330,10 +338,22 @@ namespace LocalizationTool.Editor
             EditorGUILayout.LabelField(label, FeedbackLabelStyle());
         }
 
-        private async Task<string> ControlTextAreaFeedbackDuration(int durationInMilliseconds)
+        private async void ControlTextAreaFeedbackDuration(float durationInSeconds, Data.GUI_SECTIONS feedback)
         {
-            await Task.Delay(durationInMilliseconds);
-            return "";
+            var millisecondsDelay = (int)(durationInSeconds * 1000);
+            await Task.Delay(millisecondsDelay);
+            switch (feedback)
+            {
+                case Data.GUI_SECTIONS.valueFeedback:
+                    break;
+                case Data.GUI_SECTIONS.removeFeedback:
+                    break;
+                case Data.GUI_SECTIONS.languageFeedback:
+                    _addLanguageFeedbackLabelText = "";
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(feedback), feedback, null);
+            }
         }
 
         private static void ShowVerticalLine(float width)

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using LocalizationTool.Editor;
 using UnityEngine;
 using File = System.IO.File;
 
@@ -9,56 +12,134 @@ namespace LocalizationTool
 {
     public class LocalizationManager
     {
-        public static LocalizationManager Instance => _instance ??= new LocalizationManager();
-        private static LocalizationManager _instance;
-
         #region Public Variables
+        
+        public static LocalizationManager Instance => _instance ??= new LocalizationManager();
 
-        public static List<Data.LANGUAGES> ActiveLanguages => _activeLanguages;
+        public List<Data.LANGUAGES> ActiveLanguages => _activeLanguages;
+        public Data.LANGUAGES CurrentLanguage;
 
         #endregion
 
         #region Private Variables
-
-        private bool _isInitialized;
-        private static readonly List<Data.LANGUAGES> _activeLanguages = new List<Data.LANGUAGES>();
-
+        
+        private static LocalizationManager _instance;
+        
         private const string CSV_PATH = "Assets/LocalizationTool/Data/LocalizationDataLanguage.csv";
+        
+        private bool _isInitialized;
+        
+        private readonly List<Data.LANGUAGES> _activeLanguages = new ();
+        private static Dictionary<Data.LANGUAGES, Dictionary<string, (Data.GROUPS, string)>> _dictionary = new ();
 
         #endregion
 
-
         #region Public Methods
-
-        public async Task<string> AddNewLanguageToCSV(Data.LANGUAGES newLanguage)
+        
+        public async void AddNewLanguageToCSV(Data.LANGUAGES newLanguage, LocalizationEditor editor)
         {
-            if (_activeLanguages.Contains(newLanguage)) return $"{newLanguage} already exists";
+            if (_activeLanguages.Contains(newLanguage))
+            {
+                editor.AddLanguageFeedbackLabelText = $"{newLanguage} already exists";
+                return;
+            }
 
             if (!File.Exists(CSV_PATH)) await InitFile();
 
             string line;
-
+            
+            //Add space for language value to CSV
+            var sb = new StringBuilder();
             using (var reader = new StreamReader(CSV_PATH))
             {
-                line = await reader.ReadLineAsync();
+                line = await reader.ReadLineAsync(); //Titles
+                sb.AppendLine($"{line},{newLanguage}");
+                while (!reader.EndOfStream) // Data
+                {
+                    line = await reader.ReadLineAsync();
+                    sb.AppendLine($"{line},");
+                }
+            }
+            
+            await using (var writer = new StreamWriter(CSV_PATH))
+            {
+                await writer.WriteAsync(sb.ToString());
+            }
+
+            //Add data to dictionary
+            var interDic = new Dictionary<string, (Data.GROUPS, string)>();
+            _dictionary.Add(newLanguage, interDic);
+            
+            _activeLanguages.Add(newLanguage);
+            
+            editor.AddLanguageFeedbackLabelText = $"{newLanguage} added correctly";
+        }
+
+        public async void RemoveLanguageFromCSV(Data.LANGUAGES newLanguage)
+        {
+            List<string> items;
+            var sb = new StringBuilder();
+            
+            using (var reader = new StreamReader(CSV_PATH))
+            {
+                var line = await reader.ReadLineAsync(); //Titles
+                items = line.Split(',').ToList();
+                var index = items.IndexOf(newLanguage.ToString());
+                items.Remove(newLanguage.ToString());
+                sb.AppendJoin(',', items).AppendLine();
+
+                while (!reader.EndOfStream) // Data
+                {
+                    line = await reader.ReadLineAsync();
+                    items = line.Split(',').ToList();
+                    items.RemoveAt(index);
+                    sb.AppendJoin(',', items).AppendLine();
+                }
             }
 
             await using (var writer = new StreamWriter(CSV_PATH))
             {
-                await writer.WriteAsync($"{line},{newLanguage}");
+                await writer.WriteAsync(sb.ToString());
             }
 
-            _activeLanguages.Add(newLanguage);
-            
-            return $"{newLanguage} added correctly";
-        }
+            //TODO: remove data from dictionary
 
-        public void RemoveLanguageFromCVS(Data.LANGUAGES newLanguage)
-        {
-            
             _activeLanguages.Remove(newLanguage);
+            Debug.Log($"{newLanguage} removed");
         }
 
+        public async void AddNewKeyValue(Data.LANGUAGES language, string key, Data.GROUPS group, string value)
+        {
+            _dictionary[language].Add(key, (group, value));
+            
+            List<string> items;
+            var sb = new StringBuilder();
+            
+            //TODO: add to CSV file
+            using (var reader = new StreamReader(CSV_PATH))
+            {
+                var line = await reader.ReadLineAsync(); //Titles
+                items = line.Split(',').ToList();
+                var index = items.IndexOf(language.ToString());
+                sb.AppendLine(line);
+
+                while (!reader.EndOfStream) // Data
+                {
+                    line = await reader.ReadLineAsync();
+                    items = line.Split(',').ToList();
+                    items.RemoveAt(index);
+                    sb.AppendJoin(',', items).AppendLine();
+                }
+            }
+
+            await using (var writer = new StreamWriter(CSV_PATH))
+            {
+                await writer.WriteAsync(sb.ToString());
+            }
+            
+            
+        }
+        
         #endregion
 
         #region Private Methods
@@ -67,7 +148,7 @@ namespace LocalizationTool
         {
             Init();
         }
-
+        
         public void Init()
         {
             if(_isInitialized) return;
@@ -105,10 +186,10 @@ namespace LocalizationTool
             }
             
             PrintActiveLanguages();
-            Debug.Log("CVS loaded");
+            Debug.Log("CSV loaded");
         }
 
-        private static void PrintActiveLanguages()
+        private void PrintActiveLanguages()
         {
             foreach (var l in _activeLanguages)
             {

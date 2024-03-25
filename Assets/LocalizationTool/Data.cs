@@ -16,5 +16,12 @@
             English = 1,
             Italian = 2
         }
+
+        public enum GUI_SECTIONS
+        {
+            valueFeedback = 0,
+            removeFeedback = 1,
+            languageFeedback = 2
+        }
     }
 }
