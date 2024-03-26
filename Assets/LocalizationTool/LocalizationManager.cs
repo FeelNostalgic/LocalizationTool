@@ -27,9 +27,11 @@ namespace LocalizationTool
         private static LocalizationManager _instance;
 
         private const string CSV_PATH = "Assets/LocalizationTool/Data/LocalizationDataLanguage.csv";
+        private const char SEPARATOR = ';';
+        private const string KEY = "Key";
+        private const string GROUP = "Group";
 
         private bool _isInitialized;
-        private bool _isDictionaryLocked;
 
         private readonly List<Data.LANGUAGES> _activeLanguages = new();
         private static Dictionary<(string key, Data.GROUPS group), Dictionary<Data.LANGUAGES, string>> _dictionary = new();
@@ -87,17 +89,17 @@ namespace LocalizationTool
             using (var reader = new StreamReader(CSV_PATH))
             {
                 var line = await reader.ReadLineAsync(); //Titles
-                items = line.Split(',').ToList();
+                items = line.Split(SEPARATOR).ToList();
                 var index = items.IndexOf(languageToRemove.ToString());
                 items.Remove(languageToRemove.ToString());
-                sb.AppendJoin(',', items).AppendLine();
+                sb.AppendJoin(SEPARATOR, items).AppendLine();
 
                 while (!reader.EndOfStream) // Data
                 {
                     line = await reader.ReadLineAsync();
-                    items = line.Split(',').ToList();
+                    items = line.Split(SEPARATOR).ToList();
                     items.RemoveAt(index);
-                    sb.AppendJoin(',', items).AppendLine();
+                    sb.AppendJoin(SEPARATOR, items).AppendLine();
                 }
             }
 
@@ -145,7 +147,7 @@ namespace LocalizationTool
                     group.ToString()
                 };
                 list.AddRange(_activeLanguages.Select(l => ""));
-                sb.AppendJoin(',', list);
+                sb.AppendJoin(SEPARATOR, list);
                 await writer.WriteLineAsync(sb.ToString());
             }
 
@@ -154,9 +156,6 @@ namespace LocalizationTool
 
         public async void ChangeValue(string key, Data.GROUPS group, string value, Data.LANGUAGES language)
         {
-            if(_isDictionaryLocked) return;
-            _isDictionaryLocked = true;
-            
             if(_dictionary[(key,group)][language].Equals(value)) return; //value is not modified
             
             _dictionary[(key,group)].Remove(language);
@@ -169,12 +168,12 @@ namespace LocalizationTool
                 var header = await reader.ReadLineAsync();
                 var readToEnd = await reader.ReadToEndAsync();
                 var lines = readToEnd.Split('\n');
-                var list = lines.Select(s => s.Split(",")[0]).ToList();
+                var list = lines.Select(s => s.Split(SEPARATOR)[0]).ToList();
                 var index = list.IndexOf(key);
                 //Debug.Log($"{key} is in index: {index}");
-                var items = lines[index].Split(',');
+                var items = lines[index].Split(SEPARATOR);
                 items[_activeLanguages.IndexOf(language) + 2] = value;
-                lines[index] = string.Join(',', items);
+                lines[index] = string.Join(SEPARATOR, items);
 
                 output = $"{header}\n{string.Join("\n", lines)}";
             }
@@ -183,14 +182,10 @@ namespace LocalizationTool
             {
                 await writer.WriteAsync(output);
             }
-
-            _isDictionaryLocked = false;
         }
 
         public async void ChangeGroup(string key, Data.GROUPS newGroup)
         {
-            if(_isDictionaryLocked) return;
-            _isDictionaryLocked = true;
             if(_dictionary.ContainsKey((key,newGroup))) return;
 
             var oldGroup = _groups[key];
@@ -205,12 +200,12 @@ namespace LocalizationTool
                 var header = await reader.ReadLineAsync();
                 var readToEnd = await reader.ReadToEndAsync();
                 var lines = readToEnd.Split('\n');
-                var list = lines.Select(s => s.Split(",")[0]).ToList();
+                var list = lines.Select(s => s.Split(SEPARATOR)[0]).ToList();
                 var index = list.IndexOf(key);
                 //Debug.Log($"{key} is in index: {index}");
-                var items = lines[index].Split(',');
+                var items = lines[index].Split(SEPARATOR);
                 items[1] = newGroup.ToString();
-                lines[index] = string.Join(',', items);
+                lines[index] = string.Join(SEPARATOR, items);
 
                 output = $"{header}\n{string.Join("\n", lines)}";
             }
@@ -219,8 +214,6 @@ namespace LocalizationTool
             {
                 await writer.WriteAsync(output);
             }
-
-            _isDictionaryLocked = false;
         }
 
         public void RefreshData()
@@ -248,7 +241,7 @@ namespace LocalizationTool
         {
             await File.Create(CSV_PATH).DisposeAsync();
             await using var writer = new StreamWriter(CSV_PATH);
-            await writer.WriteAsync("Key,Group");
+            await writer.WriteAsync($"{KEY},{GROUP}");
         }
 
         private async void LoadLanguagesFromCSV()
@@ -260,43 +253,59 @@ namespace LocalizationTool
                 return;
             }
 
-            using (var reader = new StreamReader(CSV_PATH))
+            try
             {
-                //Load Titles (Languages)
-                var line = await reader.ReadLineAsync();
-                var items = line.Split(',');
-                if (items.Length < 3) return;
-
-                _activeLanguages.Clear();
-
-                for (var i = 2; i < items.Length; i++)
+                using (var reader = new StreamReader(CSV_PATH))
                 {
-                    if (!Enum.TryParse(items[i], out Data.LANGUAGES language)) continue;
-                    _activeLanguages.Add(language);
-                }
+                    //Load Titles (Languages) 
+                    var line = await reader.ReadLineAsync();
+                    var items = line.Split(SEPARATOR);
+                    while (!items[0].Equals(KEY)) //Search line where is Key, Group
+                    {
+                        line = await reader.ReadLineAsync();
+                        items = line.Split(SEPARATOR);
+                    }
+                    
+                    if (items.Length < 3) return;
 
-                // Load data
-                _dictionary.Clear();
-                _groups.Clear();
-                while (!reader.EndOfStream)
-                {
-                    line = await reader.ReadLineAsync();
-                    items = line.Split(',');
-                    var key = items[0];
-                    if (Enum.TryParse(items[1], out Data.GROUPS group)) ;
-                    var interDic = new Dictionary<Data.LANGUAGES, string>();
+                    _activeLanguages.Clear();
+
                     for (var i = 2; i < items.Length; i++)
                     {
-                        interDic.Add(_activeLanguages[i-2], items[i]);
+                        if (!Enum.TryParse(items[i], out Data.LANGUAGES language)) continue;
+                        _activeLanguages.Add(language);
                     }
+                    //PrintActiveLanguages();
 
-                    _dictionary.Add((key,group), interDic);
-                    _groups.Add(key, group);
+                    // Load data
+                    _dictionary.Clear();
+                    _groups.Clear();
+                    while (!reader.EndOfStream)
+                    {
+                        line = await reader.ReadLineAsync();
+                        items = line.Split(SEPARATOR);
+                        var key = items[0];
+                        if (Enum.TryParse(items[1], out Data.GROUPS group)) ;
+                        var interDic = new Dictionary<Data.LANGUAGES, string>();
+                        for (var i = 2; i < items.Length; i++)
+                        {
+                            interDic.Add(_activeLanguages[i-2], items[i]);
+                        }
+
+                        _dictionary.Add((key,group), interDic);
+                        _groups.Add(key, group);
+                    }
+                
                 }
                 
+                Debug.Log("CSV loaded");
             }
-            //PrintActiveLanguages();
-            Debug.Log("CSV loaded");
+            catch (IOException e)
+            {
+                Debug.LogError("Sharing Violation Exception: Close .csv file and press Refresh");
+            }
+            
+            
         }
 
         private void PrintActiveLanguages()

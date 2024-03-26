@@ -1,3 +1,5 @@
-Key,Group,Spanish,English
-mainMenu,CharacterMenu,Vale0,Ok
-mainMenu2,None,,
+Column1;Column2;Column3;Column4;Column5
+Key;Group;Spanish;English;Italian
+mainMenu;CharacterMenu;Vale;Ok;
+mainMenu2;Dialogs;Salir;Exit;
+pauseMenu;MainMenu;Pausa;Pause;

@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Events;
+using UniRx;
 
 namespace LocalizationTool.Editor
 {
@@ -29,8 +30,8 @@ namespace LocalizationTool.Editor
         private Data.LANGUAGES _addLanguageValue;
         private string _addLanguageFeedbackLabelText = "";
 
-        private Dictionary<string, string> _currentKeyValueDictionary = new ();
-        private Dictionary<string, Data.GROUPS> _currentKeyGroupDictionary = new ();
+        private Dictionary<string, string> _currentKeyValueDictionary = new();
+        private Dictionary<string, Data.GROUPS> _currentKeyGroupDictionary = new();
 
         #endregion
 
@@ -48,19 +49,19 @@ namespace LocalizationTool.Editor
         #endregion
 
         #region PUBLIC VARIABLES
-        
+
         public string AddValueFeedbackLabelText
         {
             set => _addValueFeedbackLabelText = value;
         }
-        
+
         public string AddLanguageFeedbackLabelText
         {
             set => _addLanguageFeedbackLabelText = value;
         }
 
         #endregion
-        
+
         [MenuItem("Tool/LocalizationEditor")]
         public static void ShowWindow()
         {
@@ -75,6 +76,14 @@ namespace LocalizationTool.Editor
             LoadData();
             ShowLayout();
         }
+
+        // private void OnDisable()
+        // {
+        //     foreach (var (_, value) in _currentKeyValueDictionary)
+        //     {
+        //         value.Dispose();
+        //     }
+        // }
 
         private void LoadData()
         {
@@ -142,8 +151,8 @@ namespace LocalizationTool.Editor
 
             if (GUILayout.Button("ADD", ButtonStyle()))
             {
-               if(Enum.TryParse(_currentLanguage, out Data.LANGUAGES language)) LocalizationManager.Instance.AddNewKeyValue(_addKeyValue, _addGroupValue, "", this);
-               ControlTextAreaFeedbackDuration(1f, Data.GUI_SECTIONS.valueFeedback);
+                if (Enum.TryParse(_currentLanguage, out Data.LANGUAGES language)) LocalizationManager.Instance.AddNewKeyValue(_addKeyValue, _addGroupValue, "", this);
+                ControlTextAreaFeedbackDuration(1f, Data.GUI_SECTIONS.valueFeedback);
             }
 
             GUILayout.Space(10);
@@ -188,22 +197,23 @@ namespace LocalizationTool.Editor
         private void ShowCenterSection()
         {
             GUILayout.BeginVertical();
-            
+
             GUILayout.Space(5);
             GUILayout.BeginHorizontal(GUILayout.ExpandHeight(false));
-            if (GUILayout.Button(new GUIContent(){text = "Refresh", tooltip = "Refresh data loading from CSV"}, GUILayout.MaxWidth(65)))
+            if (GUILayout.Button(new GUIContent() { text = "Refresh", tooltip = "Refresh data loading from CSV" }, GUILayout.MaxWidth(65)))
             {
                 LocalizationManager.Instance.RefreshData();
             }
+
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
-           
+
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             ShowHeader(_currentLanguage);
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
-            
+
             GUILayout.Space(5);
 
             ShowHorizontalLine(5);
@@ -230,40 +240,79 @@ namespace LocalizationTool.Editor
         private void GenerateCenterScrollViewContent()
         {
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
-            foreach (var ((key, group), interDic) in LocalizationManager.Instance.Dictionary)
+            try
             {
-                 if(Enum.TryParse(_currentLanguage, out Data.LANGUAGES language)) UnitCenterScrollViewContent(key, group,interDic[language]);
+                var filteredDicToIterate = new Dictionary<(string key, Data.GROUPS group), Dictionary<Data.LANGUAGES, string>>(LocalizationManager.Instance.Dictionary);
+                if (!_searchKeyValue.Equals(""))
+                {
+                    filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Key.key.Contains(_searchKeyValue, StringComparison.InvariantCulture))
+                        .ToDictionary(kv => (kv.Key), kv => kv.Value);
+                }
+
+                if (_searchGroupValue != Data.GROUPS.None)
+                    filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Key.group == _searchGroupValue)
+                        .ToDictionary(kv => (kv.Key), kv => kv.Value);
+                
+                foreach (var ((key, group), interDic) in filteredDicToIterate)
+                {
+                    if (Enum.TryParse(_currentLanguage, out Data.LANGUAGES language)) UnitCenterScrollViewContent(key, group, interDic[language]);
+                }
             }
-            
+            catch
+            {
+                // ignored
+            }
+
             EditorGUILayout.EndScrollView();
         }
 
         private void UnitCenterScrollViewContent(string key, Data.GROUPS group, string value)
         {
-            if(!_currentKeyValueDictionary.ContainsKey(key)) _currentKeyValueDictionary.Add(key, value);
-            if(!_currentKeyGroupDictionary.ContainsKey(key)) _currentKeyGroupDictionary.Add(key, group);
-            
+            if (!_currentKeyValueDictionary.ContainsKey(key)) _currentKeyValueDictionary.Add(key, value);
+            if (!_currentKeyGroupDictionary.ContainsKey(key)) _currentKeyGroupDictionary.Add(key, group);
+
             GUILayout.Space(10);
 
             GUILayout.BeginHorizontal();
 
             GUILayout.Space(10);
-            
+
             EditorGUILayout.SelectableLabel(key, KeyLabelStyle(), MaxHeightOption(24));
-            
-            GUILayout.Space(10);
-            _currentKeyGroupDictionary[key] = (Data.GROUPS)EditorGUILayout.EnumPopup(_currentKeyGroupDictionary[key], GroupSelectionStyle(), GUILayout.MaxWidth(250));
-            LocalizationManager.Instance.ChangeGroup(key, _currentKeyGroupDictionary[key]);
 
             GUILayout.Space(10);
-            
-            _currentKeyValueDictionary[key] = EditorGUILayout.DelayedTextField(value, TextFieldValueStyle(), MinHeightOption(24));
-            if(Enum.TryParse(_currentLanguage, out Data.LANGUAGES language)) 
-                LocalizationManager.Instance.ChangeValue(key, group, _currentKeyValueDictionary[key], language);
-            
+            var tempGroup = (Data.GROUPS)EditorGUILayout.EnumPopup(_currentKeyGroupDictionary[key], GroupSelectionStyle(), GUILayout.MaxWidth(250));
+            UpdateGroup(key, tempGroup);
+
+            GUILayout.Space(10);
+
+            var tempValue = EditorGUILayout.DelayedTextField(value, TextFieldValueStyle(), MinHeightOption(24));
+            UpdateValue(key, group, tempValue);
+
             GUILayout.Space(10);
 
             GUILayout.EndHorizontal();
+        }
+
+        #endregion
+
+        #region UPDATE METHODS
+
+        private void UpdateGroup(string key, Data.GROUPS tempGroup)
+        {
+            if (tempGroup.Equals(_currentKeyGroupDictionary[key])) return;
+
+            _currentKeyGroupDictionary[key] = tempGroup;
+            LocalizationManager.Instance.ChangeGroup(key, _currentKeyGroupDictionary[key]);
+        }
+
+        private void UpdateValue(string key, Data.GROUPS group, string tempValue)
+        {
+            if (tempValue.Equals(_currentKeyValueDictionary[key])) return;
+            if (!Enum.TryParse(_currentLanguage, out Data.LANGUAGES language)) return;
+
+            _currentKeyValueDictionary[key] = tempValue;
+            LocalizationManager.Instance.ChangeValue(key, group, tempValue, language);
+            //Debug.Log($"{key} has now value: {tempValue}");
         }
 
         #endregion
@@ -440,7 +489,7 @@ namespace LocalizationTool.Editor
         {
             return GUILayout.MinHeight(height);
         }
-        
+
         private GUILayoutOption MaxHeightOption(float height)
         {
             return GUILayout.MaxHeight(height);
