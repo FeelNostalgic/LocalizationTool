@@ -114,7 +114,7 @@ namespace LocalizationTool.Editor
             GUILayout.BeginVertical(MinWidthOption(GetWidthSize(_leftSectionWidthPercent)));
             ShowSearchSection();
             ShowAddSection();
-            ShowRemoveSection();
+            //ShowRemoveSection();
             GUILayout.EndVertical();
         }
 
@@ -218,17 +218,14 @@ namespace LocalizationTool.Editor
 
             ShowHorizontalLine(5);
 
-            GUILayout.Space(20);
+            GUILayout.Space(20); // Vertical Space
 
             GUILayout.BeginHorizontal();
-
-            GUILayout.Space(10);
+            
             GUILayout.Label("KEY", SubSectionHeaderStyle());
-            GUILayout.Space(10);
             GUILayout.Label("GROUP", SubSectionHeaderStyle(), GUILayout.MaxWidth(250));
-            GUILayout.Space(10);
             GUILayout.Label("VALUE", SubSectionHeaderStyle());
-            GUILayout.Space(10);
+            GUILayout.Space(60);
 
             GUILayout.EndHorizontal();
 
@@ -274,9 +271,9 @@ namespace LocalizationTool.Editor
             GUILayout.Space(10);
 
             GUILayout.BeginHorizontal();
-
+            
             GUILayout.Space(10);
-
+            
             EditorGUILayout.SelectableLabel(key, KeyLabelStyle(), MaxHeightOption(24));
 
             GUILayout.Space(10);
@@ -289,7 +286,24 @@ namespace LocalizationTool.Editor
             UpdateValue(key, group, tempValue);
 
             GUILayout.Space(10);
+            
+            if (GUILayout.Button("E", ButtonStyle()))
+            {
+                //TODO: show interface
+                Debug.Log($"{key} edited");
+            }
+            
+            GUILayout.Space(10);
+            
+            if (GUILayout.Button("R", ButtonStyle()))
+            {
+                //TODO
+                Debug.Log($"{key} removed");
+                //TODO: add confirmation popup
+            }
 
+            GUILayout.Space(10);
+            
             GUILayout.EndHorizontal();
         }
 
