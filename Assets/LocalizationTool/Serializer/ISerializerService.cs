@@ -1,4 +1,4 @@
-﻿namespace CodingTest.Serializer
+﻿namespace LocalizationTool
 {
     public interface ISerializerService
     {

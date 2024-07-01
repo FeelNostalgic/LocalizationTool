@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using LocalizationTool.Editor;
 using UnityEngine;
-using File = System.IO.File;
 
 namespace LocalizationTool
 {
@@ -17,7 +15,7 @@ namespace LocalizationTool
         public static LocalizationManager Instance => _instance ??= new LocalizationManager();
 
         public List<Data.LANGUAGES> ActiveLanguages => _activeLanguages;
-        public Dictionary<(string key, Data.GROUPS group), Dictionary<Data.LANGUAGES, string>> Dictionary => _dictionary;
+        public Dictionary<string, KeyData> Dictionary => _dictionary;
         public Data.LANGUAGES CurrentLanguage;
 
         #endregion
@@ -25,100 +23,34 @@ namespace LocalizationTool
         #region Private Variables
 
         private static LocalizationManager _instance;
+        private ISerializerService _serializer;
+        
+        #region JSON Data
 
-        private const string CSV_PATH = "Assets/LocalizationTool/Data/LocalizationDataLanguage.csv";
-        private const char SEPARATOR = ';';
-        private const string KEY = "Key";
-        private const string GROUP = "Group";
+        private const string JSON_PATH = "Assets/LocalizationTool/Data/LocalizationDataLanguage.json";
+        private static JsonData _jsonData;
+
+        #endregion
 
         private bool _isInitialized;
 
-        private readonly List<Data.LANGUAGES> _activeLanguages = new();
-        private static Dictionary<(string key, Data.GROUPS group), Dictionary<Data.LANGUAGES, string>> _dictionary = new();
-        private static Dictionary<string, Data.GROUPS> _groups = new();
+        //TODO: remove this
+        private static readonly List<Data.LANGUAGES> _activeLanguages = new()
+        {
+            Data.LANGUAGES.Spanish,
+            Data.LANGUAGES.English,
+            Data.LANGUAGES.Italian
+        };
+        //
+        private static Dictionary<string, KeyData> _dictionary;
 
         #endregion
 
         #region Public Methods
+        
+        #region JSON
 
-        public async void AddNewLanguageToCSV(Data.LANGUAGES newLanguage, LocalizationEditor editor)
-        {
-            if (_activeLanguages.Contains(newLanguage))
-            {
-                editor.AddLanguageFeedbackLabelText = $"{newLanguage} already exists";
-                return;
-            }
-
-            if (!File.Exists(CSV_PATH)) await InitFile();
-
-            string line;
-
-            //Add space for language value to CSV
-            var sb = new StringBuilder();
-            using (var reader = new StreamReader(CSV_PATH))
-            {
-                line = await reader.ReadLineAsync(); //Titles
-                sb.AppendLine($"{line},{newLanguage}");
-                while (!reader.EndOfStream) // Data
-                {
-                    line = await reader.ReadLineAsync();
-                    sb.AppendLine($"{line},");
-                }
-            }
-
-            await using (var writer = new StreamWriter(CSV_PATH))
-            {
-                await writer.WriteAsync(sb.ToString());
-            }
-
-            _activeLanguages.Add(newLanguage);
-            
-            foreach (var ((key, group), _) in _dictionary)
-            {
-                _dictionary[(key, group)].Add(newLanguage, "");
-            }
-
-            editor.AddLanguageFeedbackLabelText = $"{newLanguage} added correctly";
-        }
-
-        public async void RemoveLanguageFromCSV(Data.LANGUAGES languageToRemove)
-        {
-            List<string> items;
-            var sb = new StringBuilder();
-
-            using (var reader = new StreamReader(CSV_PATH))
-            {
-                var line = await reader.ReadLineAsync(); //Titles
-                items = line.Split(SEPARATOR).ToList();
-                var index = items.IndexOf(languageToRemove.ToString());
-                items.Remove(languageToRemove.ToString());
-                sb.AppendJoin(SEPARATOR, items).AppendLine();
-
-                while (!reader.EndOfStream) // Data
-                {
-                    line = await reader.ReadLineAsync();
-                    items = line.Split(SEPARATOR).ToList();
-                    items.RemoveAt(index);
-                    sb.AppendJoin(SEPARATOR, items).AppendLine();
-                }
-            }
-
-            await using (var writer = new StreamWriter(CSV_PATH))
-            {
-                await writer.WriteAsync(sb.ToString());
-            }
-
-            //Remove data from dictionary
-            foreach (var ((key, group), _) in _dictionary)
-            {
-                _dictionary[(key, group)].Remove(languageToRemove);
-            }
-
-            _activeLanguages.Remove(languageToRemove);
-            Debug.Log($"{languageToRemove} removed");
-        }
-
-        public async void AddNewKeyValue(string key, Data.GROUPS group, string value, LocalizationEditor editor)
+        public async void AddNewKey(string key, Data.GROUPS group, LocalizationEditor editor)
         {
             if (key.Equals(""))
             {
@@ -126,103 +58,71 @@ namespace LocalizationTool
                 return;
             }
 
-            if (_dictionary.ContainsKey((key, group)))
+            if (_dictionary.ContainsKey(key))
             {
                 editor.AddValueFeedbackLabelText = $"{key} already exists";
                 return;
             }
             
-            var interDic = _activeLanguages.ToDictionary(language => language, _ => value);
-            _dictionary.Add((key,group), interDic);
-            _groups.Add(key, group);
+            var interDic = _activeLanguages.ToDictionary(language => language, _ => "");
+            var interList = _activeLanguages.Select(l => new LanguageValue{Language = l, Value = ""}).ToList();
+            _dictionary.Add(key, new KeyData{Group = group, LanguagesData = interDic});
 
-            var sb = new StringBuilder();
-
-            //Add key to CSV file
-            await using (var writer = File.AppendText(CSV_PATH)) //Add old key-values
-            {
-                var list = new List<string>
-                {
-                    key,
-                    group.ToString()
-                };
-                list.AddRange(_activeLanguages.Select(l => ""));
-                sb.AppendJoin(SEPARATOR, list);
-                await writer.WriteLineAsync(sb.ToString());
-            }
+            //Add key to JSON file
+            _jsonData.ListDictionaryKeyValue.Add(new KeyValue(key, group, interList));
+            
+            await SaveFile(_jsonData,JSON_PATH);
 
             editor.AddValueFeedbackLabelText = $"{key} added correctly";
         }
-
-        public async void ChangeValue(string key, Data.GROUPS group, string value, Data.LANGUAGES language)
+        
+        public async void ChangeValue(string key, string newValue, Data.LANGUAGES language)
         {
-            if(_dictionary[(key,group)][language].Equals(value)) return; //value is not modified
-            
-            _dictionary[(key,group)].Remove(language);
-            _dictionary[(key,group)].Add(language, value);
+            if(_dictionary[key].LanguagesData != null && _dictionary[key].LanguagesData[language].Equals(newValue)) return; //value is not modified
 
-            //Change CSV file 
-            string output;
-            using (var reader = new StreamReader(CSV_PATH))
-            {
-                var header = await reader.ReadLineAsync();
-                var readToEnd = await reader.ReadToEndAsync();
-                var lines = readToEnd.Split('\n');
-                var list = lines.Select(s => s.Split(SEPARATOR)[0]).ToList();
-                var index = list.IndexOf(key);
-                //Debug.Log($"{key} is in index: {index}");
-                var items = lines[index].Split(SEPARATOR);
-                items[_activeLanguages.IndexOf(language) + 2] = value;
-                lines[index] = string.Join(SEPARATOR, items);
+            UpdateValueInDictionary(key, newValue, language);
 
-                output = $"{header}\n{string.Join("\n", lines)}";
-            }
+            //Change JSON file 
+            _jsonData.ListDictionaryKeyValue.First(x => x.Key == key).UpdateValue(language, newValue);
 
-            await using (var writer = new StreamWriter(CSV_PATH))
-            {
-                await writer.WriteAsync(output);
-            }
+            await SaveFile(_jsonData, JSON_PATH);
         }
-
+        
         public async void ChangeGroup(string key, Data.GROUPS newGroup)
         {
-            if(_dictionary.ContainsKey((key,newGroup))) return;
+            if(_dictionary[key].Group == newGroup) return;
 
-            var oldGroup = _groups[key];
-            var interDic = _dictionary[(key, oldGroup)];
-            _dictionary.Remove((key, oldGroup));
-            _dictionary.Add((key, newGroup), interDic);
-            _groups[key] = newGroup;
+            var oldData = _dictionary[key].LanguagesData;
+            _dictionary.Remove(key);
+            _dictionary.Add(key, new KeyData{Group = newGroup, LanguagesData = oldData});
             
-            string output;
-            using (var reader = new StreamReader(CSV_PATH))
-            {
-                var header = await reader.ReadLineAsync();
-                var readToEnd = await reader.ReadToEndAsync();
-                var lines = readToEnd.Split('\n');
-                var list = lines.Select(s => s.Split(SEPARATOR)[0]).ToList();
-                var index = list.IndexOf(key);
-                //Debug.Log($"{key} is in index: {index}");
-                var items = lines[index].Split(SEPARATOR);
-                items[1] = newGroup.ToString();
-                lines[index] = string.Join(SEPARATOR, items);
-
-                output = $"{header}\n{string.Join("\n", lines)}";
-            }
-
-            await using (var writer = new StreamWriter(CSV_PATH))
-            {
-                await writer.WriteAsync(output);
-            }
+            //Change JSON file 
+            var data = _jsonData.ListDictionaryKeyValue.First(x => x.Key == key);
+            data.Group = newGroup;
+            
+            await SaveFile(_jsonData,JSON_PATH);
         }
 
-        public void RefreshData()
+        public async void RemoveKey(string key)
         {
-            LoadLanguagesFromCSV();
+            _dictionary.Remove(key);
+            
+            //Change JSON file 
+            var data = _jsonData.ListDictionaryKeyValue.First(x => x.Key == key);
+            _jsonData.ListDictionaryKeyValue.Remove(data);
+
+            await SaveFile(_jsonData,JSON_PATH);
         }
 
         #endregion
+        
+        public void RefreshData()
+        {
+            LoadDataFromJSON();
+        }
 
+        #endregion
+        
         #region Private Methods
 
         private LocalizationManager()
@@ -234,85 +134,88 @@ namespace LocalizationTool
         {
             if (_isInitialized) return;
             _isInitialized = true;
-            LoadLanguagesFromCSV();
+            _serializer = new UnityJsonSerializer();
+            LoadDataFromJSON();
         }
-
-        private async Task InitFile()
+        
+        private async void LoadDataFromJSON()
         {
-            await File.Create(CSV_PATH).DisposeAsync();
-            await using var writer = new StreamWriter(CSV_PATH);
-            await writer.WriteAsync($"{KEY},{GROUP}");
+            _jsonData ??= new JsonData();
+            var aux = await LoadFile<JsonData>(JSON_PATH);
+            if (aux != null) _jsonData = aux;
+
+            if(_dictionary != null) _dictionary.Clear();
+            else _dictionary = new Dictionary<string, KeyData>();
+            
+            if(_jsonData != null) _dictionary = _jsonData.ListDictionaryKeyValue.ToDictionary(data => data.Key, data => new KeyData{Group = data.Group, LanguagesData = data.DictionaryLanguageValue});
+            
+            Debug.Log("JSON loaded");
         }
-
-        private async void LoadLanguagesFromCSV()
+        
+        private static void UpdateValueInDictionary(string key, string newValue, Data.LANGUAGES language)
         {
-            if (!File.Exists(CSV_PATH))
+            var languagesData = _dictionary[key].LanguagesData;
+            if (languagesData == null)
+                languagesData = new Dictionary<Data.LANGUAGES, string>();
+            else
+                languagesData.Remove(language);
+
+            languagesData.Add(language, newValue);
+            var keyData = new KeyData
             {
-                Debug.Log("Creating file");
-                await InitFile();
-                return;
+                Group = _dictionary[key].Group,
+                LanguagesData = languagesData
+            };
+
+            _dictionary.Remove(key);
+            _dictionary.Add(key, keyData);
+        }
+
+        #region Save-Load Methods
+
+        private async Task SaveFile<T>(T fileToSave, string path)
+        {
+            var dataToSave = _serializer.Serialize(fileToSave);
+            try
+            {
+                await using StreamWriter writer = new StreamWriter(path);
+                await writer.WriteAsync(dataToSave);
             }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+
+        private async Task<T> LoadFile<T>(string path)
+        {
+            if (!File.Exists(path)) File.Create(path);
 
             try
             {
-                using (var reader = new StreamReader(CSV_PATH))
-                {
-                    //Load Titles (Languages) 
-                    var line = await reader.ReadLineAsync();
-                    var items = line.Split(SEPARATOR);
-                    while (!items[0].Equals(KEY)) //Search line where is Key, Group
-                    {
-                        line = await reader.ReadLineAsync();
-                        items = line.Split(SEPARATOR);
-                    }
-                    
-                    if (items.Length < 3) return;
-
-                    _activeLanguages.Clear();
-
-                    for (var i = 2; i < items.Length; i++)
-                    {
-                        if (!Enum.TryParse(items[i], out Data.LANGUAGES language)) continue;
-                        _activeLanguages.Add(language);
-                    }
-                    //PrintActiveLanguages();
-
-                    // Load data
-                    _dictionary.Clear();
-                    _groups.Clear();
-                    while (!reader.EndOfStream)
-                    {
-                        line = await reader.ReadLineAsync();
-                        items = line.Split(SEPARATOR);
-                        var key = items[0];
-                        if (Enum.TryParse(items[1], out Data.GROUPS group)) ;
-                        var interDic = new Dictionary<Data.LANGUAGES, string>();
-                        for (var i = 2; i < items.Length; i++)
-                        {
-                            interDic.Add(_activeLanguages[i-2], items[i]);
-                        }
-
-                        _dictionary.Add((key,group), interDic);
-                        _groups.Add(key, group);
-                    }
-                
-                }
-                
-                Debug.Log("CSV loaded");
+                using StreamReader reader = new StreamReader(path);
+                return _serializer.Deserialize<T>(await reader.ReadToEndAsync());
             }
-            catch (IOException e)
+            catch (Exception e)
             {
-                Debug.LogError("Sharing Violation Exception: Close .csv file and press Refresh");
+                Debug.LogError(e);
             }
-            
-            
+
+            return default;
         }
 
-        private void PrintActiveLanguages()
+        #endregion
+        
+        private void PrintDictionary()
         {
-            foreach (var l in _activeLanguages)
+            foreach (var l in _dictionary)
             {
-                Debug.Log(l);
+                Debug.Log($"---------------------------");
+                Debug.Log($"{l.Key} {l.Value.Group}");
+                // foreach (var keyValuePair in l.Value.LanguagesData)
+                // {
+                //     Debug.Log($"{keyValuePair.Key} : {keyValuePair.Value}");
+                // }
             }
         }
 

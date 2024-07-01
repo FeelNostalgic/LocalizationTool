@@ -1,4 +1,6 @@
-﻿namespace LocalizationTool
+﻿using System.Collections.Generic;
+
+namespace LocalizationTool
 {
     public class Data
     {
@@ -23,5 +25,11 @@
             removeFeedback = 1,
             languageFeedback = 2
         }
+    }
+    
+    public struct KeyData
+    {
+        public Data.GROUPS Group;
+        public Dictionary<Data.LANGUAGES, string> LanguagesData;
     }
 }
