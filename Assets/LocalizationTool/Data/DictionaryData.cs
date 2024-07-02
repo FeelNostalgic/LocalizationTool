@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
-namespace LocalizationTool
+namespace LocalizationTool.Data
 {
     [Serializable]
-    public class JsonData
+    public class DictionaryData
     {
-        public JsonData()
+        public DictionaryData()
         {
             ListDictionaryKeyValue = new List<KeyValue>();
         }
@@ -19,14 +20,14 @@ namespace LocalizationTool
     [Serializable]
     public class KeyValue
     {
-        public KeyValue(string key, Data.GROUPS group, List<LanguageValue> languageValue)
+        public KeyValue(string key, Enums.GROUPS category, List<LanguageValue> languageValue)
         {
             Key = key;
-            Group = group;
+            Category = category;
             _languagesValue = languageValue;
         }
 
-        public void UpdateValue(Data.LANGUAGES language, string newValue)
+        public void UpdateValue(string language, string newValue)
         {
             _languagesValue ??= new List<LanguageValue>();
             var data = _languagesValue.FirstOrDefault(x => x.Language == language);
@@ -34,9 +35,15 @@ namespace LocalizationTool
             _languagesValue.Add(new LanguageValue{Language = language, Value = newValue});
         }
 
+        public Task RemoveLanguage(string languageToRemove)
+        {
+            _languagesValue.First(l => l.Language.Equals(languageToRemove)).Value = "";
+            return Task.CompletedTask;
+        }
+
         public string Key;
-        public Data.GROUPS Group;
-        public Dictionary<Data.LANGUAGES, string> DictionaryLanguageValue => _languagesValue.ToDictionary(x => x.Language, x => x.Value);
+        public Enums.GROUPS Category;
+        public Dictionary<string, string> DictionaryLanguageValue => _languagesValue.ToDictionary(x => x.Language, x => x.Value);
 
         [SerializeField] private List<LanguageValue> _languagesValue;
     }
@@ -44,7 +51,7 @@ namespace LocalizationTool
     [Serializable]
     public class LanguageValue
     {
-        public Data.LANGUAGES Language;
+        public string Language;
         public string Value;
     }
 }
