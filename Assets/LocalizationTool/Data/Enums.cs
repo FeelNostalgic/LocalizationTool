@@ -4,14 +4,6 @@ namespace LocalizationTool.Data
 {
     public class Enums
     {
-        public enum GROUPS
-        {
-            None = 0,
-            MainMenu = 1,
-            CharacterMenu = 2,
-            Dialogs = 3
-        }
-        
         public enum GUI_WINDOW
         {
             Dictionary = 0,
@@ -23,7 +15,7 @@ namespace LocalizationTool.Data
     
     public struct KeyData
     {
-        public Enums.GROUPS Category;
+        public string Category;
         public Dictionary<string, string> LanguagesData;
     }
 }

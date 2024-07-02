@@ -11,22 +11,33 @@ namespace LocalizationTool.Data
     {
         public DictionaryData()
         {
-            ListDictionaryKeyValue = new List<KeyValue>();
+            ListDictionaryKeyCategoryLanguages = new List<KeyCategoryLanguage>();
         }
         
-        public List<KeyValue> ListDictionaryKeyValue;
+        public List<KeyCategoryLanguage> ListDictionaryKeyCategoryLanguages;
     }
 
     [Serializable]
-    public class KeyValue
+    public class KeyCategoryLanguage
     {
-        public KeyValue(string key, Enums.GROUPS category, List<LanguageValue> languageValue)
+        public KeyCategoryLanguage(string key, string category, List<LanguageValue> languageValue)
         {
             Key = key;
             Category = category;
             _languagesValue = languageValue;
         }
+        
+        public string Key;
+        public string Category;
+        public Dictionary<string, string> DictionaryLanguageValue => _languagesValue.ToDictionary(x => x.Language, x => x.Value);
 
+        [SerializeField] private List<LanguageValue> _languagesValue;
+
+        public void AddNewLanguage(string newLanguage)
+        {
+            _languagesValue.Add(new LanguageValue{Language = newLanguage, Value = ""});
+        }
+        
         public void UpdateValue(string language, string newValue)
         {
             _languagesValue ??= new List<LanguageValue>();
@@ -35,17 +46,34 @@ namespace LocalizationTool.Data
             _languagesValue.Add(new LanguageValue{Language = language, Value = newValue});
         }
 
-        public Task RemoveLanguage(string languageToRemove)
+        public Task UpdateLanguageName(string oldLanguageName, string newLanguageName)
         {
-            _languagesValue.First(l => l.Language.Equals(languageToRemove)).Value = "";
+            if (_languagesValue.FirstOrDefault(l => l.Language.Equals(oldLanguageName)) != default)
+            {
+                _languagesValue.First(l => l.Language.Equals(oldLanguageName)).Language = newLanguageName;
+            }
+           
             return Task.CompletedTask;
         }
 
-        public string Key;
-        public Enums.GROUPS Category;
-        public Dictionary<string, string> DictionaryLanguageValue => _languagesValue.ToDictionary(x => x.Language, x => x.Value);
+        public Task RemoveLanguage(string languageToRemove)
+        {
+            _languagesValue.Remove(_languagesValue.Find(l => l.Language.Equals(languageToRemove)));
+            return Task.CompletedTask;
+        }
 
-        [SerializeField] private List<LanguageValue> _languagesValue;
+        public Task UpdateCategoryName(string oldCategoryName, string newCategoryName)
+        {
+            if(Category.Equals(oldCategoryName)) Category = newCategoryName;
+            return Task.CompletedTask;
+        }
+
+        public Task RemoveCategory(string categoryToRemove)
+        {
+            if(Category.Equals(categoryToRemove)) Category = "None";
+            return Task.CompletedTask;
+        }
+        
     }
     
     [Serializable]

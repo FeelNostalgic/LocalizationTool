@@ -7,6 +7,12 @@ namespace LocalizationTool.Editor
 {
     public class LocalizationEditor : EditorWindow
     {
+        #region PROTECTED VARIABLES
+
+        protected const string NONE = "None";
+
+        #endregion
+        
         #region EDITOR VARIABLES
         
         private int _currentWindowToolbarIndex;
@@ -16,6 +22,7 @@ namespace LocalizationTool.Editor
         private Enums.GUI_WINDOW _currentWindow;
         private DictionaryEditor _dictionaryEditor;
         private LanguagesEditor _languagesEditor;
+        private CategoriesEditor _categoriesEditor;
         
         #endregion
 
@@ -37,6 +44,7 @@ namespace LocalizationTool.Editor
         private void OnGUI()
         {
             LoadData();
+            if(!LocalizationManager.Instance.IsInitalized) return;
             WindowToolbar();
             switch (_currentWindow)
             {
@@ -64,8 +72,6 @@ namespace LocalizationTool.Editor
         private void LoadData()
         {
             LocalizationManager.Instance.Init();
-            //TODO: crear selector de lenguas y poner favorita (inicial)
-            //if (LocalizationManager.Instance.ActiveLanguages.Count > 0 && _currentLanguage == null) _currentLanguage = LocalizationManager.Instance.ActiveLanguages[0];
         }
 
         private void ShowDictionaryLayout()
@@ -82,7 +88,8 @@ namespace LocalizationTool.Editor
         
         private void ShowCategoriesLayout()
         {
-            
+            _categoriesEditor ??= (CategoriesEditor)CreateInstance(typeof(CategoriesEditor));
+            _categoriesEditor.ShowLayout();
         }
         
         private void ShowConfigurationLayout()
@@ -132,13 +139,26 @@ namespace LocalizationTool.Editor
             GUILayout.Space(10);
         }
 
-        protected void ShowLabelEnumPopupSelection<T>(string label, ref T groupValue) where T : Enum
+        protected void ShowLabelPopupSelection(string label, ref string categoryValue)
         {
             GUILayout.BeginVertical();
             GUILayout.Label(label, SubSectionHeaderStyle());
             GUILayout.Space(5);
-            //TODO: EditorGUILayout.Popup();
-            groupValue = (T)EditorGUILayout.EnumPopup(groupValue, AddGroupStyle());
+
+            if (LocalizationManager.Categories != null)
+            {
+                if (LocalizationManager.Categories.IndexOf(categoryValue) != -1)
+                {
+                    var index = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(categoryValue), LocalizationManager.Categories.ToArray(), AddGroupStyle());
+                    categoryValue = LocalizationManager.Categories[index];
+                }
+                else
+                {
+                    var index = EditorGUILayout.Popup(0, LocalizationManager.Categories.ToArray(), AddGroupStyle());
+                    categoryValue = LocalizationManager.Categories[0];
+                }
+            }
+            
             GUILayout.EndVertical();
         }
 
@@ -156,9 +176,8 @@ namespace LocalizationTool.Editor
             EditorGUILayout.LabelField(label, FeedbackLabelStyle());
         }
 
-        internal virtual async void ControlTextAreaFeedbackDuration(float durationInSeconds)
+        internal virtual void ControlTextAreaFeedbackDuration(float durationInSeconds)
         {
-            ;
         }
 
         protected static void ShowVerticalLine(float width)

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
@@ -10,7 +8,7 @@ namespace LocalizationTool.Editor
     {
         #region PUBLIC VARIABLES
 
-        public new string AddLanguageFeedbackLabelText
+        public string AddLanguageFeedbackLabelText
         {
             set => _addLanguageFeedbackLabelText = value;
         }
@@ -178,14 +176,14 @@ namespace LocalizationTool.Editor
             
             if (LocalizationManager.Instance.FavouriteLanguage.Equals(language))
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Favorite"), CenterButtonComponentsStyle()))
+                if (GUILayout.Button(LocalizationManager.Instance.YellowIcon, CenterButtonComponentsStyle()))
                 {
                     // Nothing
                 }
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("IN LockButton act@2x", "Make favourite"), CenterButtonComponentsStyle()))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Make favourite"), CenterButtonComponentsStyle()))
                 {
                     LocalizationManager.Instance.ChangeFavoriteLanguage(language);
                     Debug.Log($"{language} is now favorite");

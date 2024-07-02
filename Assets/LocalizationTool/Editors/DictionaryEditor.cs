@@ -24,10 +24,10 @@ namespace LocalizationTool.Editor
         #region EDITOR VARIABLES
         
         private string _searchKeyValue = "";
-        private Enums.GROUPS _searchGroupValue;
+        private int _searchCategoryIndex = 0;
 
         private string _addKeyValue;
-        private Enums.GROUPS _addGroupValue;
+        private string _addCategoryValue;
         private string _addValueFeedbackLabelText = "";
 
         private Vector2 _scrollCenter;
@@ -35,7 +35,7 @@ namespace LocalizationTool.Editor
         private int _currentLanguageToolbarIndex;
 
         private readonly Dictionary<string, string> _currentKeyValueDictionary = new();
-        private readonly Dictionary<string, Enums.GROUPS> _currentKeyGroupDictionary = new();
+        private readonly Dictionary<string, string> _currentKeyGroupDictionary = new();
 
         #endregion
 
@@ -97,13 +97,13 @@ namespace LocalizationTool.Editor
 
             GUILayout.Space(20);
 
-            ShowLabelEnumPopupSelection("CATEGORY", ref _addGroupValue);
+            ShowLabelPopupSelection("CATEGORY", ref _addCategoryValue);
 
             GUILayout.Space(20);
 
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_ol_plus", "Add new language"), GUILayout.MaxWidth(500), GUILayout.MaxHeight(25)))
             {
-                LocalizationManager.Instance.AddNewKey(_addKeyValue, _addGroupValue, this);
+                LocalizationManager.Instance.AddNewKey(_addKeyValue, _addCategoryValue, this);
                 ControlTextAreaFeedbackDuration(1f);
             }
 
@@ -154,8 +154,12 @@ namespace LocalizationTool.Editor
         {
             GUILayout.BeginHorizontal();
 
-            _searchGroupValue = (Enums.GROUPS)EditorGUILayout.EnumPopup(_searchGroupValue, AddGroupStyle(),GUILayout.Width(200));
-
+            if (LocalizationManager.Categories != null)
+            {
+                if (_searchCategoryIndex >= LocalizationManager.Categories.Count) _searchCategoryIndex = 0;
+                _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, LocalizationManager.Categories.ToArray(), AddGroupStyle(),GUILayout.Width(200));
+            }
+            
             GUILayout.Space(5);
 
             _searchKeyValue = EditorGUILayout.TextField(_searchKeyValue, AddTextFieldStyle());
@@ -221,8 +225,8 @@ namespace LocalizationTool.Editor
                     filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Key.Contains(_searchKeyValue, StringComparison.InvariantCulture))
                         .ToDictionary(kv => (kv.Key), kv => kv.Value);
 
-                if (_searchGroupValue != Enums.GROUPS.None)
-                    filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Value.Category == _searchGroupValue)
+                if (_searchCategoryIndex != 0)
+                    filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Value.Category == LocalizationManager.Categories[_searchCategoryIndex])
                         .ToDictionary(kv => (kv.Key), kv => kv.Value);
 
                 foreach (var keyData in filteredDicToIterate)
@@ -238,10 +242,10 @@ namespace LocalizationTool.Editor
             EditorGUILayout.EndScrollView();
         }
 
-        private void UnitCenterScrollViewContent(string key, Enums.GROUPS group, string value)
+        private void UnitCenterScrollViewContent(string key, string category, string value)
         {
             if (!_currentKeyValueDictionary.ContainsKey(key)) _currentKeyValueDictionary.Add(key, value);
-            if (!_currentKeyGroupDictionary.ContainsKey(key)) _currentKeyGroupDictionary.Add(key, group);
+            if (!_currentKeyGroupDictionary.ContainsKey(key)) _currentKeyGroupDictionary.Add(key, category);
 
             GUILayout.Space(10);
 
@@ -252,12 +256,13 @@ namespace LocalizationTool.Editor
             EditorGUILayout.SelectableLabel(key, KeyLabelStyle(), MaxHeightOption(24));
 
             GUILayout.Space(10);
-            var tempGroup = (Enums.GROUPS)EditorGUILayout.EnumPopup(_currentKeyGroupDictionary[key], GroupSelectionStyle(), GUILayout.MaxWidth(250));
-            UpdateGroup(key, tempGroup);
+            if (category == "") category = NONE;
+            var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), AddGroupStyle());
+            UpdateCategory(key, LocalizationManager.Categories[tempCategory]);
 
             GUILayout.Space(10);
             var tempValue = EditorGUILayout.TextField(value, TextFieldValueStyle(), MinHeightOption(24));
-            UpdateValue(key, group, tempValue);
+            UpdateValue(key, tempValue);
 
             GUILayout.Space(10);
 
@@ -287,15 +292,15 @@ namespace LocalizationTool.Editor
 
         #region UPDATE METHODS
 
-        private void UpdateGroup(string key, Enums.GROUPS tempGroup)
+        private void UpdateCategory(string key, string tempCategory)
         {
-            if (tempGroup.Equals(_currentKeyGroupDictionary[key])) return;
+            if (tempCategory.Equals(_currentKeyGroupDictionary[key])) return;
 
-            _currentKeyGroupDictionary[key] = tempGroup;
+            _currentKeyGroupDictionary[key] = tempCategory;
             LocalizationManager.Instance.ChangeCategory(key, _currentKeyGroupDictionary[key]);
         }
 
-        private void UpdateValue(string key, Enums.GROUPS group, string tempValue)
+        private void UpdateValue(string key, string tempValue)
         {
             if (tempValue.Equals(_currentKeyValueDictionary[key])) return;
 
