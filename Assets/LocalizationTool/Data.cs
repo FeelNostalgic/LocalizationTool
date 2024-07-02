@@ -25,6 +25,14 @@ namespace LocalizationTool
             removeFeedback = 1,
             languageFeedback = 2
         }
+
+        public enum GUI_WINDOW
+        {
+            Dictionary = 0,
+            Languages = 1,
+            Categories = 2,
+            Configuration = 3
+        }
     }
     
     public struct KeyData

@@ -11,7 +11,7 @@ namespace LocalizationTool.Editor
     {
         #region EDITOR VARIABLES
 
-        private string _searchKeyValue;
+        private string _searchKeyValue = "";
         private Data.GROUPS _searchGroupValue;
 
         private string _addKeyValue;
@@ -26,7 +26,8 @@ namespace LocalizationTool.Editor
         private Vector2 _scrollCenter;
         private Vector2 _scrollRight;
         private Vector2 _scrollToolbar;
-        private int _currentToolbarIndex;
+        private int _currentLanguageToolbarIndex;
+        private int _currentWindowToolbarIndex;
 
         private Data.LANGUAGES _addLanguageValue;
         private string _addLanguageFeedbackLabelText = "";
@@ -34,11 +35,13 @@ namespace LocalizationTool.Editor
         private Dictionary<string, string> _currentKeyValueDictionary = new();
         private Dictionary<string, Data.GROUPS> _currentKeyGroupDictionary = new();
 
+        private Data.GUI_WINDOW _currentWindow;
+        
         #endregion
 
         #region DIMENSION VARIABLES
 
-        private static readonly Vector2 _windowSize = new(1400, 750);
+        protected static readonly Vector2 _windowSize = new(1400, 750);
         private float _leftSectionWidthPercent = 0.225f;
         private float _rigthSectionWidthPercent = 0.225f;
 
@@ -75,7 +78,20 @@ namespace LocalizationTool.Editor
         private void OnGUI()
         {
             LoadData();
-            ShowLayout();
+            WindowToolbar();
+            switch (_currentWindow)
+            {
+                case Data.GUI_WINDOW.Dictionary: ShowDictionaryLayout();
+                    break;
+                case Data.GUI_WINDOW.Languages: ShowLanguagesLayout();
+                    break;
+                case Data.GUI_WINDOW.Categories: ShowCategoriesLayout();
+                    break;
+                case Data.GUI_WINDOW.Configuration: ShowConfigurationLayout();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         // private void OnDisable()
@@ -93,47 +109,47 @@ namespace LocalizationTool.Editor
             //if (LocalizationManager.Instance.ActiveLanguages.Count > 0 && _currentLanguage == null) _currentLanguage = LocalizationManager.Instance.ActiveLanguages[0];
         }
 
-        private void ShowLayout()
+        private void ShowDictionaryLayout()
         {
-            GUILayout.BeginHorizontal(GUILayout.MinHeight(_windowSize.y));
+            GUILayout.BeginVertical(MinHeightOption(_windowSize.y));
+            
+            //GUILayout.Space(10);
+            ShowHorizontalLine(5);
+            
+            GUILayout.BeginHorizontal();
             ShowLeftSection();
 
             ShowVerticalLine(5);
             // TODO: VerticalReDimensionalDivisionLine(_leftSectionWidth);
 
             ShowCenterSection();
-
-            //ShowVerticalLine(5);
-
-            //ShowRightSection();
+            
             GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
         }
-
+        
+        private void ShowLanguagesLayout()
+        {
+            
+        }
+        
+        private void ShowCategoriesLayout()
+        {
+            
+        }
+        
+        private void ShowConfigurationLayout()
+        {
+            
+        }
+        
         #region LEFT SECTION
 
         private void ShowLeftSection()
         {
             GUILayout.BeginVertical(MinWidthOption(GetWidthSize(_leftSectionWidthPercent)));
-            ShowSearchSection();
+            //ShowSearchSection();
             ShowAddSection();
-            //ShowRemoveSection();
-            GUILayout.EndVertical();
-        }
-
-        private void ShowSearchSection()
-        {
-            GUILayout.BeginVertical();
-            ShowHeader("SEARCH");
-
-            ShowLabelTextField("KEY", ref _searchKeyValue);
-
-            GUILayout.Space(20);
-
-            ShowLabelEnumPopupSelection("GROUP", ref _searchGroupValue);
-
-            GUILayout.Space(10);
-            ShowHorizontalLine(5);
-
             GUILayout.EndVertical();
         }
 
@@ -166,32 +182,7 @@ namespace LocalizationTool.Editor
 
             GUILayout.EndVertical();
         }
-
-        private void ShowRemoveSection()
-        {
-            //TODO: quitar seccion y poner boton en seccion central con popup para confirmar
-            GUILayout.BeginVertical();
-            //ShowHeader("REMOVE");
-
-            GUILayout.Space(10);
-            ShowLabelTextField("KEY", ref _removeKeyValue);
-
-            GUILayout.Space(10);
-
-            if (GUILayout.Button("REMOVE", ButtonStyle()))
-            {
-                //TODO: 
-            }
-
-            GUILayout.Space(10);
-            ShowTextAreaFeedback(_removeFeedbackLabelText);
-
-            GUILayout.Space(10);
-            ShowHorizontalLine(5);
-
-            GUILayout.EndVertical();
-        }
-
+        
         #endregion
 
         #region CENTER SECTION
@@ -202,11 +193,9 @@ namespace LocalizationTool.Editor
 
             GUILayout.Space(5);
             
-            ButtonCenterSection();
-
-            GUILayout.Space(10);
-
             LanguageToolBarSection();
+
+            GUILayout.Space(5);
 
             TitleCenterSection();
 
@@ -216,6 +205,10 @@ namespace LocalizationTool.Editor
 
             GUILayout.Space(20); // Vertical Space
 
+            SearchBarCenterSection();
+
+            GUILayout.Space(10);
+            
             TableTitleCenterSection();
 
             GenerateCenterScrollViewContent();
@@ -223,31 +216,67 @@ namespace LocalizationTool.Editor
             GUILayout.EndVertical();
         }
 
-        private static void ButtonCenterSection()
+        private void SearchBarCenterSection()
         {
-            GUILayout.BeginHorizontal(GUILayout.ExpandHeight(false));
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_Refresh", "Refresh data loading"), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
-            {
-                LocalizationManager.Instance.RefreshData();
-            }
+            GUILayout.BeginHorizontal();
+
+            _searchGroupValue = (Data.GROUPS) EditorGUILayout.EnumPopup(_searchGroupValue, GUILayout.Width(200));
 
             GUILayout.Space(5);
 
-            if (GUILayout.Button(new GUIContent() { text = "Languages Manager", tooltip = "Show language manager" }, GUILayout.MaxWidth(140), GUILayout.MaxHeight(30)))
-            {
-                //TODO:
-            }
-
+            _searchKeyValue = EditorGUILayout.TextField(_searchKeyValue);
             GUILayout.Space(5);
-
-            if (GUILayout.Button(new GUIContent() { text = "Groups Manager", tooltip = "Show groups manager" }, GUILayout.MaxWidth(130), GUILayout.MaxHeight(30)))
-            {
-                //TODO:
-            }
 
             GUILayout.EndHorizontal();
         }
 
+        private void WindowToolbar()
+        {
+            GUILayout.Space(5);
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+            GUILayout.Space(10);
+            if (GUILayout.Button(new GUIContent("Dictionary"), EditorStyles.toolbarButton))
+            {
+                _currentWindow = Data.GUI_WINDOW.Dictionary;
+            }
+            GUILayout.Space(10);
+            if (GUILayout.Button(new GUIContent("Languages"), EditorStyles.toolbarButton))
+            {
+                _currentWindow = Data.GUI_WINDOW.Languages;
+            }
+            GUILayout.Space(10);
+            if (GUILayout.Button(new GUIContent("Categories"), EditorStyles.toolbarButton))
+            {
+                _currentWindow = Data.GUI_WINDOW.Categories;
+            }
+            GUILayout.Space(10);
+            if (GUILayout.Button(new GUIContent("Configuration"), EditorStyles.toolbarButton))
+            {
+                _currentWindow = Data.GUI_WINDOW.Configuration;
+            }
+            GUILayout.Space(10);
+
+            GUILayout.EndHorizontal();
+        }
+        
+        private void TitleCenterSection()
+        {
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_Refresh", "Refresh data loading"), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
+            {
+                LocalizationManager.Instance.RefreshData();
+            }
+            
+            GUILayout.FlexibleSpace();
+            
+            GUILayout.Label(_currentLanguage.ToString(), HeaderStyle());
+            
+            GUILayout.FlexibleSpace();
+            
+            GUILayout.EndHorizontal();
+        }
+
+        
         private void TableTitleCenterSection()
         {
             GUILayout.BeginHorizontal();
@@ -260,12 +289,6 @@ namespace LocalizationTool.Editor
             GUILayout.EndHorizontal();
         }
 
-        private void TitleCenterSection()
-        {
-            GUILayout.BeginHorizontal();
-            ShowHeader(_currentLanguage.ToString());
-            GUILayout.EndHorizontal();
-        }
 
         private void LanguageToolBarSection()
         {
@@ -273,10 +296,12 @@ namespace LocalizationTool.Editor
             _scrollToolbar = EditorGUILayout.BeginScrollView(_scrollToolbar, GUILayout.Height(40));
             var toolbarItems = LocalizationManager.Instance.ActiveLanguages.Select(t => t.ToString()).ToArray();
 
-            _currentToolbarIndex = GUILayout.Toolbar((int)_currentLanguage, toolbarItems);
-            _currentLanguage = (Data.LANGUAGES)_currentToolbarIndex;
+            _currentLanguageToolbarIndex = GUILayout.Toolbar((int)_currentLanguage, toolbarItems);
+            _currentLanguage = (Data.LANGUAGES)_currentLanguageToolbarIndex;
 
             EditorGUILayout.EndScrollView();
+            GUILayout.Space(5);
+
             GUILayout.EndHorizontal();
         }
 
@@ -286,11 +311,11 @@ namespace LocalizationTool.Editor
             try
             {
                 var filteredDicToIterate = new Dictionary<string, KeyData>(LocalizationManager.Instance.Dictionary);
-
+                
                 if (!_searchKeyValue.Equals(""))
                     filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Key.Contains(_searchKeyValue, StringComparison.InvariantCulture))
                         .ToDictionary(kv => (kv.Key), kv => kv.Value);
-
+                
                 if (_searchGroupValue != Data.GROUPS.None)
                     filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Value.Group == _searchGroupValue)
                         .ToDictionary(kv => (kv.Key), kv => kv.Value);
@@ -351,19 +376,6 @@ namespace LocalizationTool.Editor
             GUILayout.Space(10);
 
             GUILayout.EndHorizontal();
-        }
-
-        private Texture2D MakeTex(int width, int height, Color col)
-        {
-            var pix = new Color[width * height];
-            for (var i = 0; i < pix.Length; i++)
-            {
-                pix[i] = col;
-            }
-            var result = new Texture2D(width, height);
-            result.SetPixels(pix);
-            result.Apply();
-            return result;
         }
         
         #endregion
@@ -463,16 +475,16 @@ namespace LocalizationTool.Editor
 
         #endregion
         
-        #region BASE
+        #region COMMONS
 
-        private void ShowHeader(string name, params GUILayoutOption[] options)
+        protected void ShowHeader(string name, params GUILayoutOption[] options)
         {
-            GUILayout.Space(10);
+            GUILayout.Space(5);
             GUILayout.Label(name, HeaderStyle(), options);
-            GUILayout.Space(15);
+            GUILayout.Space(10);
         }
 
-        private void ShowLabelEnumPopupSelection<T>(string label, ref T groupValue) where T : Enum
+        protected void ShowLabelEnumPopupSelection<T>(string label, ref T groupValue) where T : Enum
         {
             GUILayout.BeginVertical();
             GUILayout.Label(label, SubSectionHeaderStyle());
@@ -480,20 +492,21 @@ namespace LocalizationTool.Editor
             GUILayout.EndVertical();
         }
 
-        private void ShowLabelTextField(string label, ref string keyValue)
+        protected void ShowLabelTextField(string label, ref string keyValue)
         {
             GUILayout.BeginVertical();
             GUILayout.Label(label, SubSectionHeaderStyle());
+            GUILayout.Space(4);
             keyValue = EditorGUILayout.TextField(keyValue);
             GUILayout.EndVertical();
         }
 
-        private void ShowTextAreaFeedback(string label)
+        protected void ShowTextAreaFeedback(string label)
         {
             EditorGUILayout.LabelField(label, FeedbackLabelStyle());
         }
 
-        private async void ControlTextAreaFeedbackDuration(float durationInSeconds, Data.GUI_SECTIONS feedback)
+        protected async void ControlTextAreaFeedbackDuration(float durationInSeconds, Data.GUI_SECTIONS feedback)
         {
             var millisecondsDelay = (int)(durationInSeconds * 1000);
             await Task.Delay(millisecondsDelay);
@@ -512,17 +525,17 @@ namespace LocalizationTool.Editor
             }
         }
 
-        private static void ShowVerticalLine(float width)
+        protected static void ShowVerticalLine(float width)
         {
             GUILayout.Box("", GUILayout.ExpandHeight(true), GUILayout.Width(width));
         }
 
-        private static void ShowHorizontalLine(float height)
+        protected static void ShowHorizontalLine(float height)
         {
             GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(height));
         }
 
-        private void VerticalReDimensionalDivisionLine(float width)
+        protected void VerticalReDimensionalDivisionLine(float width)
         {
             var dividerRect = new Rect(width, 0f, dividerWidth, position.height);
             EditorGUIUtility.AddCursorRect(dividerRect, MouseCursor.ResizeHorizontal);
@@ -530,7 +543,7 @@ namespace LocalizationTool.Editor
             RedimensionEvent(dividerRect);
         }
 
-        private void RedimensionEvent(Rect dividerRect)
+        protected void RedimensionEvent(Rect dividerRect)
         {
             isResizingDivider = Event.current.type switch
             {
@@ -545,34 +558,34 @@ namespace LocalizationTool.Editor
             Repaint();
         }
 
-        private float GetWidthSize(float percent)
+        protected float GetWidthSize(float percent)
         {
             return percent * _windowSize.x;
         }
 
-        private GUILayoutOption MinWidthOption(float width)
+        protected GUILayoutOption MinWidthOption(float width)
         {
             return GUILayout.MinWidth(width);
         }
 
-        private GUILayoutOption MaxWidthOption(float width)
+        protected GUILayoutOption MaxWidthOption(float width)
         {
             return GUILayout.MaxWidth(width);
         }
 
-        private GUILayoutOption MinHeightOption(float height)
+        protected GUILayoutOption MinHeightOption(float height)
         {
             return GUILayout.MinHeight(height);
         }
 
-        private GUILayoutOption MaxHeightOption(float height)
+        protected GUILayoutOption MaxHeightOption(float height)
         {
             return GUILayout.MaxHeight(height);
         }
 
         #region Styles
 
-        private GUIStyle CenterButtonComponentsStyle()
+        protected GUIStyle CenterButtonComponentsStyle()
         {
             var style = new GUIStyle(GUI.skin.button)
             {
@@ -583,7 +596,7 @@ namespace LocalizationTool.Editor
             return style;
         }
         
-        private GUIStyle FixedWidthStyle(float width)
+        protected GUIStyle FixedWidthStyle(float width)
         {
             var style = new GUIStyle
             {
@@ -593,7 +606,7 @@ namespace LocalizationTool.Editor
             return style;
         }
 
-        private GUIStyle SubSectionHeaderStyle()
+        protected GUIStyle SubSectionHeaderStyle()
         {
             var style = new GUIStyle
             {
@@ -609,7 +622,7 @@ namespace LocalizationTool.Editor
             return style;
         }
 
-        private GUIStyle FeedbackLabelStyle()
+        protected GUIStyle FeedbackLabelStyle()
         {
             var style = new GUIStyle
             {
@@ -625,7 +638,7 @@ namespace LocalizationTool.Editor
             return style;
         }
 
-        private GUIStyle ButtonStyle()
+        protected GUIStyle ButtonStyle()
         {
             var style = new GUIStyle(GUI.skin.button)
             {
@@ -642,7 +655,7 @@ namespace LocalizationTool.Editor
             return style;
         }
 
-        private GUIStyle HeaderStyle()
+        protected GUIStyle HeaderStyle()
         {
             var style = new GUIStyle
             {
@@ -658,7 +671,7 @@ namespace LocalizationTool.Editor
             return style;
         }
 
-        private GUIStyle KeyLabelStyle()
+        protected GUIStyle KeyLabelStyle()
         {
             var style = new GUIStyle(GUI.skin.textField)
             {
@@ -673,7 +686,7 @@ namespace LocalizationTool.Editor
             return style;
         }
 
-        private GUIStyle TextFieldValueStyle()
+        protected GUIStyle TextFieldValueStyle()
         {
             var style = new GUIStyle(GUI.skin.textField)
             {
@@ -688,7 +701,7 @@ namespace LocalizationTool.Editor
             return style;
         }
 
-        private GUIStyle GroupSelectionStyle()
+        protected GUIStyle GroupSelectionStyle()
         {
             var style = new GUIStyle(EditorStyles.popup)
             {

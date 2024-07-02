@@ -133,6 +133,7 @@ namespace LocalizationTool
         public void Init()
         {
             if (_isInitialized) return;
+            Debug.Log("Manager initialized");
             _isInitialized = true;
             _serializer = new UnityJsonSerializer();
             LoadDataFromJSON();
