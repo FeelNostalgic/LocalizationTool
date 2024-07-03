@@ -11,6 +11,13 @@ namespace LocalizationTool.Data
             Categories = 2,
             Configuration = 3
         }
+
+        public enum RICH_TEXT_STYLE
+        {
+            Bold = 0,
+            Italic = 1,
+            FontSize = 2
+        }
     }
     
     public struct KeyData

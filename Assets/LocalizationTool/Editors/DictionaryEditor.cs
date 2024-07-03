@@ -22,7 +22,7 @@ namespace LocalizationTool.Editor
         #region PRIVATE VARIABLES
 
         #region EDITOR VARIABLES
-        
+
         private string _searchKeyValue = "";
         private int _searchCategoryIndex = 0;
 
@@ -157,9 +157,9 @@ namespace LocalizationTool.Editor
             if (LocalizationManager.Categories != null)
             {
                 if (_searchCategoryIndex >= LocalizationManager.Categories.Count) _searchCategoryIndex = 0;
-                _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, LocalizationManager.Categories.ToArray(), AddGroupStyle(),GUILayout.Width(200));
+                _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, LocalizationManager.Categories.ToArray(), AddGroupStyle(), GUILayout.Width(200));
             }
-            
+
             GUILayout.Space(5);
 
             _searchKeyValue = EditorGUILayout.TextField(_searchKeyValue, AddTextFieldStyle());
@@ -205,9 +205,13 @@ namespace LocalizationTool.Editor
             if (toolbarItems.Length != 0)
             {
                 _currentLanguageToolbarIndex = GUILayout.Toolbar(LocalizationManager.Instance.CurrentToolbarLanguageIndex, toolbarItems);
-                LocalizationManager.Instance.CurrentLanguageInDictionarySection = LocalizationManager.ActiveLanguages[_currentLanguageToolbarIndex];
+                if (LocalizationManager.Instance.CurrentLanguageInDictionarySection != LocalizationManager.ActiveLanguages[_currentLanguageToolbarIndex])
+                {
+                    LocalizationManager.Instance.CurrentLanguageInDictionarySection = LocalizationManager.ActiveLanguages[_currentLanguageToolbarIndex];
+                    GUI.FocusControl(null);
+                }
             }
-            
+
             EditorGUILayout.EndScrollView();
             GUILayout.Space(5);
 
@@ -253,7 +257,7 @@ namespace LocalizationTool.Editor
 
             GUILayout.Space(10);
 
-            EditorGUILayout.SelectableLabel(key, KeyLabelStyle(), MaxHeightOption(24));
+           EditorGUILayout.SelectableLabel(key, KeyLabelStyle(), MaxHeightOption(24));
 
             GUILayout.Space(10);
             if (category == "") category = NONE;
@@ -268,8 +272,8 @@ namespace LocalizationTool.Editor
 
             if (GUILayout.Button(EditorGUIUtility.IconContent("Customized", "Edit"), CenterButtonComponentsStyle()))
             {
-                //TODO: show interface
-                Debug.Log($"{key} edited");
+                RichTextEditor.ShowWindow(tempValue, key, delegate(string s) { UpdateValue(key, s); });
+                Debug.Log($"Key '{key}' edited");
             }
 
             GUILayout.Space(10);

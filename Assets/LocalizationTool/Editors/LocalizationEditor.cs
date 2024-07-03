@@ -12,18 +12,18 @@ namespace LocalizationTool.Editor
         protected const string NONE = "None";
 
         #endregion
-        
+
         #region EDITOR VARIABLES
-        
+
         private int _currentWindowToolbarIndex;
-        
+
         private Vector2 _scrollRight;
-        
+
         private Enums.GUI_WINDOW _currentWindow;
         private DictionaryEditor _dictionaryEditor;
         private LanguagesEditor _languagesEditor;
         private CategoriesEditor _categoriesEditor;
-        
+
         #endregion
 
         #region DIMENSION VARIABLES
@@ -31,7 +31,7 @@ namespace LocalizationTool.Editor
         protected static readonly Vector2 _windowSize = new(1400, 750);
 
         #endregion
-        
+
         [MenuItem("Tool/LocalizationEditor")]
         public static void ShowWindow()
         {
@@ -40,21 +40,25 @@ namespace LocalizationTool.Editor
             window.minSize = _windowSize;
             window.titleContent = new GUIContent("Localization Tool");
         }
-        
+
         private void OnGUI()
         {
             LoadData();
-            if(!LocalizationManager.Instance.IsInitalized) return;
+            if (!LocalizationManager.Instance.IsInitalized) return;
             WindowToolbar();
             switch (_currentWindow)
             {
-                case Enums.GUI_WINDOW.Dictionary: ShowDictionaryLayout();
+                case Enums.GUI_WINDOW.Dictionary:
+                    ShowDictionaryLayout();
                     break;
-                case Enums.GUI_WINDOW.Languages: ShowLanguagesLayout();
+                case Enums.GUI_WINDOW.Languages:
+                    ShowLanguagesLayout();
                     break;
-                case Enums.GUI_WINDOW.Categories: ShowCategoriesLayout();
+                case Enums.GUI_WINDOW.Categories:
+                    ShowCategoriesLayout();
                     break;
-                case Enums.GUI_WINDOW.Configuration: ShowConfigurationLayout();
+                case Enums.GUI_WINDOW.Configuration:
+                    ShowConfigurationLayout();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -76,27 +80,26 @@ namespace LocalizationTool.Editor
 
         private void ShowDictionaryLayout()
         {
-            _dictionaryEditor ??= (DictionaryEditor) CreateInstance(typeof(DictionaryEditor));
+            _dictionaryEditor ??= (DictionaryEditor)CreateInstance(typeof(DictionaryEditor));
             _dictionaryEditor.ShowLayout();
         }
-        
+
         private void ShowLanguagesLayout()
         {
-            _languagesEditor ??= (LanguagesEditor) CreateInstance((typeof(LanguagesEditor)));
+            _languagesEditor ??= (LanguagesEditor)CreateInstance((typeof(LanguagesEditor)));
             _languagesEditor.ShowLayout();
         }
-        
+
         private void ShowCategoriesLayout()
         {
             _categoriesEditor ??= (CategoriesEditor)CreateInstance(typeof(CategoriesEditor));
             _categoriesEditor.ShowLayout();
         }
-        
+
         private void ShowConfigurationLayout()
         {
-            
         }
-        
+
         #region CENTER SECTION
 
         private void WindowToolbar()
@@ -107,29 +110,37 @@ namespace LocalizationTool.Editor
             if (GUILayout.Button(new GUIContent("Dictionary"), EditorStyles.toolbarButton))
             {
                 _currentWindow = Enums.GUI_WINDOW.Dictionary;
+                GUI.FocusControl(null);
             }
+
             GUILayout.Space(10);
             if (GUILayout.Button(new GUIContent("Languages"), EditorStyles.toolbarButton))
             {
                 _currentWindow = Enums.GUI_WINDOW.Languages;
+                GUI.FocusControl(null);
             }
+
             GUILayout.Space(10);
             if (GUILayout.Button(new GUIContent("Categories"), EditorStyles.toolbarButton))
             {
                 _currentWindow = Enums.GUI_WINDOW.Categories;
+                GUI.FocusControl(null);
             }
+
             GUILayout.Space(10);
             if (GUILayout.Button(new GUIContent("Configuration"), EditorStyles.toolbarButton))
             {
                 _currentWindow = Enums.GUI_WINDOW.Configuration;
+                GUI.FocusControl(null);
             }
+
             GUILayout.Space(10);
 
             GUILayout.EndHorizontal();
         }
-        
+
         #endregion
-        
+
         #region COMMONS
 
         protected void ShowHeader(string name, params GUILayoutOption[] options)
@@ -154,11 +165,11 @@ namespace LocalizationTool.Editor
                 }
                 else
                 {
-                    var index = EditorGUILayout.Popup(0, LocalizationManager.Categories.ToArray(), AddGroupStyle());
+                    EditorGUILayout.Popup(0, LocalizationManager.Categories.ToArray(), AddGroupStyle());
                     categoryValue = LocalizationManager.Categories[0];
                 }
             }
-            
+
             GUILayout.EndVertical();
         }
 
@@ -334,7 +345,6 @@ namespace LocalizationTool.Editor
                 alignment = TextAnchor.MiddleCenter,
                 fontStyle = FontStyle.Bold,
                 fontSize = 13,
-                fixedHeight = 22,
                 normal =
                 {
                     textColor = Color.white
@@ -379,7 +389,8 @@ namespace LocalizationTool.Editor
         {
             var style = new GUIStyle(GUI.skin.textField)
             {
-                alignment = TextAnchor.MiddleLeft,
+                alignment = TextAnchor.UpperLeft,
+                richText = true,
                 fontSize = 13,
                 normal =
                 {

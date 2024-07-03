@@ -1,1 +1,70 @@
-{"ListDictionaryKeyCategoryLanguages":[{"Key":"1","Category":"None","_languagesValue":[{"Language":"English","Value":""},{"Language":"Spanish","Value":""},{"Language":"Italian","Value":"a"},{"Language":"French","Value":"a"}]},{"Key":"2","Category":"Main Menu","_languagesValue":[{"Language":"English","Value":""},{"Language":"Spanish","Value":""},{"Language":"Italian","Value":"b"},{"Language":"French","Value":"d"}]},{"Key":"3","Category":"None","_languagesValue":[{"Language":"English","Value":""},{"Language":"Spanish","Value":""},{"Language":"Italian","Value":"c"},{"Language":"French","Value":"c"}]}]}
+{
+  "ListDictionaryKeyCategoryLanguages": [
+    {
+      "Key": "1",
+      "Category": "None",
+      "_languagesValue": [
+        {
+          "Language": "English",
+          "Value": ""
+        },
+        {
+          "Language": "Spanish",
+          "Value": ""
+        },
+        {
+          "Language": "Italian",
+          "Value": "a"
+        },
+        {
+          "Language": "French",
+          "Value": "a"
+        }
+      ]
+    },
+    {
+      "Key": "2",
+      "Category": "Main Menu",
+      "_languagesValue": [
+        {
+          "Language": "English",
+          "Value": ""
+        },
+        {
+          "Language": "Spanish",
+          "Value": ""
+        },
+        {
+          "Language": "French",
+          "Value": "d"
+        },
+        {
+          "Language": "Italian",
+          "Value": "dfgdfgdf"
+        }
+      ]
+    },
+    {
+      "Key": "3",
+      "Category": "None",
+      "_languagesValue": [
+        {
+          "Language": "English",
+          "Value": ""
+        },
+        {
+          "Language": "French",
+          "Value": "c"
+        },
+        {
+          "Language": "Italian",
+          "Value": "d"
+        },
+        {
+          "Language": "Spanish",
+          "Value": "<size=13>Hola\nQue \nTal</size>"
+        }
+      ]
+    }
+  ]
+}
