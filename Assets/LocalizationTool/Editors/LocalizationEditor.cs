@@ -1,10 +1,12 @@
 using System;
 using LocalizationTool.Data;
+using LocalizationTool.Manager;
 using UnityEditor;
 using UnityEngine;
 
-namespace LocalizationTool.Editor
+namespace LocalizationTool.Editors
 {
+#if UNITY_EDITOR
     public class LocalizationEditor : EditorWindow
     {
         #region PROTECTED VARIABLES
@@ -73,9 +75,9 @@ namespace LocalizationTool.Editor
         //     }
         // }
 
-        private void LoadData()
+        private async void LoadData()
         {
-            LocalizationManager.Instance.Init();
+            await LocalizationManager.Instance.Init();
         }
 
         private void ShowDictionaryLayout()
@@ -191,12 +193,12 @@ namespace LocalizationTool.Editor
         {
         }
 
-        protected static void ShowVerticalLine(float width)
+        public static void ShowVerticalLine(float width)
         {
             GUILayout.Box("", GUILayout.ExpandHeight(true), GUILayout.Width(width));
         }
 
-        protected static void ShowHorizontalLine(float height)
+        public static void ShowHorizontalLine(float height)
         {
             GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(height));
         }
@@ -421,4 +423,5 @@ namespace LocalizationTool.Editor
 
         #endregion
     }
+#endif
 }

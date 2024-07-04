@@ -4,8 +4,9 @@ using LocalizationTool.Data;
 using UnityEditor;
 using UnityEngine;
 
-namespace LocalizationTool.Editor
+namespace LocalizationTool.Editors
 {
+#if UNITY_EDITOR
     public class RichTextEditor : LocalizationEditor
     {
         #region DIMENSION VARIABLES
@@ -22,7 +23,7 @@ namespace LocalizationTool.Editor
         private int _fontSizeIndex = 5;
         private string[] _fontSizes = { "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "30", "32" };
         private int _currentFontSizeIndex = 5;
-        
+
         private Action<string> _onTextChanged;
 
         #endregion
@@ -77,7 +78,7 @@ namespace LocalizationTool.Editor
 
             _richText = EditorGUILayout.TextArea(_richText, richTextStyle, GUILayout.Height(450));
             EditorGUILayout.EndHorizontal();
-            
+
             if (GUILayout.Button("Apply", ButtonStyle(), MinHeightOption(30)))
             {
                 _onTextChanged?.Invoke(_richText);
@@ -155,10 +156,10 @@ namespace LocalizationTool.Editor
             if (length == 0) return;
 
             var selectedText = _richText.Substring(startIndex, length);
-            
+
             bool removeOrAdd;
             string styledText;
-            
+
             if (style == Enums.RICH_TEXT_STYLE.FontSize)
             {
                 removeOrAdd = !selectedText.Contains("size");
@@ -180,12 +181,13 @@ namespace LocalizationTool.Editor
                         numberEndIndex = i;
                         break;
                     }
+
                     var (openingTag, closingTag) = GetTags(style);
                     var oldOpeningTag = $"<size={selectedText.Substring(numberStartIndex, numberEndIndex - numberStartIndex)}>";
 
                     var textWithoutTags = selectedText.Replace(oldOpeningTag, "");
                     textWithoutTags = textWithoutTags.Replace(closingTag, "");
-                    
+
                     //Add new font size
                     styledText = $"{openingTag}{textWithoutTags}{closingTag}";
                     _richText = $"{_richText[..startIndex]}{styledText}{_richText[(startIndex + length)..]}";
@@ -212,7 +214,6 @@ namespace LocalizationTool.Editor
             }
 
 
-
             // Move cursor to the end of the newly styled text
             tEditor.cursorIndex = startIndex + styledText.Length;
             tEditor.selectIndex = startIndex + styledText.Length;
@@ -233,4 +234,5 @@ namespace LocalizationTool.Editor
 
         #endregion
     }
+#endif
 }

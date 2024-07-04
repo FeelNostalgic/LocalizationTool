@@ -1,9 +1,11 @@
 using System.Threading.Tasks;
+using LocalizationTool.Manager;
 using UnityEditor;
 using UnityEngine;
 
-namespace LocalizationTool.Editor
+namespace LocalizationTool.Editors
 {
+#if UNITY_EDITOR
     public class LanguagesEditor : LocalizationEditor
     {
         #region PUBLIC VARIABLES
@@ -245,4 +247,5 @@ namespace LocalizationTool.Editor
 
         #endregion
     }
+#endif
 }

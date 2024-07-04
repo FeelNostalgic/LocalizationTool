@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LocalizationTool.Data;
+using LocalizationTool.Manager;
 using UnityEditor;
 using UnityEngine;
 
-namespace LocalizationTool.Editor
+namespace LocalizationTool.Editors
 {
+#if UNITY_EDITOR
     public class DictionaryEditor : LocalizationEditor
     {
         #region PUBLIC VARIABLES
@@ -257,7 +259,7 @@ namespace LocalizationTool.Editor
 
             GUILayout.Space(10);
 
-           EditorGUILayout.SelectableLabel(key, KeyLabelStyle(), MaxHeightOption(24));
+            EditorGUILayout.SelectableLabel(key, KeyLabelStyle(), MaxHeightOption(24));
 
             GUILayout.Space(10);
             if (category == "") category = NONE;
@@ -324,4 +326,5 @@ namespace LocalizationTool.Editor
 
         #endregion
     }
+#endif
 }

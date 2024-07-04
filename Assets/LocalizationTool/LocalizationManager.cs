@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using LocalizationTool.Controller;
 using LocalizationTool.Data;
-using LocalizationTool.Editor;
+using LocalizationTool.Editors;
 using UnityEditor;
 using UnityEngine;
 
-namespace LocalizationTool
+namespace LocalizationTool.Manager
 {
     public class LocalizationManager
     {
@@ -17,10 +18,8 @@ namespace LocalizationTool
         public static LocalizationManager Instance => _instance ??= new LocalizationManager();
 
         public static List<string> ActiveLanguages => _languagesData.Languagues;
-
-        public static List<string> Categories => _categoriesData?.Categories;
-
-        public static Dictionary<string, KeyData> Dictionary => _dynamicDictionary;
+        public static List<string> Categories => _categoriesData?.Categories ?? new List<string>();
+        public static Dictionary<string, KeyData> Dictionary => _dynamicDictionary ?? new Dictionary<string, KeyData>();
         public string CurrentLanguageInDictionarySection { get; set; }
         public int CurrentToolbarLanguageIndex => _languagesData.Languagues.IndexOf(CurrentLanguageInDictionarySection);
         public string FavouriteLanguage => _languagesData.FavouriteLanguage;
@@ -292,8 +291,7 @@ namespace LocalizationTool
         #endregion
 
         #endregion
-
-
+        
         public void RefreshDictionaryData()
         {
             LoadDictionaryDataFromJSON();
@@ -309,6 +307,11 @@ namespace LocalizationTool
             LoadCategoriesDataFromBINARY();
         }
 
+        #region GET METHODS
+
+
+        #endregion
+
         #endregion
 
         #region PRIVATE METHODS
@@ -318,21 +321,22 @@ namespace LocalizationTool
             Init();
         }
 
-        public void Init()
+        public async Task Init()
         {
             if (_isInitialized) return;
+            _isInitialized = true;
             Debug.Log("Manager initialized");
             _serializerJson = new UnityJsonSerializer();
             _serializerBinary = new BinarySerializer();
-            LoadDictionaryDataFromJSON();
-            LoadLanguagesDataFromBINARY();
-            LoadCategoriesDataFromBINARY();
+            await LoadDictionaryDataFromJSON();
+            await LoadLanguagesDataFromBINARY();
+            await LoadCategoriesDataFromBINARY();
             YellowIcon = GetColoredIcon("d_Favorite", Color.yellow);
-            
-            _isInitialized = true;
+
+            LocalizationToolController.Instance.ActiveLanguage = FavouriteLanguage;
         }
 
-        private async void LoadDictionaryDataFromJSON()
+        private async Task LoadDictionaryDataFromJSON()
         {
             _dictionaryData ??= new DictionaryData();
             var aux = await LoadFile<DictionaryData>(JSON_DICTIONARY_PATH, _serializerJson);
@@ -347,7 +351,7 @@ namespace LocalizationTool
             Debug.Log("JSON Dictionary loaded");
         }
 
-        private async void LoadLanguagesDataFromBINARY()
+        private async Task LoadLanguagesDataFromBINARY()
         {
             _languagesData ??= new LanguagesData();
             _languagesData = await LoadFile<LanguagesData>(BINARY_LANGUAGES_PATH, _serializerBinary);
@@ -357,7 +361,7 @@ namespace LocalizationTool
             Debug.Log("BINARY Languages loaded");
         }
 
-        private async void LoadCategoriesDataFromBINARY()
+        private async Task LoadCategoriesDataFromBINARY()
         {
             _categoriesData = await LoadFile<CategoriesData>(BINARY_CATEGORIES_PATH, _serializerBinary);
             

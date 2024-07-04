@@ -1,12 +1,13 @@
-
 using System.Threading.Tasks;
+using LocalizationTool.Manager;
 using UnityEditor;
 using UnityEngine;
 
-namespace LocalizationTool.Editor 
-{ 
-	public class CategoriesEditor : LocalizationEditor
-	{
+namespace LocalizationTool.Editors
+{
+#if UNITY_EDITOR
+    public class CategoriesEditor : LocalizationEditor
+    {
         #region PUBLIC VARIABLES
 
         public string AddCategoryFeedbackLabelText
@@ -19,12 +20,12 @@ namespace LocalizationTool.Editor
         #region PRIVATE VARIABLES
 
         #region EDITOR VARIABLES
-        
+
         private string _addCategoryValue;
         private string _addCategoryFeedbackLabelText = "";
 
         private Vector2 _scrollCenter;
-        
+
         #endregion
 
         #region DIMENSION VARIABLES
@@ -45,7 +46,7 @@ namespace LocalizationTool.Editor
         public void ShowLayout()
         {
             GUILayout.BeginVertical(MinHeightOption(_windowSize.y), MinWidthOption(_windowSize.x));
-            
+
             GUILayout.Space(5);
             ShowHorizontalLine(5);
 
@@ -86,7 +87,7 @@ namespace LocalizationTool.Editor
             GUILayout.Space(8);
 
             GUILayout.BeginHorizontal();
-            
+
             _addCategoryValue = EditorGUILayout.TextField(_addCategoryValue, MinHeightOption(25));
 
             GUILayout.Space(5);
@@ -134,13 +135,13 @@ namespace LocalizationTool.Editor
             {
                 LocalizationManager.Instance.RefreshCategoriesData();
             }
-            
+
             GUILayout.FlexibleSpace();
-            
+
             GUILayout.Label("CATEGORIES", HeaderStyle());
-            
+
             GUILayout.FlexibleSpace();
-            
+
             GUILayout.EndHorizontal();
         }
 
@@ -172,7 +173,7 @@ namespace LocalizationTool.Editor
 
             var tempValue = EditorGUILayout.TextField(category, TextFieldValueStyle(), MinHeightOption(24));
             UpdateCategory(category, tempValue);
-            
+
             GUILayout.Space(10);
 
             if (category.Equals(NONE))
@@ -195,7 +196,7 @@ namespace LocalizationTool.Editor
                     }
                 }
             }
-            
+
             GUILayout.Space(10);
 
             GUILayout.EndHorizontal();
@@ -220,5 +221,6 @@ namespace LocalizationTool.Editor
         }
 
         #endregion
-	}
+    }
+#endif
 }
