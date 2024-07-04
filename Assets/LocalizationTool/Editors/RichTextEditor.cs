@@ -51,7 +51,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.Space(5);
 
-            EditorGUILayout.SelectableLabel(_key, KeyLabelStyle(), MaxHeightOption(24));
+            EditorGUILayout.SelectableLabel(_key, KeyLabelStyle());
 
             GUILayout.Space(10);
 

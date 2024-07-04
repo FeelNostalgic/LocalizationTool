@@ -12,6 +12,7 @@ namespace LocalizationTool.Editors
 
         public string AddCategoryFeedbackLabelText
         {
+            get => _addCategoryFeedbackLabelText;
             set => _addCategoryFeedbackLabelText = value;
         }
 
@@ -88,6 +89,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.BeginHorizontal();
 
+            GUI.SetNextControlName("CATEGORY");
             _addCategoryValue = EditorGUILayout.TextField(_addCategoryValue, MinHeightOption(25));
 
             GUILayout.Space(5);
@@ -96,6 +98,15 @@ namespace LocalizationTool.Editors
             {
                 LocalizationManager.Instance.AddNewCategory(_addCategoryValue, this);
                 ControlTextAreaFeedbackDuration(1f);
+            }
+            
+            if (GUI.GetNameOfFocusedControl() == "CATEGORY")
+            {
+                if (Event.current is { keyCode: (KeyCode.Return or KeyCode.KeypadEnter) })
+                {
+                    LocalizationManager.Instance.AddNewCategory(_addCategoryValue, this);
+                    ControlTextAreaFeedbackDuration(1f);
+                }
             }
 
             GUILayout.EndHorizontal();

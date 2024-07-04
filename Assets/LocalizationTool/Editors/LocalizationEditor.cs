@@ -43,7 +43,7 @@ namespace LocalizationTool.Editors
             window.titleContent = new GUIContent("Localization Tool");
         }
 
-        private void OnGUI()
+        protected void OnGUI()
         {
             LoadData();
             if (!LocalizationManager.Instance.IsInitalized) return;
@@ -66,6 +66,27 @@ namespace LocalizationTool.Editors
                     throw new ArgumentOutOfRangeException();
             }
         }
+        
+        // private void Update()
+        // {
+        //     switch (_currentWindow)
+        //     {
+        //         case Enums.GUI_WINDOW.Dictionary:
+        //             
+        //             break;
+        //         case Enums.GUI_WINDOW.Languages:
+        //             
+        //             break;
+        //         case Enums.GUI_WINDOW.Categories:
+        //             
+        //             break;
+        //         case Enums.GUI_WINDOW.Configuration:
+        //             
+        //             break;
+        //         default:
+        //             throw new ArgumentOutOfRangeException();
+        //     }
+        // }
 
         // private void OnDisable()
         // {
@@ -168,7 +189,7 @@ namespace LocalizationTool.Editors
                 else
                 {
                     EditorGUILayout.Popup(0, LocalizationManager.Categories.ToArray(), AddGroupStyle());
-                    categoryValue = LocalizationManager.Categories[0];
+                    if(LocalizationManager.Categories.Count > 0) categoryValue = LocalizationManager.Categories[0];
                 }
             }
 
@@ -178,6 +199,7 @@ namespace LocalizationTool.Editors
         protected void ShowLabelTextFieldVertical(string label, ref string keyValue)
         {
             GUILayout.BeginVertical();
+            GUI.SetNextControlName(label);
             GUILayout.Label(label, SubSectionHeaderStyle());
             GUILayout.Space(5);
             keyValue = EditorGUILayout.TextField(keyValue, AddTextFieldStyle());
@@ -191,6 +213,7 @@ namespace LocalizationTool.Editors
 
         internal virtual void ControlTextAreaFeedbackDuration(float durationInSeconds)
         {
+            Repaint();
         }
 
         public static void ShowVerticalLine(float width)
@@ -272,7 +295,7 @@ namespace LocalizationTool.Editors
             {
                 alignment = TextAnchor.MiddleLeft,
                 fontSize = 12,
-                fixedHeight = 25,
+                fixedHeight = 24,
                 normal =
                 {
                     textColor = Color.white
@@ -281,13 +304,14 @@ namespace LocalizationTool.Editors
 
             return style;
         }
-
-        protected GUIStyle AddGroupStyle()
+        
+        protected GUIStyle CategoryPopupStyle()
         {
             var style = new GUIStyle(EditorStyles.popup)
             {
                 alignment = TextAnchor.MiddleLeft,
-                fixedHeight = 25,
+                fixedHeight = 24,
+                fixedWidth = 250,
                 fontSize = 12,
                 normal =
                 {
@@ -297,17 +321,24 @@ namespace LocalizationTool.Editors
 
             return style;
         }
+        
 
-        protected GUIStyle FixedWidthStyle(float width)
+        protected GUIStyle AddGroupStyle()
         {
-            var style = new GUIStyle
+            var style = new GUIStyle(EditorStyles.popup)
             {
-                fixedWidth = width
+                alignment = TextAnchor.MiddleLeft,
+                fixedHeight = 24,
+                fontSize = 12,
+                normal =
+                {
+                    textColor = Color.white
+                }
             };
 
             return style;
         }
-
+        
         protected GUIStyle SubSectionHeaderStyle()
         {
             var style = new GUIStyle
@@ -315,6 +346,23 @@ namespace LocalizationTool.Editors
                 alignment = TextAnchor.MiddleCenter,
                 fontStyle = FontStyle.Bold,
                 fontSize = 13,
+                normal =
+                {
+                    textColor = Color.white
+                }
+            };
+
+            return style;
+        }
+        
+        protected GUIStyle SubSectionHeaderStyle(float fixedWidth)
+        {
+            var style = new GUIStyle
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontStyle = FontStyle.Bold,
+                fontSize = 13,
+                fixedWidth = fixedWidth,
                 normal =
                 {
                     textColor = Color.white
@@ -372,12 +420,30 @@ namespace LocalizationTool.Editors
             return style;
         }
 
+        protected GUIStyle SelectableLabelStyle()
+        {
+            var style = new GUIStyle(GUI.skin.textField)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 13,
+                fixedHeight = 24,
+                fixedWidth = 300,
+                normal =
+                {
+                    textColor = Color.white
+                }
+            };
+
+            return style;
+        }
+        
         protected GUIStyle KeyLabelStyle()
         {
             var style = new GUIStyle(GUI.skin.textField)
             {
                 alignment = TextAnchor.MiddleCenter,
                 fontSize = 13,
+                fixedHeight = 24,
                 normal =
                 {
                     textColor = Color.white

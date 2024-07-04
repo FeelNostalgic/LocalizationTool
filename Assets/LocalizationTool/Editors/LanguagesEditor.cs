@@ -12,6 +12,7 @@ namespace LocalizationTool.Editors
 
         public string AddLanguageFeedbackLabelText
         {
+            get => _addLanguageFeedbackLabelText;
             set => _addLanguageFeedbackLabelText = value;
         }
 
@@ -88,6 +89,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.BeginHorizontal();
             
+            GUI.SetNextControlName("LANGUAGE");
             _addLanguageValue = EditorGUILayout.TextField(_addLanguageValue, MinHeightOption(25));
 
             GUILayout.Space(5);
@@ -96,6 +98,15 @@ namespace LocalizationTool.Editors
             {
                 LocalizationManager.Instance.AddNewLanguage(_addLanguageValue, this);
                 ControlTextAreaFeedbackDuration(1f);
+            }
+            
+            if (GUI.GetNameOfFocusedControl() == "LANGUAGE")
+            {
+                if (Event.current is { keyCode: (KeyCode.Return or KeyCode.KeypadEnter) })
+                {
+                    LocalizationManager.Instance.AddNewLanguage(_addLanguageValue, this);
+                    ControlTextAreaFeedbackDuration(1.5f);
+                }
             }
 
             GUILayout.EndHorizontal();

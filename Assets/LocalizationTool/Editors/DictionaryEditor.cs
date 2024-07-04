@@ -16,6 +16,7 @@ namespace LocalizationTool.Editors
 
         public string AddValueFeedbackLabelText
         {
+            get => _addValueFeedbackLabelText;
             set => _addValueFeedbackLabelText = value;
         }
 
@@ -74,7 +75,7 @@ namespace LocalizationTool.Editors
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
         }
-
+        
         #endregion
 
         #region PRRIVATE METHODS
@@ -92,29 +93,46 @@ namespace LocalizationTool.Editors
 
         private void ShowAddSection()
         {
-            ShowHorizontalLine(5);
-
-            GUILayout.Space(10);
-            ShowLabelTextFieldVertical("KEY", ref _addKeyValue);
-
-            GUILayout.Space(20);
-
-            ShowLabelPopupSelection("CATEGORY", ref _addCategoryValue);
-
-            GUILayout.Space(20);
-
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_ol_plus", "Add new language"), GUILayout.MaxWidth(500), GUILayout.MaxHeight(25)))
+            try
             {
-                LocalizationManager.Instance.AddNewKey(_addKeyValue, _addCategoryValue, this);
-                ControlTextAreaFeedbackDuration(1f);
+                ShowHorizontalLine(5);
+
+                GUILayout.Space(10);
+                ShowLabelTextFieldVertical("KEY", ref _addKeyValue);
+
+                GUILayout.Space(20);
+
+                ShowLabelPopupSelection("CATEGORY", ref _addCategoryValue);
+
+                GUILayout.Space(20);
+                
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_ol_plus", "Add new language"), GUILayout.MaxWidth(500), GUILayout.MaxHeight(25)))
+                {
+                    LocalizationManager.Instance.AddNewKey(_addKeyValue, _addCategoryValue, this);
+                    ControlTextAreaFeedbackDuration(1.5f);
+                }
+
+                if (GUI.GetNameOfFocusedControl() == "KEY")
+                {
+                    if (Event.current is { keyCode: (KeyCode.Return or KeyCode.KeypadEnter) })
+                    {
+                        LocalizationManager.Instance.AddNewKey(_addKeyValue, _addCategoryValue, this);
+                        ControlTextAreaFeedbackDuration(1.5f);
+                    }
+                }
+
+                GUILayout.Space(10);
+
+                ShowTextAreaFeedback(_addValueFeedbackLabelText);
+
+                GUILayout.Space(10);
+                ShowHorizontalLine(5);
             }
-
-            GUILayout.Space(10);
-
-            ShowTextAreaFeedback(_addValueFeedbackLabelText);
-
-            GUILayout.Space(10);
-            ShowHorizontalLine(5);
+            catch (Exception e)
+            {
+                Debug.Log(e);
+                //Ignore
+            }
         }
 
         #endregion
@@ -159,11 +177,13 @@ namespace LocalizationTool.Editors
             if (LocalizationManager.Categories != null)
             {
                 if (_searchCategoryIndex >= LocalizationManager.Categories.Count) _searchCategoryIndex = 0;
+                GUI.SetNextControlName("Popup");
                 _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, LocalizationManager.Categories.ToArray(), AddGroupStyle(), GUILayout.Width(200));
             }
 
             GUILayout.Space(5);
-
+            
+            GUI.SetNextControlName("Search");
             _searchKeyValue = EditorGUILayout.TextField(_searchKeyValue, AddTextFieldStyle());
             GUILayout.Space(5);
 
@@ -179,7 +199,7 @@ namespace LocalizationTool.Editors
             }
 
             GUILayout.FlexibleSpace();
-
+            
             GUILayout.Label(LocalizationManager.Instance.CurrentLanguageInDictionarySection, HeaderStyle());
 
             GUILayout.FlexibleSpace();
@@ -191,40 +211,47 @@ namespace LocalizationTool.Editors
         {
             GUILayout.BeginHorizontal();
 
-            GUILayout.Label("KEY", SubSectionHeaderStyle());
-            GUILayout.Label("CATEGORY", SubSectionHeaderStyle(), GUILayout.MaxWidth(250));
+            GUILayout.Label("KEY", SubSectionHeaderStyle(325));
+            GUILayout.Label("CATEGORY", SubSectionHeaderStyle(250));
+            GUILayout.FlexibleSpace();
             GUILayout.Label("VALUE", SubSectionHeaderStyle());
-            GUILayout.Space(60);
-
+            GUILayout.FlexibleSpace();
+            GUILayout.Space(100);
             GUILayout.EndHorizontal();
         }
 
         private void LanguageToolBarSection()
         {
-            GUILayout.BeginHorizontal();
-            _scrollToolbar = EditorGUILayout.BeginScrollView(_scrollToolbar, GUILayout.Height(40));
-            var toolbarItems = LocalizationManager.ActiveLanguages.Select(t => t).ToArray();
-            if (toolbarItems.Length != 0)
+            try
             {
-                _currentLanguageToolbarIndex = GUILayout.Toolbar(LocalizationManager.Instance.CurrentToolbarLanguageIndex, toolbarItems);
-                if (LocalizationManager.Instance.CurrentLanguageInDictionarySection != LocalizationManager.ActiveLanguages[_currentLanguageToolbarIndex])
+                GUILayout.BeginHorizontal();
+                _scrollToolbar = EditorGUILayout.BeginScrollView(_scrollToolbar, GUILayout.Height(40));
+                var toolbarItems = LocalizationManager.ActiveLanguages.Select(t => t).ToArray();
+                if (toolbarItems.Length != 0)
                 {
-                    LocalizationManager.Instance.CurrentLanguageInDictionarySection = LocalizationManager.ActiveLanguages[_currentLanguageToolbarIndex];
-                    GUI.FocusControl(null);
+                    _currentLanguageToolbarIndex = GUILayout.Toolbar(LocalizationManager.Instance.CurrentToolbarLanguageIndex, toolbarItems);
+                    if (LocalizationManager.Instance.CurrentLanguageInDictionarySection != LocalizationManager.ActiveLanguages[_currentLanguageToolbarIndex])
+                    {
+                        LocalizationManager.Instance.CurrentLanguageInDictionarySection = LocalizationManager.ActiveLanguages[_currentLanguageToolbarIndex];
+                        GUI.FocusControl(null);
+                    }
                 }
+                EditorGUILayout.EndScrollView();
+                GUILayout.Space(5);
+
+                GUILayout.EndHorizontal();
             }
-
-            EditorGUILayout.EndScrollView();
-            GUILayout.Space(5);
-
-            GUILayout.EndHorizontal();
+            catch (Exception e)
+            {
+                //Ignore
+            }
         }
 
         private void GenerateCenterScrollViewContent()
         {
-            _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
             try
             {
+                _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
                 var filteredDicToIterate = new Dictionary<string, KeyData>(LocalizationManager.Dictionary);
 
                 if (!_searchKeyValue.Equals(""))
@@ -239,13 +266,12 @@ namespace LocalizationTool.Editors
                 {
                     UnitCenterScrollViewContent(keyData.Key, keyData.Value.Category, keyData.Value.LanguagesData[LocalizationManager.Instance.CurrentLanguageInDictionarySection]);
                 }
+                EditorGUILayout.EndScrollView();
             }
             catch
             {
                 // ignored
             }
-
-            EditorGUILayout.EndScrollView();
         }
 
         private void UnitCenterScrollViewContent(string key, string category, string value)
@@ -259,15 +285,19 @@ namespace LocalizationTool.Editors
 
             GUILayout.Space(10);
 
-            EditorGUILayout.SelectableLabel(key, KeyLabelStyle(), MaxHeightOption(24));
+            if (GUILayout.Button(key, SelectableLabelStyle()))
+            {
+                EditorGUIUtility.systemCopyBuffer = key;
+                Debug.Log($"Key '{key}' copied to clipboard");
+            }
 
             GUILayout.Space(10);
             if (category == "") category = NONE;
-            var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), AddGroupStyle());
+            var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), CategoryPopupStyle(), MaxWidthOption(250));
             UpdateCategory(key, LocalizationManager.Categories[tempCategory]);
 
             GUILayout.Space(10);
-            var tempValue = EditorGUILayout.TextField(value, TextFieldValueStyle(), MinHeightOption(24));
+            var tempValue = EditorGUILayout.TextField(value, TextFieldValueStyle(), MinHeightOption(24), GUILayout.ExpandWidth(true));
             UpdateValue(key, tempValue);
 
             GUILayout.Space(10);
@@ -322,6 +352,14 @@ namespace LocalizationTool.Editors
             var millisecondsDelay = (int)(durationInSeconds * 1000);
             await Task.Delay(millisecondsDelay);
             _addValueFeedbackLabelText = "";
+            base.ControlTextAreaFeedbackDuration(durationInSeconds);
+        }
+
+        private async void ControlFocus()
+        {
+            // GUI.FocusControl("Search");
+            // await Task.Delay(200);
+            // GUI.FocusControl("KEY");
         }
 
         #endregion

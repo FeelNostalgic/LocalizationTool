@@ -17,7 +17,7 @@ namespace LocalizationTool.Manager
 
         public static LocalizationManager Instance => _instance ??= new LocalizationManager();
 
-        public static List<string> ActiveLanguages => _languagesData.Languagues;
+        public static List<string> ActiveLanguages => _languagesData.Languagues ?? new List<string>();
         public static List<string> Categories => _categoriesData?.Categories ?? new List<string>();
         public static Dictionary<string, KeyData> Dictionary => _dynamicDictionary ?? new Dictionary<string, KeyData>();
         public string CurrentLanguageInDictionarySection { get; set; }
@@ -67,16 +67,20 @@ namespace LocalizationTool.Manager
         {
             if (key.Equals(""))
             {
+                if (editor.AddValueFeedbackLabelText != "") return;
                 editor.AddValueFeedbackLabelText = "Key cannot be an empty value";
                 return;
             }
 
             if (_dynamicDictionary.ContainsKey(key))
             {
-                editor.AddValueFeedbackLabelText = $"{key} already exists";
+                if (editor.AddValueFeedbackLabelText != "") return;
+                editor.AddValueFeedbackLabelText = $"Key '{key}' already exists";
                 return;
             }
-
+            
+            editor.AddValueFeedbackLabelText = $"Key '{key}'added correctly";
+            
             var interDic = ActiveLanguages.ToDictionary(language => language, _ => "");
             var interList = ActiveLanguages.Select(l => new LanguageValue { Language = l, Value = "" }).ToList();
             _dynamicDictionary.Add(key, new KeyData { Category = group, LanguagesData = interDic });
@@ -85,8 +89,8 @@ namespace LocalizationTool.Manager
             _dictionaryData.ListDictionaryKeyCategoryLanguages.Add(new KeyCategoryLanguage(key, group, interList));
 
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
-
-            editor.AddValueFeedbackLabelText = $"{key} added correctly";
+            
+            Debug.Log($"Key '{key}' added correctly");
         }
 
         public async void ChangeValue(string key, string newValue, string language)
@@ -139,16 +143,20 @@ namespace LocalizationTool.Manager
         {
             if (newLanguage.Equals(""))
             {
+                if(editor.AddLanguageFeedbackLabelText != "") return;
                 editor.AddLanguageFeedbackLabelText = "Language cannot be an empty value";
                 return;
             }
 
             if (ActiveLanguages.Exists(l => l.Equals(newLanguage)))
             {
-                editor.AddLanguageFeedbackLabelText = $"{newLanguage} already exists";
+                if(editor.AddLanguageFeedbackLabelText != "") return;
+                editor.AddLanguageFeedbackLabelText = $"Language '{newLanguage}' already exists";
                 return;
             }
 
+            editor.AddLanguageFeedbackLabelText = $"Language '{newLanguage}' added correctly";
+            
             //Add language to Binary 
             _languagesData.Languagues.Add(newLanguage);
 
@@ -159,8 +167,6 @@ namespace LocalizationTool.Manager
             }
 
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
-
-            editor.AddLanguageFeedbackLabelText = $"{newLanguage} added correctly";
             
             //Update JSON
             foreach (var keyValue in _dictionaryData.ListDictionaryKeyCategoryLanguages)
@@ -229,22 +235,23 @@ namespace LocalizationTool.Manager
         {
             if (newCategory.Equals(""))
             {
+                if (editor.AddCategoryFeedbackLabelText != "") return;
                 editor.AddCategoryFeedbackLabelText = "Category cannot be an empty value";
                 return;
             }
 
             if (Categories.Exists(c => c.Equals(newCategory)))
             {
-                editor.AddCategoryFeedbackLabelText = $"{newCategory} already exists";
+                if (editor.AddCategoryFeedbackLabelText != "") return;
+                editor.AddCategoryFeedbackLabelText = $"Category '{newCategory}' already exists";
                 return;
             }
+            editor.AddCategoryFeedbackLabelText = $"Category '{newCategory}' added correctly";
 
             //Add language to Binary 
             _categoriesData.Categories.Add(newCategory);
 
             await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
-
-            editor.AddCategoryFeedbackLabelText = $"{newCategory} added correctly";
         }
 
         public async void RemoveCategory(string category)
