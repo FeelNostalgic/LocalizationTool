@@ -199,7 +199,7 @@ namespace LocalizationTool.Editors
                 if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Make favourite"), CenterButtonComponentsStyle()))
                 {
                     LocalizationManager.Instance.ChangeFavoriteLanguage(language);
-                    Debug.Log($"{language} is now favorite");
+                    LocalizationManager.Log($"Language '{language}' is now favorite");
                 }
             }
 
@@ -224,10 +224,18 @@ namespace LocalizationTool.Editors
                     }
                     else
                     {
-                        if (EditorUtility.DisplayDialog("Confirm Delete", $"Are you sure you want to delete {language}?", "Delete", "Cancel"))
+                        if (LocalizationManager.Configuration.LanguageDeleteConfirmation)
+                        {
+                            if (EditorUtility.DisplayDialog("Confirm Delete", $"Are you sure you want to delete {language}?", "Delete", "Cancel"))
+                            {
+                                LocalizationManager.Instance.RemoveLanguage(language);
+                                LocalizationManager.Log($"Language '{language}' removed");
+                            }
+                        }
+                        else
                         {
                             LocalizationManager.Instance.RemoveLanguage(language);
-                            Debug.Log($"Language '{language}' removed");
+                            LocalizationManager.Log($"Language '{language}' removed");
                         }
                     }
                 }

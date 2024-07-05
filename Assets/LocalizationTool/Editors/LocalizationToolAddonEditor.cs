@@ -82,7 +82,7 @@ namespace LocalizationTool.Editors
             {
                 GUILayout.Label(LocalizationToolController.Instance.GetValueByKey(_target.Key), SelectedValueLabelStyle());
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 GUILayout.Label("", SelectedValueLabelStyle());
             }

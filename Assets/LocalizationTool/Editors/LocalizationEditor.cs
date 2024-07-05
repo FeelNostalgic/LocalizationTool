@@ -25,6 +25,7 @@ namespace LocalizationTool.Editors
         private DictionaryEditor _dictionaryEditor;
         private LanguagesEditor _languagesEditor;
         private CategoriesEditor _categoriesEditor;
+        private ConfigurationEditor _configurationEditor;
 
         #endregion
 
@@ -121,6 +122,8 @@ namespace LocalizationTool.Editors
 
         private void ShowConfigurationLayout()
         {
+            _configurationEditor ??= (ConfigurationEditor)CreateInstance(typeof(ConfigurationEditor));
+            _configurationEditor.ShowLayout();
         }
 
         #region CENTER SECTION
@@ -173,6 +176,20 @@ namespace LocalizationTool.Editors
             GUILayout.Space(10);
         }
 
+        protected void ShowSubHeader(string name, params GUILayoutOption[] options)
+        {
+            GUILayout.Space(8);
+            GUILayout.Label(name, SubHeaderStyle(), options);
+            GUILayout.Space(10);
+        }
+        
+        protected void ShowSectionHeader(string name, params GUILayoutOption[] options)
+        {
+            GUILayout.Space(8);
+            GUILayout.Label(name, SectionHeaderStyle(), options);
+            GUILayout.Space(10);
+        }
+
         protected void ShowLabelPopupSelection(string label, ref string categoryValue)
         {
             GUILayout.BeginVertical();
@@ -183,12 +200,12 @@ namespace LocalizationTool.Editors
             {
                 if (LocalizationManager.Categories.IndexOf(categoryValue) != -1)
                 {
-                    var index = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(categoryValue), LocalizationManager.Categories.ToArray(), AddGroupStyle());
+                    var index = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(categoryValue), LocalizationManager.Categories.ToArray(), AddCategoryStyle());
                     categoryValue = LocalizationManager.Categories[index];
                 }
                 else
                 {
-                    EditorGUILayout.Popup(0, LocalizationManager.Categories.ToArray(), AddGroupStyle());
+                    EditorGUILayout.Popup(0, LocalizationManager.Categories.ToArray(), AddCategoryStyle());
                     if(LocalizationManager.Categories.Count > 0) categoryValue = LocalizationManager.Categories[0];
                 }
             }
@@ -322,8 +339,7 @@ namespace LocalizationTool.Editors
             return style;
         }
         
-
-        protected GUIStyle AddGroupStyle()
+        protected GUIStyle AddCategoryStyle()
         {
             var style = new GUIStyle(EditorStyles.popup)
             {
@@ -339,13 +355,14 @@ namespace LocalizationTool.Editors
             return style;
         }
         
-        protected GUIStyle SubSectionHeaderStyle()
+        protected GUIStyle SearchTypeStyle()
         {
-            var style = new GUIStyle
+            var style = new GUIStyle(EditorStyles.popup)
             {
-                alignment = TextAnchor.MiddleCenter,
-                fontStyle = FontStyle.Bold,
-                fontSize = 13,
+                alignment = TextAnchor.MiddleLeft,
+                fixedHeight = 24,
+                fixedWidth = 150,
+                fontSize = 12,
                 normal =
                 {
                     textColor = Color.white
@@ -411,6 +428,55 @@ namespace LocalizationTool.Editors
                 fontStyle = FontStyle.Bold,
                 fontSize = 20,
                 alignment = TextAnchor.MiddleCenter,
+                normal =
+                {
+                    textColor = Color.white
+                }
+            };
+
+            return style;
+        }
+
+        protected GUIStyle SubHeaderStyle()
+        {
+            var style = new GUIStyle
+            {
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Bold,
+                fontSize = 14,
+                normal =
+                {
+                    textColor = Color.white
+                }
+            };
+
+            return style;
+        }
+        
+        protected GUIStyle SectionHeaderStyle()
+        {
+            var style = new GUIStyle
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontStyle = FontStyle.Bold,
+                fontSize = 15,
+                normal =
+                {
+                    textColor = Color.white
+                }
+            };
+
+            return style;
+        }
+        
+        
+        protected GUIStyle SubSectionHeaderStyle()
+        {
+            var style = new GUIStyle
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontStyle = FontStyle.Bold,
+                fontSize = 14,
                 normal =
                 {
                     textColor = Color.white

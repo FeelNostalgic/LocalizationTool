@@ -29,9 +29,9 @@ namespace LocalizationTool.Controller
 
         #region UNITY METHODS
 
-        private void Awake()
+        private async void Awake()
         {
-            LocalizationManager.Instance.Init();
+            await LocalizationManager.Instance.Init();
         }
 
         private void Start()
@@ -92,14 +92,18 @@ namespace LocalizationTool.Controller
 
         public List<string> GetAllCategories()
         {
+#pragma warning disable CS4014
             LocalizationManager.Instance.Init();
+#pragma warning restore CS4014
             var categories = LocalizationManager.Categories;
             return categories;
         }
 
         public List<string> GetAllKeys()
         {
+#pragma warning disable CS4014
             LocalizationManager.Instance.Init();
+#pragma warning restore CS4014
             var keys = LocalizationManager.Dictionary.Keys.ToList();
             return keys;
         }

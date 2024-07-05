@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LocalizationTool.Controller;
 using LocalizationTool.Data;
 using LocalizationTool.Manager;
 using UnityEditor;
@@ -178,7 +179,7 @@ namespace LocalizationTool.Editors
             {
                 if (_searchCategoryIndex >= LocalizationManager.Categories.Count) _searchCategoryIndex = 0;
                 GUI.SetNextControlName("Popup");
-                _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, LocalizationManager.Categories.ToArray(), AddGroupStyle(), GUILayout.Width(200));
+                _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, LocalizationManager.Categories.ToArray(), AddCategoryStyle(), GUILayout.Width(200));
             }
 
             GUILayout.Space(5);
@@ -241,7 +242,7 @@ namespace LocalizationTool.Editors
 
                 GUILayout.EndHorizontal();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //Ignore
             }
@@ -252,15 +253,7 @@ namespace LocalizationTool.Editors
             try
             {
                 _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
-                var filteredDicToIterate = new Dictionary<string, KeyData>(LocalizationManager.Dictionary);
-
-                if (!_searchKeyValue.Equals(""))
-                    filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Key.Contains(_searchKeyValue, StringComparison.InvariantCulture))
-                        .ToDictionary(kv => (kv.Key), kv => kv.Value);
-
-                if (_searchCategoryIndex != 0)
-                    filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Value.Category == LocalizationManager.Categories[_searchCategoryIndex])
-                        .ToDictionary(kv => (kv.Key), kv => kv.Value);
+                var filteredDicToIterate = GetFilteredDictionary();
 
                 foreach (var keyData in filteredDicToIterate)
                 {
@@ -272,6 +265,38 @@ namespace LocalizationTool.Editors
             {
                 // ignored
             }
+        }
+
+        private Dictionary<string, KeyData> GetFilteredDictionary()
+        {
+            var filteredDicToIterate = new Dictionary<string, KeyData>(LocalizationManager.Dictionary);
+
+            switch (LocalizationManager.Configuration.SearchTypeIndex)
+            {
+                case 0: // By Key
+                    if (!_searchKeyValue.Equals(""))
+                        filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Key.Contains(_searchKeyValue, StringComparison.InvariantCulture))
+                            .ToDictionary(kv => (kv.Key), kv => kv.Value);
+                    break;
+                case 1: // By Value
+                    if (!_searchKeyValue.Equals(""))
+                        filteredDicToIterate = filteredDicToIterate.Where(pair => LocalizationToolController.Instance.GetValueByKey(pair.Key).Contains(_searchKeyValue, StringComparison.InvariantCulture))
+                            .ToDictionary(kv => (kv.Key), kv => kv.Value);
+                    break;
+                case 2: //By Both
+                    if (!_searchKeyValue.Equals(""))
+                        filteredDicToIterate = filteredDicToIterate.Where(pair => 
+                                pair.Key.Contains(_searchKeyValue, StringComparison.InvariantCulture)
+                                || LocalizationToolController.Instance.GetValueByKey(pair.Key).Contains(_searchKeyValue, StringComparison.InvariantCulture) )
+                            .ToDictionary(kv => (kv.Key), kv => kv.Value);
+                    break;
+            }
+
+            if (_searchCategoryIndex != 0)
+                filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Value.Category == LocalizationManager.Categories[_searchCategoryIndex])
+                    .ToDictionary(kv => (kv.Key), kv => kv.Value);
+            
+            return filteredDicToIterate;
         }
 
         private void UnitCenterScrollViewContent(string key, string category, string value)
@@ -288,7 +313,7 @@ namespace LocalizationTool.Editors
             if (GUILayout.Button(key, SelectableLabelStyle()))
             {
                 EditorGUIUtility.systemCopyBuffer = key;
-                Debug.Log($"Key '{key}' copied to clipboard");
+                LocalizationManager.Log($"Key '{key}' copied to clipboard");
             }
 
             GUILayout.Space(10);
@@ -305,18 +330,27 @@ namespace LocalizationTool.Editors
             if (GUILayout.Button(EditorGUIUtility.IconContent("Customized", "Edit"), CenterButtonComponentsStyle()))
             {
                 RichTextEditor.ShowWindow(tempValue, key, delegate(string s) { UpdateValue(key, s); });
-                Debug.Log($"Key '{key}' edited");
+                LocalizationManager.Log($"Editing key '{key}'");
             }
 
             GUILayout.Space(10);
 
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CenterButtonComponentsStyle()))
             {
-                if (EditorUtility.DisplayDialog("Confirm Delete", $"Are you sure you want to delete {key}?", "Delete", "Cancel"))
+                if (LocalizationManager.Configuration.DictionaryDeleteConfirmation)
+                {
+                    if (EditorUtility.DisplayDialog("Confirm Delete", $"Are you sure you want to delete {key}?", "Delete", "Cancel"))
+                    {
+                        LocalizationManager.Instance.RemoveKey(key);
+                        LocalizationManager.Log($"Key '{key}' removed");
+                    }
+                }
+                else
                 {
                     LocalizationManager.Instance.RemoveKey(key);
-                    Debug.Log($"Key '{key}' removed");
+                    LocalizationManager.Log($"Key '{key}' removed");
                 }
+
             }
 
             GUILayout.Space(10);
@@ -342,7 +376,6 @@ namespace LocalizationTool.Editors
 
             _currentKeyValueDictionary[key] = tempValue;
             LocalizationManager.Instance.ChangeValue(key, tempValue, LocalizationManager.Instance.CurrentLanguageInDictionarySection);
-            //Debug.Log($"{key} has now value: {tempValue}");
         }
 
         #endregion
@@ -354,14 +387,7 @@ namespace LocalizationTool.Editors
             _addValueFeedbackLabelText = "";
             base.ControlTextAreaFeedbackDuration(durationInSeconds);
         }
-
-        private async void ControlFocus()
-        {
-            // GUI.FocusControl("Search");
-            // await Task.Delay(200);
-            // GUI.FocusControl("KEY");
-        }
-
+        
         #endregion
     }
 #endif

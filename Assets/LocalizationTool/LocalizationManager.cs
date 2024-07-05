@@ -19,13 +19,15 @@ namespace LocalizationTool.Manager
 
         public static List<string> ActiveLanguages => _languagesData.Languagues ?? new List<string>();
         public static List<string> Categories => _categoriesData?.Categories ?? new List<string>();
+        public static ConfigurationData Configuration => _configurationData ?? new ConfigurationData();
+
         public static Dictionary<string, KeyData> Dictionary => _dynamicDictionary ?? new Dictionary<string, KeyData>();
         public string CurrentLanguageInDictionarySection { get; set; }
         public int CurrentToolbarLanguageIndex => _languagesData.Languagues.IndexOf(CurrentLanguageInDictionarySection);
         public string FavouriteLanguage => _languagesData.FavouriteLanguage;
         public bool IsInitalized => _isInitialized;
         public Texture2D YellowIcon { get; set; }
-        
+
         #endregion
 
         #region PRIVATE VARIABLES
@@ -49,6 +51,9 @@ namespace LocalizationTool.Manager
         private const string BINARY_CATEGORIES_PATH = "Assets/LocalizationTool/Data/LocalizationCategories.bin";
         private static CategoriesData _categoriesData;
 
+        private const string BINARY_CONFIGURATION_PATH = "Assets/LocalizationTool/Data/LocalizationConfiguration.bin";
+        private static ConfigurationData _configurationData;
+
         #endregion
 
         private bool _isInitialized;
@@ -68,6 +73,7 @@ namespace LocalizationTool.Manager
             if (key.Equals(""))
             {
                 if (editor.AddValueFeedbackLabelText != "") return;
+                Log("Key cannot be an empty value");
                 editor.AddValueFeedbackLabelText = "Key cannot be an empty value";
                 return;
             }
@@ -75,12 +81,13 @@ namespace LocalizationTool.Manager
             if (_dynamicDictionary.ContainsKey(key))
             {
                 if (editor.AddValueFeedbackLabelText != "") return;
+                Log($"Key '{key}' already exists");
                 editor.AddValueFeedbackLabelText = $"Key '{key}' already exists";
                 return;
             }
-            
-            editor.AddValueFeedbackLabelText = $"Key '{key}'added correctly";
-            
+
+            editor.AddValueFeedbackLabelText = $"Key '{key}' added correctly";
+
             var interDic = ActiveLanguages.ToDictionary(language => language, _ => "");
             var interList = ActiveLanguages.Select(l => new LanguageValue { Language = l, Value = "" }).ToList();
             _dynamicDictionary.Add(key, new KeyData { Category = group, LanguagesData = interDic });
@@ -89,8 +96,8 @@ namespace LocalizationTool.Manager
             _dictionaryData.ListDictionaryKeyCategoryLanguages.Add(new KeyCategoryLanguage(key, group, interList));
 
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
-            
-            Debug.Log($"Key '{key}' added correctly");
+
+            Log($"Key '{key}' added correctly");
         }
 
         public async void ChangeValue(string key, string newValue, string language)
@@ -118,6 +125,8 @@ namespace LocalizationTool.Manager
             data.Category = newCategory;
 
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
+
+            Log($"Key '{key}' changed category to '{newCategory}' correctly");
         }
 
         public async void RemoveKey(string key)
@@ -143,20 +152,22 @@ namespace LocalizationTool.Manager
         {
             if (newLanguage.Equals(""))
             {
-                if(editor.AddLanguageFeedbackLabelText != "") return;
+                if (editor.AddLanguageFeedbackLabelText != "") return;
+                Log("Language cannot be an empty value");
                 editor.AddLanguageFeedbackLabelText = "Language cannot be an empty value";
                 return;
             }
 
             if (ActiveLanguages.Exists(l => l.Equals(newLanguage)))
             {
-                if(editor.AddLanguageFeedbackLabelText != "") return;
+                if (editor.AddLanguageFeedbackLabelText != "") return;
+                Log($"Language '{newLanguage}' already exists");
                 editor.AddLanguageFeedbackLabelText = $"Language '{newLanguage}' already exists";
                 return;
             }
 
             editor.AddLanguageFeedbackLabelText = $"Language '{newLanguage}' added correctly";
-            
+
             //Add language to Binary 
             _languagesData.Languagues.Add(newLanguage);
 
@@ -167,15 +178,17 @@ namespace LocalizationTool.Manager
             }
 
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
-            
+
             //Update JSON
             foreach (var keyValue in _dictionaryData.ListDictionaryKeyCategoryLanguages)
             {
                 keyValue.AddNewLanguage(newLanguage);
             }
-            
+
             //Update dynamic Dictionary
             _dynamicDictionary = _dictionaryData.ListDictionaryKeyCategoryLanguages.ToDictionary(data => data.Key, data => new KeyData { Category = data.Category, LanguagesData = data.DictionaryLanguageValue });
+
+            Log($"Language '{newLanguage}' added correctly");
         }
 
         public async void RemoveLanguage(string language)
@@ -200,13 +213,13 @@ namespace LocalizationTool.Manager
         public async void ChangeLanguageValue(string oldLanguageName, string newLanguageName)
         {
             if (_languagesData.Languagues.FirstOrDefault(l => l.Equals(newLanguageName)) != default) return; //the new value is the same
-            
+
             //Change BINARY file 
             _languagesData.Languagues.Remove(oldLanguageName);
             _languagesData.Languagues.Add(newLanguageName);
 
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
-            
+
             //Update JSON
             foreach (var keyValue in _dictionaryData.ListDictionaryKeyCategoryLanguages)
             {
@@ -214,9 +227,11 @@ namespace LocalizationTool.Manager
             }
 
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
-            
+
             //Update dynamic Dictionary
             _dynamicDictionary = _dictionaryData.ListDictionaryKeyCategoryLanguages.ToDictionary(data => data.Key, data => new KeyData { Category = data.Category, LanguagesData = data.DictionaryLanguageValue });
+
+            //Log($"Language '{oldLanguageName}' update to '{newLanguageName}' correctly");
         }
 
         public async void ChangeFavoriteLanguage(string newLanguage)
@@ -236,6 +251,7 @@ namespace LocalizationTool.Manager
             if (newCategory.Equals(""))
             {
                 if (editor.AddCategoryFeedbackLabelText != "") return;
+                Log("Category cannot be an empty value");
                 editor.AddCategoryFeedbackLabelText = "Category cannot be an empty value";
                 return;
             }
@@ -243,15 +259,19 @@ namespace LocalizationTool.Manager
             if (Categories.Exists(c => c.Equals(newCategory)))
             {
                 if (editor.AddCategoryFeedbackLabelText != "") return;
+                Log($"Category '{newCategory}' already exists");
                 editor.AddCategoryFeedbackLabelText = $"Category '{newCategory}' already exists";
                 return;
             }
+
             editor.AddCategoryFeedbackLabelText = $"Category '{newCategory}' added correctly";
 
             //Add language to Binary 
             _categoriesData.Categories.Add(newCategory);
 
             await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
+
+            Log($"Category '{newCategory}' added correctly");
         }
 
         public async void RemoveCategory(string category)
@@ -266,7 +286,7 @@ namespace LocalizationTool.Manager
             {
                 await keyValue.RemoveCategory(category);
             }
-            
+
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
 
             //Update dynamic Dictionary
@@ -276,13 +296,13 @@ namespace LocalizationTool.Manager
         public async void ChangeCategoryName(string oldCategoryName, string newCategoryName)
         {
             if (_categoriesData.Categories.FirstOrDefault(l => l.Equals(newCategoryName)) != default) return; //the new value is the same
-            
+
             //Change BINARY file 
             _categoriesData.Categories.Remove(oldCategoryName);
             _categoriesData.Categories.Add(newCategoryName);
 
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
-            
+
             //Update JSON
             foreach (var keyValue in _dictionaryData.ListDictionaryKeyCategoryLanguages)
             {
@@ -290,15 +310,58 @@ namespace LocalizationTool.Manager
             }
 
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
-            
+
             //Update dynamic Dictionary
             _dynamicDictionary = _dictionaryData.ListDictionaryKeyCategoryLanguages.ToDictionary(data => data.Key, data => new KeyData { Category = data.Category, LanguagesData = data.DictionaryLanguageValue });
+
+            //Log($"Category '{oldCategoryName}' update to '{newCategoryName}' correctly");
+        }
+
+        #endregion
+
+        #region CONFIGURATION
+
+        public async void UpdateDeleteConfirmation(bool newValue, Enums.GUI_WINDOW window)
+        {
+            switch (window)
+            {
+                case Enums.GUI_WINDOW.Dictionary:
+                    if (_configurationData.DictionaryDeleteConfirmation == newValue) return;
+                    _configurationData.DictionaryDeleteConfirmation = newValue;
+                    break;
+                case Enums.GUI_WINDOW.Languages:
+                    if (_configurationData.LanguageDeleteConfirmation == newValue) return;
+                    _configurationData.LanguageDeleteConfirmation = newValue;
+                    break;
+                case Enums.GUI_WINDOW.Categories:
+                    if (_configurationData.CategoryDeleteConfirmation == newValue) return;
+                    _configurationData.CategoryDeleteConfirmation = newValue;
+                    break;
+            }
+
+            await SaveFile(_configurationData, BINARY_CONFIGURATION_PATH, _serializerBinary);
+        }
+
+        public async void UpdateSearchType(int searchTypeIndex)
+        {
+            if (_configurationData.SearchTypeIndex == searchTypeIndex) return;
+
+            _configurationData.SearchTypeIndex = searchTypeIndex;
+            await SaveFile(_configurationData, BINARY_CONFIGURATION_PATH, _serializerBinary);
+        }
+
+        public async void UpdateShowLog(bool showLogs)
+        {
+            if (_configurationData.ShowLogsInConsole == showLogs) return;
+
+            _configurationData.ShowLogsInConsole = showLogs;
+            await SaveFile(_configurationData, BINARY_CONFIGURATION_PATH, _serializerBinary);
         }
 
         #endregion
 
         #endregion
-        
+
         public void RefreshDictionaryData()
         {
             LoadDictionaryDataFromJSON();
@@ -314,33 +377,44 @@ namespace LocalizationTool.Manager
             LoadCategoriesDataFromBINARY();
         }
 
-        #region GET METHODS
-
-
-        #endregion
-
+        public static void Log(string log)
+        {
+            try
+            {
+                if (_configurationData.ShowLogsInConsole) Debug.Log(log);
+            }
+            catch (Exception)
+            {
+                Debug.Log(log);
+            }
+        }
+        
         #endregion
 
         #region PRIVATE METHODS
 
         private LocalizationManager()
         {
+#pragma warning disable CS4014
             Init();
+#pragma warning restore CS4014
         }
 
         public async Task Init()
         {
             if (_isInitialized) return;
             _isInitialized = true;
-            Debug.Log("Manager initialized");
             _serializerJson = new UnityJsonSerializer();
             _serializerBinary = new BinarySerializer();
+#pragma warning disable CS4014
+            LoadConfigurationDataFromBINARY();
+#pragma warning restore CS4014
             await LoadDictionaryDataFromJSON();
             await LoadLanguagesDataFromBINARY();
             await LoadCategoriesDataFromBINARY();
             YellowIcon = GetColoredIcon("d_Favorite", Color.yellow);
-
-            LocalizationToolController.Instance.ActiveLanguage = FavouriteLanguage;
+            
+            Log("Manager initialized");
         }
 
         private async Task LoadDictionaryDataFromJSON()
@@ -355,7 +429,7 @@ namespace LocalizationTool.Manager
             if (_dictionaryData != null)
                 _dynamicDictionary = _dictionaryData.ListDictionaryKeyCategoryLanguages.ToDictionary(data => data.Key, data => new KeyData { Category = data.Category, LanguagesData = data.DictionaryLanguageValue });
 
-            Debug.Log("JSON Dictionary loaded");
+            Log("Dictionary loaded");
         }
 
         private async Task LoadLanguagesDataFromBINARY()
@@ -364,23 +438,48 @@ namespace LocalizationTool.Manager
             _languagesData = await LoadFile<LanguagesData>(BINARY_LANGUAGES_PATH, _serializerBinary);
 
             CurrentLanguageInDictionarySection = _languagesData.FavouriteLanguage;
+            LocalizationToolController.Instance.ActiveLanguage = FavouriteLanguage;
 
-            Debug.Log("BINARY Languages loaded");
+            Log("Languages loaded");
         }
 
         private async Task LoadCategoriesDataFromBINARY()
         {
+            if(_serializerBinary == null) Debug.Log("Serializer is null");
             _categoriesData = await LoadFile<CategoriesData>(BINARY_CATEGORIES_PATH, _serializerBinary);
-            
+
             if (_categoriesData == null)
             {
                 _categoriesData = new CategoriesData();
                 _categoriesData.Categories.Add("None");
                 await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
             }
-            
-            Debug.Log("BINARY Categories loaded");
+
+            Log("Categories loaded");
         }
+
+        private async Task LoadConfigurationDataFromBINARY()
+        {
+            _configurationData ??= new ConfigurationData();
+            _configurationData = await LoadFile<ConfigurationData>(BINARY_CONFIGURATION_PATH, _serializerBinary);
+
+            if (_configurationData == null)
+            {
+                _configurationData = new ConfigurationData
+                {
+                    DictionaryDeleteConfirmation = true,
+                    CategoryDeleteConfirmation = true,
+                    LanguageDeleteConfirmation = true,
+                    SearchTypeIndex = 0,
+                    ShowLogsInConsole = true
+                };
+                await SaveFile(_configurationData, BINARY_CONFIGURATION_PATH, _serializerBinary);
+            }
+
+            Log("Configuration loaded");
+        }
+
+        #region UPDATES
 
         private static void UpdateValueInDictionary(string key, string newValue, string language)
         {
@@ -400,6 +499,8 @@ namespace LocalizationTool.Manager
             _dynamicDictionary.Remove(key);
             _dynamicDictionary.Add(key, keyData);
         }
+
+        #endregion
 
         #region SAVE-LOAD METHODS
 
@@ -443,11 +544,11 @@ namespace LocalizationTool.Manager
             {
                 return null;
             }
-            
+
             var coloredTexture = new Texture2D(originalTexture.width, originalTexture.height, TextureFormat.RGBA32, false);
 
             Graphics.CopyTexture(originalTexture, coloredTexture);
-            
+
             for (var y = 0; y < coloredTexture.height; y++)
             {
                 for (var x = 0; x < coloredTexture.width; x++)
@@ -461,7 +562,7 @@ namespace LocalizationTool.Manager
             coloredTexture.Apply();
             return coloredTexture;
         }
-        
+
         private void PrintDictionary()
         {
             foreach (var l in _dynamicDictionary)

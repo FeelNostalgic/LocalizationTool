@@ -200,10 +200,18 @@ namespace LocalizationTool.Editors
             {
                 if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CenterButtonComponentsStyle()))
                 {
-                    if (EditorUtility.DisplayDialog("Confirm Delete", $"Are you sure you want to delete {category}?", "Delete", "Cancel"))
+                    if (LocalizationManager.Configuration.CategoryDeleteConfirmation)
+                    {
+                        if (EditorUtility.DisplayDialog("Confirm Delete", $"Are you sure you want to delete {category}?", "Delete", "Cancel"))
+                        {
+                            LocalizationManager.Instance.RemoveCategory(category);
+                            LocalizationManager.Log($"Category '{category}' removed");
+                        }
+                    }
+                    else
                     {
                         LocalizationManager.Instance.RemoveCategory(category);
-                        Debug.Log($"Category '{category}' removed");
+                        LocalizationManager.Log($"Category '{category}' removed");
                     }
                 }
             }

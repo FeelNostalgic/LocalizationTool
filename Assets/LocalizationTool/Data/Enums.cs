@@ -18,6 +18,8 @@ namespace LocalizationTool.Data
             Italic = 1,
             FontSize = 2
         }
+        
+        public static string[] SEARCH_TYPE = {"By key", "By value", "By both"};
     }
     
     public struct KeyData
