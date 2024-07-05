@@ -40,6 +40,7 @@ namespace LocalizationTool.Editors
 
         private readonly Dictionary<string, string> _currentKeyValueDictionary = new();
         private readonly Dictionary<string, string> _currentKeyGroupDictionary = new();
+        private readonly Dictionary<string, Vector2> _currentKeyScrollPosition = new();
 
         #endregion
 
@@ -61,8 +62,7 @@ namespace LocalizationTool.Editors
         public void ShowLayout()
         {
             GUILayout.BeginVertical(MinHeightOption(_windowSize.y));
-
-            //GUILayout.Space(10);
+            
             ShowHorizontalLine(5);
 
             GUILayout.BeginHorizontal();
@@ -303,11 +303,12 @@ namespace LocalizationTool.Editors
         {
             if (!_currentKeyValueDictionary.ContainsKey(key)) _currentKeyValueDictionary.Add(key, value);
             if (!_currentKeyGroupDictionary.ContainsKey(key)) _currentKeyGroupDictionary.Add(key, category);
+            if(!_currentKeyScrollPosition.ContainsKey(key)) _currentKeyScrollPosition.Add(key, Vector2.zero);
 
             GUILayout.Space(10);
 
             GUILayout.BeginHorizontal();
-
+            
             GUILayout.Space(10);
 
             if (GUILayout.Button(key, SelectableLabelStyle()))
@@ -322,10 +323,13 @@ namespace LocalizationTool.Editors
             UpdateCategory(key, LocalizationManager.Categories[tempCategory]);
 
             GUILayout.Space(10);
-            var tempValue = EditorGUILayout.TextField(value, TextFieldValueStyle(), MinHeightOption(24), GUILayout.ExpandWidth(true));
+            
+            _currentKeyScrollPosition[key] = EditorGUILayout.BeginScrollView(_currentKeyScrollPosition[key], GUIStyle.none, GUIStyle.none, GUILayout.Height(28), GUILayout.ExpandWidth(true));
+            var tempValue = EditorGUILayout.TextArea(value, TextFieldValueStyle(), GUILayout.ExpandHeight(true));
+            EditorGUILayout.EndScrollView();
             UpdateValue(key, tempValue);
-
-            GUILayout.Space(10);
+            
+            GUILayout.Space(8);
 
             if (GUILayout.Button(EditorGUIUtility.IconContent("Customized", "Edit"), CenterButtonComponentsStyle()))
             {
@@ -333,7 +337,7 @@ namespace LocalizationTool.Editors
                 LocalizationManager.Log($"Editing key '{key}'");
             }
 
-            GUILayout.Space(10);
+            GUILayout.Space(8);
 
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CenterButtonComponentsStyle()))
             {
@@ -353,7 +357,7 @@ namespace LocalizationTool.Editors
 
             }
 
-            GUILayout.Space(10);
+            GUILayout.Space(14);
 
             GUILayout.EndHorizontal();
         }

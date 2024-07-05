@@ -312,7 +312,7 @@ namespace LocalizationTool.Editors
             {
                 alignment = TextAnchor.MiddleLeft,
                 fontSize = 12,
-                fixedHeight = 24,
+                fixedHeight = 25,
                 normal =
                 {
                     textColor = Color.white
@@ -327,7 +327,7 @@ namespace LocalizationTool.Editors
             var style = new GUIStyle(EditorStyles.popup)
             {
                 alignment = TextAnchor.MiddleLeft,
-                fixedHeight = 24,
+                fixedHeight = 25,
                 fixedWidth = 250,
                 fontSize = 12,
                 normal =
@@ -518,7 +518,7 @@ namespace LocalizationTool.Editors
 
             return style;
         }
-
+        
         protected GUIStyle TextFieldValueStyle()
         {
             var style = new GUIStyle(GUI.skin.textField)

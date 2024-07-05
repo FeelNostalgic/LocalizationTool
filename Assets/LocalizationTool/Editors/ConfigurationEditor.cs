@@ -45,12 +45,13 @@ namespace LocalizationTool.Editors
             
             GUILayout.BeginHorizontal();
             
+            GUILayout.FlexibleSpace();
             OptionsSection();
-
+            GUILayout.FlexibleSpace();
             ShowVerticalLine(5);
-            
+            GUILayout.FlexibleSpace();
             ExportSection();
-
+            GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -73,12 +74,12 @@ namespace LocalizationTool.Editors
         
         private void OptionsSection()
         {
-	        var style = new GUIStyle
-	        {
-		        margin = new RectOffset(100, 100, 10, 25)
-	        };
+	        // var style = new GUIStyle
+	        // {
+		       //  margin = new RectOffset(100, 0, 10, 25)
+	        // };
 	        
-	        GUILayout.BeginVertical(style);
+	        GUILayout.BeginVertical();
 	        
 	        DeleteConfirmationSection();
 
@@ -93,7 +94,7 @@ namespace LocalizationTool.Editors
 
         private void ExportSection()
         {
-	        GUILayout.BeginVertical(MinWidthOption(_windowSize.x * 0.5f));
+	        GUILayout.BeginVertical();
 
 	        ShowSectionHeader("EXPORT - IMPORT");
 

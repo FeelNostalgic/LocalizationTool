@@ -46,7 +46,7 @@ namespace LocalizationTool.Editors
 
         public void ShowLayout()
         {
-            GUILayout.BeginVertical(MinHeightOption(_windowSize.y), MinWidthOption(_windowSize.x));
+            GUILayout.BeginVertical(MinHeightOption(_windowSize.y));
 
             GUILayout.Space(5);
             ShowHorizontalLine(5);
