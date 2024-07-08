@@ -68,7 +68,7 @@ namespace LocalizationTool.Manager
 
         #region DICTIONARY
 
-        public async void AddNewKey(string key, string group, DictionaryEditor editor)
+        public async void AddNewKey(string key, string category, DictionaryEditor editor)
         {
             if (key.Equals(""))
             {
@@ -90,10 +90,10 @@ namespace LocalizationTool.Manager
 
             var interDic = ActiveLanguages.ToDictionary(language => language, _ => "");
             var interList = ActiveLanguages.Select(l => new LanguageValue { Language = l, Value = "" }).ToList();
-            _dynamicDictionary.Add(key, new KeyData { Category = group, LanguagesData = interDic });
+            _dynamicDictionary.Add(key, new KeyData { Category = category, LanguagesData = interDic });
 
             //Add key to JSON file
-            _dictionaryData.ListDictionaryKeyCategoryLanguages.Add(new KeyCategoryLanguage(key, group, interList));
+            _dictionaryData.ListDictionaryKeyCategoryLanguages.Add(new KeyCategoryLanguage(key, category, interList));
 
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
 
@@ -362,6 +362,76 @@ namespace LocalizationTool.Manager
 
         #endregion
 
+        #region IMPORT
+
+        public async void ImportLanguage(string language)
+        {
+            if (ActiveLanguages.Exists(l => l.Equals(language))) return;
+
+            //Add language to Binary 
+            _languagesData.Languagues.Add(language);
+
+            if (_languagesData.Languagues.Count == 1)
+            {
+                _languagesData.FavouriteLanguage = language;
+                CurrentLanguageInDictionarySection = language;
+            }
+
+            await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
+
+            //Update JSON
+            foreach (var keyValue in _dictionaryData.ListDictionaryKeyCategoryLanguages)
+            {
+                keyValue.AddNewLanguage(language);
+            }
+
+            //Update dynamic Dictionary
+            _dynamicDictionary = _dictionaryData.ListDictionaryKeyCategoryLanguages.ToDictionary(data => data.Key, data => new KeyData { Category = data.Category, LanguagesData = data.DictionaryLanguageValue });
+        }
+
+        public async void ImportKey(string key, string category, Dictionary<string, string> values)
+        {
+            Log($"Key '{key}' - '{category}' : {string.Join(" | ", values)}");
+            if (_dynamicDictionary.ContainsKey(key))
+            {
+                if (_dynamicDictionary[key].Category != category)
+                {
+                    //TODO: test this
+                    //Change category
+                    _dictionaryData.UpdateCategoryName(key, category);
+                }
+
+                //Update values
+                foreach (var (language, value) in values)
+                {
+                    _dictionaryData.UpdateLanguageValue(key, language, value);
+
+                }
+            }
+            else
+            {
+                //TODO: test this
+                //Add new key
+                if (key.Equals("")) return;
+                
+                var interList = values.Select(languageValuePair => new LanguageValue { Language = languageValuePair.Key, Value = languageValuePair.Value }).ToList();
+                _dynamicDictionary.Add(key, new KeyData { Category = category, LanguagesData = values });
+
+                //Add key to JSON file
+                _dictionaryData.ListDictionaryKeyCategoryLanguages.Add(new KeyCategoryLanguage(key, category, interList));
+            }
+            
+            //Update JSON
+            await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
+            
+            //Update dynamic Dictionary
+            _dynamicDictionary = _dictionaryData.ListDictionaryKeyCategoryLanguages.ToDictionary(data => data.Key, data => new KeyData { Category = data.Category, LanguagesData = data.DictionaryLanguageValue });
+        }
+
+        #endregion
+
+        #region RefreshData
+
         public void RefreshDictionaryData()
         {
             LoadDictionaryDataFromJSON();
@@ -377,6 +447,8 @@ namespace LocalizationTool.Manager
             LoadCategoriesDataFromBINARY();
         }
 
+        #endregion
+        
         public static void Log(string log)
         {
             try
@@ -388,7 +460,7 @@ namespace LocalizationTool.Manager
                 Debug.Log(log);
             }
         }
-        
+
         #endregion
 
         #region PRIVATE METHODS
@@ -413,7 +485,7 @@ namespace LocalizationTool.Manager
             await LoadLanguagesDataFromBINARY();
             await LoadCategoriesDataFromBINARY();
             YellowIcon = GetColoredIcon("d_Favorite", Color.yellow);
-            
+
             Log("Manager initialized");
         }
 
@@ -445,7 +517,7 @@ namespace LocalizationTool.Manager
 
         private async Task LoadCategoriesDataFromBINARY()
         {
-            if(_serializerBinary == null) Debug.Log("Serializer is null");
+            if (_serializerBinary == null) Debug.Log("Serializer is null");
             _categoriesData = await LoadFile<CategoriesData>(BINARY_CATEGORIES_PATH, _serializerBinary);
 
             if (_categoriesData == null)

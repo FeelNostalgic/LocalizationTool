@@ -15,6 +15,18 @@ namespace LocalizationTool.Data
         }
         
         public List<KeyCategoryLanguage> ListDictionaryKeyCategoryLanguages;
+
+        public void UpdateCategoryName(string key, string newCategory)
+        {
+            var item = ListDictionaryKeyCategoryLanguages.First(k => k.Key == key);
+            item.Category = newCategory;
+        }
+
+        public void UpdateLanguageValue(string key, string language, string value)
+        {
+            var item = ListDictionaryKeyCategoryLanguages.First(k => k.Key == key);
+            item.UpdateValue(language, value);
+        }
     }
 
     [Serializable]
@@ -29,10 +41,9 @@ namespace LocalizationTool.Data
         
         public string Key;
         public string Category;
-        public Dictionary<string, string> DictionaryLanguageValue => _languagesValue.ToDictionary(x => x.Language, x => x.Value);
-
         [SerializeField] private List<LanguageValue> _languagesValue;
-
+        public Dictionary<string, string> DictionaryLanguageValue => _languagesValue.ToDictionary(x => x.Language, x => x.Value);
+        
         public void AddNewLanguage(string newLanguage)
         {
             _languagesValue.Add(new LanguageValue{Language = newLanguage, Value = ""});

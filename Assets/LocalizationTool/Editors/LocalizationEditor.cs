@@ -176,6 +176,13 @@ namespace LocalizationTool.Editors
             GUILayout.Space(10);
         }
 
+        protected void ShowExportSubHeader(string name, params GUILayoutOption[] options)
+        {
+            GUILayout.Space(8);
+            GUILayout.Label(name,  ExportSubHeaderStyle(), options);
+            GUILayout.Space(10);
+        }
+        
         protected void ShowSubHeader(string name, params GUILayoutOption[] options)
         {
             GUILayout.Space(8);
@@ -295,17 +302,28 @@ namespace LocalizationTool.Editors
 
         #region Styles
 
-        protected GUIStyle CenterButtonComponentsStyle()
+        protected GUIStyle CenterButtonWithIconStyle()
         {
             var style = new GUIStyle(GUI.skin.button)
             {
-                fixedHeight = 25,
-                fixedWidth = 25
+                fixedHeight = 24,
+                fixedWidth = 28
             };
 
             return style;
         }
 
+        protected GUIStyle BiggerButtonWithIconStyle()
+        {
+            var style = new GUIStyle(GUI.skin.button)
+            {
+                fixedHeight = 30,
+                fixedWidth = 30
+            };
+
+            return style;
+        }
+        
         protected GUIStyle AddTextFieldStyle()
         {
             var style = new GUIStyle(GUI.skin.textField)
@@ -313,6 +331,39 @@ namespace LocalizationTool.Editors
                 alignment = TextAnchor.MiddleLeft,
                 fontSize = 12,
                 fixedHeight = 25,
+                normal =
+                {
+                    textColor = Color.white
+                }
+            };
+
+            return style;
+        }
+
+        protected GUIStyle FoldoutHeaderStyle()
+        {
+            var style = new GUIStyle(EditorStyles.foldoutHeader)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fixedHeight = 24,
+                fontSize = 14,
+                normal =
+                {
+                    textColor = Color.white
+                }
+            };
+
+            return style;
+        }
+        
+        protected GUIStyle SeparatorCSVStyle()
+        {
+            var style = new GUIStyle(EditorStyles.popup)
+            {
+                alignment = TextAnchor.UpperCenter,
+                fixedHeight = 30,
+                fixedWidth = 60,
+                fontSize = 20,
                 normal =
                 {
                     textColor = Color.white
@@ -428,6 +479,21 @@ namespace LocalizationTool.Editors
                 fontStyle = FontStyle.Bold,
                 fontSize = 20,
                 alignment = TextAnchor.MiddleCenter,
+                normal =
+                {
+                    textColor = Color.white
+                }
+            };
+
+            return style;
+        }
+
+        protected GUIStyle ExportSubHeaderStyle()
+        {
+            var style = new GUIStyle
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 14,
                 normal =
                 {
                     textColor = Color.white

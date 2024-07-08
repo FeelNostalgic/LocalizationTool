@@ -189,7 +189,7 @@ namespace LocalizationTool.Editors
 
             if (category.Equals(NONE))
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Locked"), CenterButtonComponentsStyle()))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Locked"), CenterButtonWithIconStyle()))
                 {
                     if (EditorUtility.DisplayDialog("Warning", $"You can not remove None category", "Ok"))
                     {
@@ -198,7 +198,7 @@ namespace LocalizationTool.Editors
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CenterButtonComponentsStyle()))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CenterButtonWithIconStyle()))
                 {
                     if (LocalizationManager.Configuration.CategoryDeleteConfirmation)
                     {

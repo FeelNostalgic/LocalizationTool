@@ -331,7 +331,7 @@ namespace LocalizationTool.Editors
             
             GUILayout.Space(8);
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("Customized", "Edit"), CenterButtonComponentsStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("Customized", "Edit"), CenterButtonWithIconStyle()))
             {
                 RichTextEditor.ShowWindow(tempValue, key, delegate(string s) { UpdateValue(key, s); });
                 LocalizationManager.Log($"Editing key '{key}'");
@@ -339,7 +339,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.Space(8);
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CenterButtonComponentsStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CenterButtonWithIconStyle()))
             {
                 if (LocalizationManager.Configuration.DictionaryDeleteConfirmation)
                 {

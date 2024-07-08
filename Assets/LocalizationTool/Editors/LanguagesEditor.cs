@@ -181,31 +181,45 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal();
 
             GUILayout.Space(10);
-
-            var tempValue = EditorGUILayout.TextField(language, TextFieldValueStyle(), MinHeightOption(24));
-            UpdateLanguage(language, tempValue);
-            
-            GUILayout.Space(10);
             
             if (LocalizationManager.Instance.FavouriteLanguage.Equals(language))
             {
-                if (GUILayout.Button(LocalizationManager.Instance.YellowIcon, CenterButtonComponentsStyle()))
+                if (GUILayout.Button(LocalizationManager.Instance.YellowIcon, CenterButtonWithIconStyle()))
                 {
                     // Nothing
                 }
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Make favourite"), CenterButtonComponentsStyle()))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Make favourite"), CenterButtonWithIconStyle()))
                 {
                     LocalizationManager.Instance.ChangeFavoriteLanguage(language);
                     LocalizationManager.Log($"Language '{language}' is now favorite");
                 }
             }
-
+            
             GUILayout.Space(10);
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CenterButtonComponentsStyle()))
+            var tempValue = EditorGUILayout.TextField(language, TextFieldValueStyle(), MinHeightOption(24));
+            UpdateLanguage(language, tempValue);
+
+            GUILayout.Space(10);
+            
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), CenterButtonWithIconStyle()))
+            {
+                //TODO: abrir interfaz para elegir método de import
+            }
+           
+            GUILayout.Space(10);
+            
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CenterButtonWithIconStyle()))
+            {
+                //TODO: abrir interfaz para elegir método de export
+            }
+            
+            GUILayout.Space(10);
+
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CenterButtonWithIconStyle()))
             {
                 if (LocalizationManager.ActiveLanguages.Count == 1)
                 {
