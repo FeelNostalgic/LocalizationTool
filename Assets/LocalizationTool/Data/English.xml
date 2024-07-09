@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-16"?>
+<LanguageTemplate xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Language>English</Language>
+  <Data>
+    <KeyCategoryLanguage>
+      <Key>1</Key>
+      <Category>None</Category>
+      <Value />
+    </KeyCategoryLanguage>
+    <KeyCategoryLanguage>
+      <Key>2</Key>
+      <Category>Main Menu</Category>
+      <Value />
+    </KeyCategoryLanguage>
+    <KeyCategoryLanguage>
+      <Key>3</Key>
+      <Category>Inventory</Category>
+      <Value>Hello5</Value>
+    </KeyCategoryLanguage>
+    <KeyCategoryLanguage>
+      <Key>4</Key>
+      <Category>None</Category>
+      <Value />
+    </KeyCategoryLanguage>
+    <KeyCategoryLanguage>
+      <Key>5</Key>
+      <Category>Main Menu</Category>
+      <Value />
+    </KeyCategoryLanguage>
+    <KeyCategoryLanguage>
+      <Key>6</Key>
+      <Category>None</Category>
+      <Value>Test</Value>
+    </KeyCategoryLanguage>
+    <KeyCategoryLanguage>
+      <Key>7</Key>
+      <Category>Inventory</Category>
+      <Value />
+    </KeyCategoryLanguage>
+    <KeyCategoryLanguage>
+      <Key>8</Key>
+      <Category>Table</Category>
+      <Value>Test</Value>
+    </KeyCategoryLanguage>
+    <KeyCategoryLanguage>
+      <Key>9</Key>
+      <Category>Testing</Category>
+      <Value>Test5</Value>
+    </KeyCategoryLanguage>
+<KeyCategoryLanguage>
+      <Key>10</Key>
+      <Category>Testing2</Category>
+      <Value>Test8</Value>
+    </KeyCategoryLanguage>
+  </Data>
+</LanguageTemplate>

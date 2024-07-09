@@ -26,6 +26,8 @@ namespace LocalizationTool.Editors
         private LanguagesEditor _languagesEditor;
         private CategoriesEditor _categoriesEditor;
         private ConfigurationEditor _configurationEditor;
+        
+        protected readonly string[] _csvSeparators = { ",", ";", ".", ":", "|", "=" };
 
         #endregion
 
@@ -169,6 +171,8 @@ namespace LocalizationTool.Editors
 
         #region COMMONS
 
+        #region GUI ELEMENTS
+
         protected void ShowHeader(string name, params GUILayoutOption[] options)
         {
             GUILayout.Space(5);
@@ -300,6 +304,8 @@ namespace LocalizationTool.Editors
             return GUILayout.MaxHeight(height);
         }
 
+        #endregion
+
         #region Styles
 
         protected GUIStyle CenterButtonWithIconStyle()
@@ -364,6 +370,23 @@ namespace LocalizationTool.Editors
                 fixedHeight = 30,
                 fixedWidth = 60,
                 fontSize = 20,
+                normal =
+                {
+                    textColor = Color.white
+                }
+            };
+
+            return style;
+        }
+
+        protected GUIStyle SeparatorCSVLanguageWindowStyle()
+        {
+            var style = new GUIStyle(EditorStyles.popup)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fixedHeight = 22,
+                fixedWidth = 45,
+                fontSize = 15,
                 normal =
                 {
                     textColor = Color.white
@@ -503,11 +526,11 @@ namespace LocalizationTool.Editors
             return style;
         }
 
-        protected GUIStyle SubHeaderStyle()
+        protected GUIStyle SubHeaderStyle(TextAnchor textAnchor = TextAnchor.MiddleLeft)
         {
             var style = new GUIStyle
             {
-                alignment = TextAnchor.MiddleLeft,
+                alignment = textAnchor,
                 fontStyle = FontStyle.Bold,
                 fontSize = 14,
                 normal =

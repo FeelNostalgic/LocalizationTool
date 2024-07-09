@@ -207,14 +207,14 @@ namespace LocalizationTool.Editors
             
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), CenterButtonWithIconStyle()))
             {
-                //TODO: abrir interfaz para elegir método de import
+                LanguageImportEditor.ShowWindow(language);
             }
            
             GUILayout.Space(10);
             
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CenterButtonWithIconStyle()))
             {
-                //TODO: abrir interfaz para elegir método de export
+                LanguageExportEditor.ShowWindow(language);
             }
             
             GUILayout.Space(10);

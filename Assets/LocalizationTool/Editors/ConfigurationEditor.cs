@@ -36,7 +36,6 @@ namespace LocalizationTool.Editors
         private bool _csvExportSection = true;
         private bool _csvImportSection = true;
 
-        private readonly string[] _csvSeparators = { ",", ";", ".", ":", "|", "=" };
         private int _selectedCsvSeparatorIndexForExport;
         private int _selectedCsvSeparatorIndexForImport;
 
@@ -91,6 +90,8 @@ namespace LocalizationTool.Editors
 
             GUILayout.Space(10);
         }
+        
+        #region CONFIGURATION SECTION
 
         private void OptionsSection()
         {
@@ -98,7 +99,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.FlexibleSpace();
 
-            GUILayout.BeginVertical();
+            GUILayout.BeginVertical(MinWidthOption(275));
 
             DeleteConfirmationSection();
 
@@ -114,12 +115,65 @@ namespace LocalizationTool.Editors
 
             GUILayout.EndHorizontal();
         }
+        
+        private void DeleteConfirmationSection()
+        {
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+            ShowSubHeader("Delete Confirmation");
+
+            if (_dictionaryDeleteConfirmation && _languageDeleteConfirmation && _categoryDeleteConfirmation) _toggleAllDeleteConfirmation = true;
+            else _toggleAllDeleteConfirmation = false;
+
+            var tempToogle = EditorGUILayout.Toggle(_toggleAllDeleteConfirmation);
+            UpdateAllDeleteConfirmation(_toggleAllDeleteConfirmation, tempToogle);
+
+            _dictionaryDeleteConfirmation = EditorGUILayout.ToggleLeft("Show delete confirmation in DICTIONARY", LocalizationManager.Configuration.DictionaryDeleteConfirmation, MinHeightOption(24));
+            UpdateDeleteConfirmation(Enums.GUI_WINDOW.Dictionary);
+
+            _languageDeleteConfirmation = EditorGUILayout.ToggleLeft("Show delete confirmation in LANGUAGES", LocalizationManager.Configuration.LanguageDeleteConfirmation, MinHeightOption(24));
+            UpdateDeleteConfirmation(Enums.GUI_WINDOW.Languages);
+
+            _categoryDeleteConfirmation = EditorGUILayout.ToggleLeft("Show delete confirmation in CATEGORIES", LocalizationManager.Configuration.CategoryDeleteConfirmation, MinHeightOption(24));
+            UpdateDeleteConfirmation(Enums.GUI_WINDOW.Categories);
+            GUILayout.EndVertical();
+        }
+
+        private void SearchSection()
+        {
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+            ShowSubHeader("Search");
+            _searchTypeIndex = EditorGUILayout.Popup(LocalizationManager.Configuration.SearchTypeIndex, Enums.SEARCH_TYPE, SearchTypeStyle());
+            UpdateSearchType();
+            GUILayout.Space(5);
+            GUILayout.EndVertical();
+        }
+
+        private void LogsSection()
+        {
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+            ShowSubHeader("Logs");
+            _showLogs = EditorGUILayout.ToggleLeft("Show logs in Console", LocalizationManager.Configuration.ShowLogsInConsole, MinHeightOption(24));
+            UpdateShowLogs();
+            GUILayout.EndVertical();
+        }
+
+        private void ReadmeSection()
+        {
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+            ShowSubHeader("Readme");
+            //TODO: poner boton para abrir readme/documentation o link
+            GUILayout.EndVertical();
+        }
+
+        #endregion
+
+        #region EXPORT SECTION
 
         private void ExportSection()
         {
             GUILayout.BeginVertical();
 
-            GUILayout.BeginVertical(MinHeightOption(_windowSize.y *0.5f));
+            GUILayout.BeginVertical(MinHeightOption(_windowSize.y * 0.5f));
             ShowSectionHeader("EXPORT");
 
             ShowExportCsvSection();
@@ -135,7 +189,7 @@ namespace LocalizationTool.Editors
             ShowImportCsvSection();
             ShowImportJsonSection();
             ShowImportXmlSection();
-            
+
             GUILayout.EndVertical();
 
             GUILayout.EndVertical();
@@ -152,7 +206,7 @@ namespace LocalizationTool.Editors
                 GUILayout.FlexibleSpace();
 
                 _selectedCsvSeparatorIndexForExport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForExport, _csvSeparators, SeparatorCSVStyle());
-                
+
                 if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), BiggerButtonWithIconStyle()))
                 {
                     var path = EditorUtility.SaveFilePanel("Save CSV File", "", "Localization.csv", "csv");
@@ -161,19 +215,19 @@ namespace LocalizationTool.Editors
                     {
                         var fileContent = BuildCSV();
                         // Create and save the file
-                        SaveFile(path, fileContent);
+                        LocalizationManager.SaveFile(path, fileContent, "File Saved", "File has been saved successfully!", "OK");
                     }
                 }
 
                 GUILayout.FlexibleSpace();
-                
+
                 GUILayout.EndHorizontal();
             }
 
             EditorGUILayout.EndFoldoutHeaderGroup();
             GUILayout.Space(5);
         }
-        
+
         private void ShowExportJsonSection()
         {
             _jsonExportSection = EditorGUILayout.BeginFoldoutHeaderGroup(_jsonExportSection, "JSON", FoldoutHeaderStyle());
@@ -186,18 +240,18 @@ namespace LocalizationTool.Editors
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), BiggerButtonWithIconStyle()))
                 {
-                   //TODO
+                    //TODO
                 }
 
                 GUILayout.FlexibleSpace();
-                
+
                 GUILayout.EndHorizontal();
             }
 
             EditorGUILayout.EndFoldoutHeaderGroup();
             GUILayout.Space(5);
         }
-        
+
         private void ShowExportXMLSection()
         {
             _xmlExportSection = EditorGUILayout.BeginFoldoutHeaderGroup(_xmlExportSection, "XML", FoldoutHeaderStyle());
@@ -214,14 +268,18 @@ namespace LocalizationTool.Editors
                 }
 
                 GUILayout.FlexibleSpace();
-                
+
                 GUILayout.EndHorizontal();
             }
 
             EditorGUILayout.EndFoldoutHeaderGroup();
             GUILayout.Space(5);
         }
-        
+
+        #endregion
+
+        #region IMPORT SECTION
+
         private void ShowImportCsvSection()
         {
             _csvImportSection = EditorGUILayout.BeginFoldoutHeaderGroup(_csvImportSection, "CSV", FoldoutHeaderStyle());
@@ -263,7 +321,7 @@ namespace LocalizationTool.Editors
                 GUILayout.BeginHorizontal();
                 GUILayout.Space(15);
                 GUILayout.FlexibleSpace();
-                
+
                 GUILayout.Space(5);
 
                 if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), BiggerButtonWithIconStyle()))
@@ -288,7 +346,7 @@ namespace LocalizationTool.Editors
                 GUILayout.BeginHorizontal();
                 GUILayout.Space(8);
                 GUILayout.FlexibleSpace();
-                
+
                 GUILayout.Space(5);
 
                 if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), BiggerButtonWithIconStyle()))
@@ -304,47 +362,8 @@ namespace LocalizationTool.Editors
             GUILayout.Space(5);
         }
 
-        private void DeleteConfirmationSection()
-        {
-            ShowSubHeader("Delete Confirmation");
-
-            if (_dictionaryDeleteConfirmation && _languageDeleteConfirmation && _categoryDeleteConfirmation) _toggleAllDeleteConfirmation = true;
-            else _toggleAllDeleteConfirmation = false;
-
-            var tempToogle = EditorGUILayout.Toggle(_toggleAllDeleteConfirmation);
-            UpdateAllDeleteConfirmation(_toggleAllDeleteConfirmation, tempToogle);
-
-            _dictionaryDeleteConfirmation = EditorGUILayout.ToggleLeft("Show delete confirmation in DICTIONARY", LocalizationManager.Configuration.DictionaryDeleteConfirmation, MinHeightOption(24));
-            UpdateDeleteConfirmation(Enums.GUI_WINDOW.Dictionary);
-
-            _languageDeleteConfirmation = EditorGUILayout.ToggleLeft("Show delete confirmation in LANGUAGES", LocalizationManager.Configuration.LanguageDeleteConfirmation, MinHeightOption(24));
-            UpdateDeleteConfirmation(Enums.GUI_WINDOW.Languages);
-
-            _categoryDeleteConfirmation = EditorGUILayout.ToggleLeft("Show delete confirmation in CATEGORIES", LocalizationManager.Configuration.CategoryDeleteConfirmation, MinHeightOption(24));
-            UpdateDeleteConfirmation(Enums.GUI_WINDOW.Categories);
-        }
-
-        private void SearchSection()
-        {
-            ShowSubHeader("Search");
-            _searchTypeIndex = EditorGUILayout.Popup(LocalizationManager.Configuration.SearchTypeIndex, Enums.SEARCH_TYPE, SearchTypeStyle());
-            UpdateSearchType();
-            GUILayout.Space(5);
-        }
-
-        private void LogsSection()
-        {
-            ShowSubHeader("Logs");
-            _showLogs = EditorGUILayout.ToggleLeft("Show logs in Console", LocalizationManager.Configuration.ShowLogsInConsole, MinHeightOption(24));
-            UpdateShowLogs();
-        }
-
-        private void ReadmeSection()
-        {
-            ShowSubHeader("Readme");
-            //TODO: poner boton para abrir readme/documentation o link
-        }
-
+        #endregion
+        
         #region UPDATES
 
         private void UpdateAllDeleteConfirmation(bool oldValue, bool newValue)
@@ -393,7 +412,7 @@ namespace LocalizationTool.Editors
 
         private string BuildCSV()
         {
-            var serializer = new CsvSerializer();
+            var serializer = new CSV_Serializer();
             serializer.SetSeparator(_csvSeparators[_selectedCsvSeparatorIndexForExport]);
             var data = new Dictionary<string, KeyData>(LocalizationManager.Dictionary);
 
@@ -429,13 +448,6 @@ namespace LocalizationTool.Editors
             return serializer.File();
         }
 
-        private static async void SaveFile(string path, string fileContent)
-        {
-            await File.WriteAllTextAsync(path, fileContent);
-
-            EditorUtility.DisplayDialog("File Saved", "File has been saved successfully!", "OK");
-        }
-
         #endregion
 
         #region IMPORTS
@@ -451,13 +463,19 @@ namespace LocalizationTool.Editors
             var separator = _csvSeparators[_selectedCsvSeparatorIndexForImport];
             var languages = header.Split(separator);
 
+            if (languages.Length < 2)
+            {
+                EditorUtility.DisplayDialog("Error while importing CSV", $"Separator [ {separator} ] not found", "OK");
+                return;
+            }
+            
             sb.AppendLine($"{languages.Length - 2} language imported");
 
             var languageOrder = new List<string>();
             for (var i = 2; i < languages.Length; i++)
             {
                 languageOrder.Add(languages[i]);
-                LocalizationManager.Instance.ImportLanguage(languages[i]);
+                await LocalizationManager.Instance.ImportLanguage(languages[i]);
             }
 
             var nKeys = 0;
@@ -465,19 +483,19 @@ namespace LocalizationTool.Editors
             {
                 nKeys++;
                 var nextLine = await reader.ReadLineAsync();
-                var items = nextLine.Split(separator);
-                var key = items[0];
-                var category = items[1];
+                var lineItems = nextLine.Split(separator);
+                var key = lineItems[0];
+                var category = lineItems[1];
                 var values = new Dictionary<string, string>();
-                
-                for (var i = 0; i < items.Length - 2; i++)
+
+                for (var i = 0; i < lineItems.Length - 2; i++)
                 {
-                    values.Add(languageOrder[i], items[i+2]);
+                    values.Add(languageOrder[i], lineItems[i + 2]);
                 }
 
-                LocalizationManager.Instance.ImportKey(key, category, values);
+                await LocalizationManager.Instance.ImportKey(key, category, values);
 
-                await Task.Delay(100);
+                // await Task.Delay(50);
             }
 
             sb.AppendLine($"{nKeys} keys imported");

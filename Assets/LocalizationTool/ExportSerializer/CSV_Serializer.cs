@@ -5,13 +5,13 @@ using LocalizationTool.Manager;
 
 namespace LocalizationTool.ExportSerializer
 {
-    public class CsvSerializer
+    public class CSV_Serializer
     {
         private string _separator;
 
         private readonly StringBuilder _sb;
         
-        public CsvSerializer()
+        public CSV_Serializer()
         {
             _sb = new StringBuilder();
         }

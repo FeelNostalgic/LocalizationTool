@@ -2,7 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace LocalizationTool
+namespace LocalizationTool.Serializer
 {
     public class BinarySerializer : ISerializerService
     {

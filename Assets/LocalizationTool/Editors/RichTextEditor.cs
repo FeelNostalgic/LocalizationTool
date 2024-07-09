@@ -45,7 +45,7 @@ namespace LocalizationTool.Editors
 
         #region PRIVATE METHODS
 
-        private void OnGUI()
+        private new void OnGUI()
         {
             GUILayout.BeginVertical(MaxHeightOption(_windowSize.y), MaxWidthOption(_windowSize.x));
 

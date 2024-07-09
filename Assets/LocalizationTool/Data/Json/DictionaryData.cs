@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LocalizationTool.Manager;
 using UnityEngine;
 
-namespace LocalizationTool.Data
+namespace LocalizationTool.Data.Json
 {
     [Serializable]
     public class DictionaryData
@@ -16,6 +17,16 @@ namespace LocalizationTool.Data
         
         public List<KeyCategoryLanguage> ListDictionaryKeyCategoryLanguages;
 
+        public void AddNewKeyCategoryLanguage(KeyCategoryLanguage item)
+        {
+            if (ListDictionaryKeyCategoryLanguages.FirstOrDefault(i => i.Key == item.Key) != default)
+            {
+                LocalizationManager.Log($"Key {item.Key} is already in the dictionary");
+                return;
+            }
+            ListDictionaryKeyCategoryLanguages.Add(item);
+        }
+        
         public void UpdateCategoryName(string key, string newCategory)
         {
             var item = ListDictionaryKeyCategoryLanguages.First(k => k.Key == key);

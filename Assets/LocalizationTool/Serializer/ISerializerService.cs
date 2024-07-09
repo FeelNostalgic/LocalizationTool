@@ -1,4 +1,4 @@
-﻿namespace LocalizationTool
+﻿namespace LocalizationTool.Serializer
 {
     public interface ISerializerService
     {

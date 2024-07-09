@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace LocalizationTool.Data
 {
@@ -22,6 +23,7 @@ namespace LocalizationTool.Data
         public static string[] SEARCH_TYPE = {"By key", "By value", "By both"};
     }
     
+    [Serializable]
     public struct KeyData
     {
         public string Category;

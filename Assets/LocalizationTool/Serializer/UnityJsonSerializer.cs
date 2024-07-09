@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace LocalizationTool
+namespace LocalizationTool.Serializer
 {
     public class UnityJsonSerializer : ISerializerService
     {

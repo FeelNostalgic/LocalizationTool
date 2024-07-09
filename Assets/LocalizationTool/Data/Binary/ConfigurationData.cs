@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LocalizationTool.Data
+namespace LocalizationTool.Data.Binary
 {
     [Serializable]
     public class ConfigurationData
