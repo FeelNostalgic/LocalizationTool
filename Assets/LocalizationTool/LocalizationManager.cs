@@ -96,21 +96,21 @@ namespace LocalizationTool.Manager
             _dynamicDictionary.Add(key, new KeyData { Category = category, LanguagesData = interDic });
 
             //Add key to JSON file
-            _dictionaryData.ListDictionaryKeyCategoryLanguages.Add(new KeyCategoryLanguage(key, category, interList));
+            _dictionaryData.ListDictionaryKeyCategoryLanguages.Add(new KeyCategoryLanguageValues(key, category, interList));
 
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
 
             Log($"Key '{key}' added correctly");
         }
 
-        public async void ChangeValue(string key, string newValue, string language)
+        public async Task ChangeValue(string key, string newValue)
         {
-            if (_dynamicDictionary[key].LanguagesData != null && _dynamicDictionary[key].LanguagesData[language].Equals(newValue)) return; //value is not modified
+            if (_dynamicDictionary[key].LanguagesData != null && _dynamicDictionary[key].LanguagesData[CurrentLanguageInDictionarySection].Equals(newValue)) return;
 
-            UpdateValueInDictionary(key, newValue, language);
+            UpdateValueInDictionary(key, newValue, CurrentLanguageInDictionarySection);
 
             //Change JSON file 
-            _dictionaryData.ListDictionaryKeyCategoryLanguages.First(x => x.Key == key).UpdateValue(language, newValue);
+            _dictionaryData.ListDictionaryKeyCategoryLanguages.First(x => x.Key == key).UpdateValue(CurrentLanguageInDictionarySection, newValue);
 
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
         }
@@ -200,7 +200,11 @@ namespace LocalizationTool.Manager
         {
             //Change BINARY file 
             _languagesData.Languagues.Remove(language);
-
+            if (_languagesData.Languagues.Count == 1)
+            {
+                _languagesData.FavouriteLanguage = _languagesData.Languagues[0];
+            }
+            
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
 
             //Update JSON
@@ -217,6 +221,7 @@ namespace LocalizationTool.Manager
 
         public async void ChangeLanguageValue(string oldLanguageName, string newLanguageName)
         {
+            if (newLanguageName.Length == 0) return; //TODO: mostrar warning de alguna manera
             if (_languagesData.Languagues.FirstOrDefault(l => l.Equals(newLanguageName)) != default) return; //the new value is the same
 
             //Change BINARY file 
@@ -430,7 +435,7 @@ namespace LocalizationTool.Manager
                 var interList = values.Select(languageValuePair => new LanguageValue { Language = languageValuePair.Key, Value = languageValuePair.Value }).ToList();
 
                 //Add key to JSON file
-                _dictionaryData.AddNewKeyCategoryLanguage(new KeyCategoryLanguage(key, category, interList));
+                _dictionaryData.AddNewKeyCategoryLanguage(new KeyCategoryLanguageValues(key, category, interList));
             }
 
             //Update JSON
@@ -473,7 +478,7 @@ namespace LocalizationTool.Manager
                 _dynamicDictionary.Add(key, new KeyData { Category = category, LanguagesData = interDic });
 
                 //Add key to JSON file
-                _dictionaryData.ListDictionaryKeyCategoryLanguages.Add(new KeyCategoryLanguage(key, category, interList));
+                _dictionaryData.ListDictionaryKeyCategoryLanguages.Add(new KeyCategoryLanguageValues(key, category, interList));
             }
 
             //Update JSON
@@ -661,7 +666,7 @@ namespace LocalizationTool.Manager
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                if(e is not IOException) Debug.LogError(e);
             }
         }
 

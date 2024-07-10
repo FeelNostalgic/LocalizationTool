@@ -319,7 +319,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.Space(10);
             if (category == "") category = NONE;
-            var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), CategoryPopupStyle(), MaxWidthOption(250));
+            var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), CategoryPopupStyle(), GUILayout.Width(250));
             UpdateCategory(key, LocalizationManager.Categories[tempCategory]);
 
             GUILayout.Space(10);
@@ -374,12 +374,12 @@ namespace LocalizationTool.Editors
             LocalizationManager.Instance.ChangeCategory(key, _currentKeyGroupDictionary[key]);
         }
 
-        private void UpdateValue(string key, string tempValue)
+        private async void UpdateValue(string key, string tempValue)
         {
             if (tempValue.Equals(_currentKeyValueDictionary[key])) return;
 
             _currentKeyValueDictionary[key] = tempValue;
-            LocalizationManager.Instance.ChangeValue(key, tempValue, LocalizationManager.Instance.CurrentLanguageInDictionarySection);
+            await LocalizationManager.Instance.ChangeValue(key, tempValue);
         }
 
         #endregion

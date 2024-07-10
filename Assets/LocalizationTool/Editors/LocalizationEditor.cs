@@ -26,7 +26,7 @@ namespace LocalizationTool.Editors
         private LanguagesEditor _languagesEditor;
         private CategoriesEditor _categoriesEditor;
         private ConfigurationEditor _configurationEditor;
-        
+
         protected readonly string[] _csvSeparators = { ",", ";", ".", ":", "|", "=" };
 
         #endregion
@@ -69,27 +69,27 @@ namespace LocalizationTool.Editors
                     throw new ArgumentOutOfRangeException();
             }
         }
-        
-        // private void Update()
-        // {
-        //     switch (_currentWindow)
-        //     {
-        //         case Enums.GUI_WINDOW.Dictionary:
-        //             
-        //             break;
-        //         case Enums.GUI_WINDOW.Languages:
-        //             
-        //             break;
-        //         case Enums.GUI_WINDOW.Categories:
-        //             
-        //             break;
-        //         case Enums.GUI_WINDOW.Configuration:
-        //             
-        //             break;
-        //         default:
-        //             throw new ArgumentOutOfRangeException();
-        //     }
-        // }
+
+        private void Update()
+        {
+            switch (_currentWindow)
+            {
+                case Enums.GUI_WINDOW.Dictionary:
+                    //TODO
+                    break;
+                case Enums.GUI_WINDOW.Languages:
+                    // TODO
+                    break;
+                case Enums.GUI_WINDOW.Categories:
+                    // TODO
+                    break;
+                case Enums.GUI_WINDOW.Configuration:
+                    // TODO
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
 
         // private void OnDisable()
         // {
@@ -183,17 +183,17 @@ namespace LocalizationTool.Editors
         protected void ShowExportSubHeader(string name, params GUILayoutOption[] options)
         {
             GUILayout.Space(8);
-            GUILayout.Label(name,  ExportSubHeaderStyle(), options);
+            GUILayout.Label(name, ExportSubHeaderStyle(), options);
             GUILayout.Space(10);
         }
-        
+
         protected void ShowSubHeader(string name, params GUILayoutOption[] options)
         {
             GUILayout.Space(8);
             GUILayout.Label(name, SubHeaderStyle(), options);
             GUILayout.Space(10);
         }
-        
+
         protected void ShowSectionHeader(string name, params GUILayoutOption[] options)
         {
             GUILayout.Space(8);
@@ -217,7 +217,7 @@ namespace LocalizationTool.Editors
                 else
                 {
                     EditorGUILayout.Popup(0, LocalizationManager.Categories.ToArray(), AddCategoryStyle());
-                    if(LocalizationManager.Categories.Count > 0) categoryValue = LocalizationManager.Categories[0];
+                    if (LocalizationManager.Categories.Count > 0) categoryValue = LocalizationManager.Categories[0];
                 }
             }
 
@@ -329,7 +329,7 @@ namespace LocalizationTool.Editors
 
             return style;
         }
-        
+
         protected GUIStyle AddTextFieldStyle()
         {
             var style = new GUIStyle(GUI.skin.textField)
@@ -361,15 +361,15 @@ namespace LocalizationTool.Editors
 
             return style;
         }
-        
+
         protected GUIStyle SeparatorCSVStyle()
         {
             var style = new GUIStyle(EditorStyles.popup)
             {
                 alignment = TextAnchor.UpperCenter,
-                fixedHeight = 30,
-                fixedWidth = 60,
-                fontSize = 20,
+                fixedHeight = 28,
+                fixedWidth = 55,
+                fontSize = 18,
                 normal =
                 {
                     textColor = Color.white
@@ -395,7 +395,7 @@ namespace LocalizationTool.Editors
 
             return style;
         }
-        
+
         protected GUIStyle CategoryPopupStyle()
         {
             var style = new GUIStyle(EditorStyles.popup)
@@ -412,7 +412,7 @@ namespace LocalizationTool.Editors
 
             return style;
         }
-        
+
         protected GUIStyle AddCategoryStyle()
         {
             var style = new GUIStyle(EditorStyles.popup)
@@ -428,7 +428,7 @@ namespace LocalizationTool.Editors
 
             return style;
         }
-        
+
         protected GUIStyle SearchTypeStyle()
         {
             var style = new GUIStyle(EditorStyles.popup)
@@ -445,7 +445,7 @@ namespace LocalizationTool.Editors
 
             return style;
         }
-        
+
         protected GUIStyle SubSectionHeaderStyle(float fixedWidth)
         {
             var style = new GUIStyle
@@ -515,7 +515,7 @@ namespace LocalizationTool.Editors
         {
             var style = new GUIStyle
             {
-                alignment = TextAnchor.MiddleCenter,
+                alignment = TextAnchor.LowerCenter,
                 fontSize = 14,
                 normal =
                 {
@@ -541,7 +541,7 @@ namespace LocalizationTool.Editors
 
             return style;
         }
-        
+
         protected GUIStyle SectionHeaderStyle()
         {
             var style = new GUIStyle
@@ -557,8 +557,8 @@ namespace LocalizationTool.Editors
 
             return style;
         }
-        
-        
+
+
         protected GUIStyle SubSectionHeaderStyle()
         {
             var style = new GUIStyle
@@ -591,7 +591,7 @@ namespace LocalizationTool.Editors
 
             return style;
         }
-        
+
         protected GUIStyle KeyLabelStyle()
         {
             var style = new GUIStyle(GUI.skin.textField)
@@ -607,13 +607,29 @@ namespace LocalizationTool.Editors
 
             return style;
         }
-        
+
         protected GUIStyle TextFieldValueStyle()
         {
             var style = new GUIStyle(GUI.skin.textField)
             {
-                alignment = TextAnchor.UpperLeft,
+                alignment = TextAnchor.MiddleLeft,
                 richText = true,
+                wordWrap = true,
+                fontSize = 13,
+                normal =
+                {
+                    textColor = Color.white
+                }
+            };
+
+            return style;
+        }
+
+        protected GUIStyle IntFieldValueStyle()
+        {
+            var style = new GUIStyle(GUI.skin.textField)
+            {
+                alignment = TextAnchor.MiddleCenter,
                 fontSize = 13,
                 normal =
                 {

@@ -26,6 +26,8 @@ namespace LocalizationTool.Editors
         private string _addCategoryFeedbackLabelText = "";
 
         private Vector2 _scrollCenter;
+        
+        private const int MAX_CHARACTERS = 100;
 
         #endregion
 
@@ -181,8 +183,30 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal();
 
             GUILayout.Space(10);
+            
+            //Number
+            var tempIndex = EditorGUILayout.IntField(100, IntFieldValueStyle(), GUILayout.Width(35), GUILayout.Height(24));
+            
+            GUILayout.Space(5);
+            
+            //Buttons To move
+            
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrollup", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
+            {
+                // TODO
+            }
+            
+            GUILayout.Space(3);
+            
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrolldown", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
+            {
+                // TODO
+            }
+            
+            GUILayout.Space(20);
 
             var tempValue = EditorGUILayout.TextField(category, TextFieldValueStyle(), MinHeightOption(24));
+            if (tempValue.Length > MAX_CHARACTERS) tempValue = tempValue[..MAX_CHARACTERS];
             UpdateCategory(category, tempValue);
 
             GUILayout.Space(10);

@@ -12,12 +12,12 @@ namespace LocalizationTool.Data.Json
     {
         public DictionaryData()
         {
-            ListDictionaryKeyCategoryLanguages = new List<KeyCategoryLanguage>();
+            ListDictionaryKeyCategoryLanguages = new List<KeyCategoryLanguageValues>();
         }
         
-        public List<KeyCategoryLanguage> ListDictionaryKeyCategoryLanguages;
+        public List<KeyCategoryLanguageValues> ListDictionaryKeyCategoryLanguages;
 
-        public void AddNewKeyCategoryLanguage(KeyCategoryLanguage item)
+        public void AddNewKeyCategoryLanguage(KeyCategoryLanguageValues item)
         {
             if (ListDictionaryKeyCategoryLanguages.FirstOrDefault(i => i.Key == item.Key) != default)
             {
@@ -41,9 +41,9 @@ namespace LocalizationTool.Data.Json
     }
 
     [Serializable]
-    public class KeyCategoryLanguage
+    public class KeyCategoryLanguageValues
     {
-        public KeyCategoryLanguage(string key, string category, List<LanguageValue> languageValue)
+        public KeyCategoryLanguageValues(string key, string category, List<LanguageValue> languageValue)
         {
             Key = key;
             Category = category;

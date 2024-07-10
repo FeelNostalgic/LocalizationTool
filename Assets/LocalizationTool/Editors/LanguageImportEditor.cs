@@ -14,7 +14,7 @@ namespace LocalizationTool.Editors
     {
         #region DIMENSION VARIABLES
 
-        private static readonly Vector2 WindowSize = new(200, 250);
+        private static readonly Vector2 WindowSize = new(250, 275);
 
         #endregion
 
@@ -68,7 +68,7 @@ namespace LocalizationTool.Editors
             GUILayout.Label("CSV", SubHeaderStyle());
 
             GUILayout.BeginHorizontal();
-            GUILayout.Space(75);
+            GUILayout.Space(125);
             _selectedCsvSeparatorIndexForImport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForImport, _csvSeparators, SeparatorCSVLanguageWindowStyle());
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Export"), CenterButtonWithIconStyle()))
             {

@@ -21,12 +21,13 @@ namespace LocalizationTool.Editors
         #region PRIVATE VARIABLES
 
         #region EDITOR VARIABLES
-        
+
         private string _addLanguageValue;
         private string _addLanguageFeedbackLabelText = "";
 
         private Vector2 _scrollCenter;
-        
+        private const int MAX_CHARACTERS = 40;
+
         #endregion
 
         #region DIMENSION VARIABLES
@@ -47,7 +48,7 @@ namespace LocalizationTool.Editors
         public void ShowLayout()
         {
             GUILayout.BeginVertical(MinHeightOption(_windowSize.y));
-            
+
             GUILayout.Space(5);
             ShowHorizontalLine(5);
 
@@ -88,7 +89,7 @@ namespace LocalizationTool.Editors
             GUILayout.Space(8);
 
             GUILayout.BeginHorizontal();
-            
+
             GUI.SetNextControlName("LANGUAGE");
             _addLanguageValue = EditorGUILayout.TextField(_addLanguageValue, MinHeightOption(25));
 
@@ -99,7 +100,7 @@ namespace LocalizationTool.Editors
                 LocalizationManager.Instance.AddNewLanguage(_addLanguageValue, this);
                 ControlTextAreaFeedbackDuration(1f);
             }
-            
+
             if (GUI.GetNameOfFocusedControl() == "LANGUAGE")
             {
                 if (Event.current is { keyCode: (KeyCode.Return or KeyCode.KeypadEnter) })
@@ -146,13 +147,13 @@ namespace LocalizationTool.Editors
             {
                 LocalizationManager.Instance.RefreshLanguagesData();
             }
-            
+
             GUILayout.FlexibleSpace();
-            
+
             GUILayout.Label("LANGUAGES", HeaderStyle());
-            
+
             GUILayout.FlexibleSpace();
-            
+
             GUILayout.EndHorizontal();
         }
 
@@ -181,6 +182,27 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal();
 
             GUILayout.Space(10);
+
+            //Number
+            var tempIndex = EditorGUILayout.IntField(100, IntFieldValueStyle(), GUILayout.Width(35), GUILayout.Height(24));
+            
+            GUILayout.Space(5);
+            
+            //Buttons To move
+            
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrollup", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
+            {
+                // TODO
+            }
+            
+            GUILayout.Space(3);
+            
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrolldown", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
+            {
+                // TODO
+            }
+            
+            GUILayout.Space(20);
             
             if (LocalizationManager.Instance.FavouriteLanguage.Equals(language))
             {
@@ -197,64 +219,59 @@ namespace LocalizationTool.Editors
                     LocalizationManager.Log($"Language '{language}' is now favorite");
                 }
             }
-            
+
             GUILayout.Space(10);
 
             var tempValue = EditorGUILayout.TextField(language, TextFieldValueStyle(), MinHeightOption(24));
+            if (tempValue.Length > MAX_CHARACTERS) tempValue = tempValue[..MAX_CHARACTERS];
             UpdateLanguage(language, tempValue);
 
             GUILayout.Space(10);
-            
+
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), CenterButtonWithIconStyle()))
             {
                 LanguageImportEditor.ShowWindow(language);
             }
-           
+
             GUILayout.Space(10);
-            
+
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CenterButtonWithIconStyle()))
             {
                 LanguageExportEditor.ShowWindow(language);
             }
-            
+
             GUILayout.Space(10);
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CenterButtonWithIconStyle()))
+            if (LocalizationManager.Instance.FavouriteLanguage.Equals(language))
             {
-                if (LocalizationManager.ActiveLanguages.Count == 1)
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Delete"), CenterButtonWithIconStyle()))
                 {
-                    if (EditorUtility.DisplayDialog("Warning", $"Al least you need ONE active language", "Ok"))
+                    if (EditorUtility.DisplayDialog("Warning", $"Favourite language can not be removed", "Ok"))
                     {
                         //Nothing
                     }
                 }
-                else
+            }
+            else
+            {
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CenterButtonWithIconStyle()))
                 {
-                    if (LocalizationManager.Instance.FavouriteLanguage.Equals(language))
+                    if (LocalizationManager.Configuration.LanguageDeleteConfirmation)
                     {
-                        if (EditorUtility.DisplayDialog("Warning", $"Favourite language can not be removed", "Ok"))
-                        {
-                        }
-                    }
-                    else
-                    {
-                        if (LocalizationManager.Configuration.LanguageDeleteConfirmation)
-                        {
-                            if (EditorUtility.DisplayDialog("Confirm Delete", $"Are you sure you want to delete {language}?", "Delete", "Cancel"))
-                            {
-                                LocalizationManager.Instance.RemoveLanguage(language);
-                                LocalizationManager.Log($"Language '{language}' removed");
-                            }
-                        }
-                        else
+                        if (EditorUtility.DisplayDialog("Confirm Delete", $"Are you sure you want to delete {language}?", "Delete", "Cancel"))
                         {
                             LocalizationManager.Instance.RemoveLanguage(language);
                             LocalizationManager.Log($"Language '{language}' removed");
                         }
                     }
+                    else
+                    {
+                        LocalizationManager.Instance.RemoveLanguage(language);
+                        LocalizationManager.Log($"Language '{language}' removed");
+                    }
                 }
             }
-
+            
             GUILayout.Space(10);
 
             GUILayout.EndHorizontal();

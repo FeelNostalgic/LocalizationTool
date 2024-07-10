@@ -16,7 +16,7 @@ namespace LocalizationTool.Editors
     {
         #region DIMENSION VARIABLES
 
-        private static readonly Vector2 WindowSize = new(200, 250);
+        private static readonly Vector2 WindowSize = new(250, 275);
 
         #endregion
 
@@ -64,13 +64,14 @@ namespace LocalizationTool.Editors
 
         private void CSV()
         {
+            GUILayout.BeginVertical();
             GUILayout.BeginHorizontal();
             
             GUILayout.Space(10);
             GUILayout.Label("CSV", SubHeaderStyle());
 
             GUILayout.BeginHorizontal();
-            GUILayout.Space(75);
+            GUILayout.Space(125);
             _selectedCsvSeparatorIndexForExport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForExport, _csvSeparators, SeparatorCSVLanguageWindowStyle());
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CenterButtonWithIconStyle()))
             {
@@ -86,6 +87,23 @@ namespace LocalizationTool.Editors
             GUILayout.EndHorizontal();
             
             GUILayout.EndHorizontal();
+            
+            GUILayout.Space(5);
+            
+            GUILayout.BeginHorizontal();
+
+            GUILayout.Label(EditorGUIUtility.IconContent("d_console.warnicon.sml"));
+
+            var style = new GUIStyle(GUI.skin.label)
+            {
+                wordWrap = true,
+            };
+
+            GUILayout.Label("Line breaks are removed when exporting to CSV", style);
+
+            GUILayout.EndHorizontal();
+            
+            GUILayout.EndVertical();
         }
 
         private void JSON()
