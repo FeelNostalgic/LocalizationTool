@@ -21,6 +21,7 @@ namespace LocalizationTool.Manager
         public static LocalizationManager Instance => _instance ??= new LocalizationManager();
 
         public static List<string> ActiveLanguages => _languagesData.Languagues ?? new List<string>();
+        public static List<CategoriesData.CategoryTuple> OrderedCategories => _categoriesData?.OrderedCategories ?? new List<CategoriesData.CategoryTuple>();
         public static List<string> Categories => _categoriesData?.Categories ?? new List<string>();
         public static ConfigurationData Configuration => _configurationData ?? new ConfigurationData();
 
@@ -258,6 +259,7 @@ namespace LocalizationTool.Manager
 
         public async void AddNewCategory(string newCategory, CategoriesEditor editor = null, bool showEditorLogs = true)
         {
+            // Empty value
             if (newCategory.Equals(""))
             {
                 if (!showEditorLogs) return;
@@ -267,7 +269,8 @@ namespace LocalizationTool.Manager
                 return;
             }
 
-            if (Categories.Exists(c => c.Equals(newCategory)))
+            // Already in data
+            if (_categoriesData.Contains(newCategory))
             {
                 if (!showEditorLogs) return;
                 if (editor != null && editor.AddCategoryFeedbackLabelText != "") return;
@@ -279,7 +282,7 @@ namespace LocalizationTool.Manager
             if (editor != null) editor.AddCategoryFeedbackLabelText = $"Category '{newCategory}' added correctly";
 
             //Add language to Binary 
-            _categoriesData.Categories.Add(newCategory);
+            _categoriesData.Add(newCategory);
 
             await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
 
@@ -289,7 +292,7 @@ namespace LocalizationTool.Manager
         public async void RemoveCategory(string category)
         {
             //Change BINARY file 
-            _categoriesData.Categories.Remove(category);
+            _categoriesData.Remove(category);
 
             await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
 
@@ -302,18 +305,18 @@ namespace LocalizationTool.Manager
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
 
             //Update dynamic Dictionary
-            _dynamicDictionary = _dictionaryData.ListDictionaryKeyCategoryLanguages.ToDictionary(data => data.Key, data => new KeyData { Category = data.Category, LanguagesData = data.DictionaryLanguageValue });
+            _dynamicDictionary = _dictionaryData.ListDictionaryKeyCategoryLanguages
+                .ToDictionary(data => data.Key, data => new KeyData { Category = data.Category, LanguagesData = data.DictionaryLanguageValue });
         }
 
         public async void ChangeCategoryName(string oldCategoryName, string newCategoryName)
         {
-            if (_categoriesData.Categories.FirstOrDefault(l => l.Equals(newCategoryName)) != default) return; //the new value is the same
-
+            if (_categoriesData.Contains(newCategoryName)) return; //the new value is the same
+            
             //Change BINARY file 
-            _categoriesData.Categories.Remove(oldCategoryName);
-            _categoriesData.Categories.Add(newCategoryName);
+            _categoriesData.ChangeName(oldCategoryName, newCategoryName);
 
-            await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
+            await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
 
             //Update JSON
             foreach (var keyValue in _dictionaryData.ListDictionaryKeyCategoryLanguages)
@@ -324,9 +327,24 @@ namespace LocalizationTool.Manager
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
 
             //Update dynamic Dictionary
-            _dynamicDictionary = _dictionaryData.ListDictionaryKeyCategoryLanguages.ToDictionary(data => data.Key, data => new KeyData { Category = data.Category, LanguagesData = data.DictionaryLanguageValue });
+            _dynamicDictionary = _dictionaryData.ListDictionaryKeyCategoryLanguages
+                .ToDictionary(data => data.Key, data => new KeyData { Category = data.Category, LanguagesData = data.DictionaryLanguageValue });
 
             //Log($"Category '{oldCategoryName}' update to '{newCategoryName}' correctly");
+        }
+
+        public async void ChangeCategoryIndex(int oldIndex, int newIndex)
+        {
+            if (oldIndex == newIndex) return; //the new index is the same
+            
+            //Change binary file
+            var category =_categoriesData.ChangeIndex(oldIndex, newIndex);
+            
+            await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
+            
+            Log($"Category '{category}' update to index '{newIndex}' correctly");
+            
+            GUI.FocusControl(null);
         }
 
         #endregion
@@ -603,7 +621,7 @@ namespace LocalizationTool.Manager
             {
                 Log("Categories empty");
                 _categoriesData = new CategoriesData();
-                _categoriesData.Categories.Add("None");
+                _categoriesData.Add("None");
                 await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
             }
 

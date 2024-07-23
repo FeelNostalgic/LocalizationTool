@@ -175,9 +175,9 @@ namespace LocalizationTool.Editors
         {
             GUILayout.BeginHorizontal();
 
-            if (LocalizationManager.Categories != null)
+            if (LocalizationManager.OrderedCategories != null)
             {
-                if (_searchCategoryIndex >= LocalizationManager.Categories.Count) _searchCategoryIndex = 0;
+                if (_searchCategoryIndex >= LocalizationManager.OrderedCategories.Count) _searchCategoryIndex = 0;
                 GUI.SetNextControlName("Popup");
                 _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, LocalizationManager.Categories.ToArray(), AddCategoryStyle(), GUILayout.Width(200));
             }

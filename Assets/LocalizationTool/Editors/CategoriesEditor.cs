@@ -163,9 +163,9 @@ namespace LocalizationTool.Editors
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
             try
             {
-                foreach (var category in LocalizationManager.Categories)
+                foreach (var (index, category) in LocalizationManager.OrderedCategories)
                 {
-                    UnitCenterScrollViewContent(category);
+                    UnitCenterScrollViewContent(index, category);
                 }
             }
             catch
@@ -176,7 +176,7 @@ namespace LocalizationTool.Editors
             EditorGUILayout.EndScrollView();
         }
 
-        private void UnitCenterScrollViewContent(string category)
+        private void UnitCenterScrollViewContent(int index, string category)
         {
             GUILayout.Space(10);
 
@@ -185,7 +185,8 @@ namespace LocalizationTool.Editors
             GUILayout.Space(10);
             
             //Number
-            var tempIndex = EditorGUILayout.IntField(100, IntFieldValueStyle(), GUILayout.Width(35), GUILayout.Height(24));
+            var tempIndex = EditorGUILayout.IntField(index, IntFieldValueStyle(), GUILayout.Width(35), GUILayout.Height(24));
+            UpdateIndex(index, tempIndex);
             
             GUILayout.Space(5);
             
@@ -194,6 +195,7 @@ namespace LocalizationTool.Editors
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrollup", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
             {
                 // TODO
+                UpdateIndex(index, index - 2);
             }
             
             GUILayout.Space(3);
@@ -201,9 +203,10 @@ namespace LocalizationTool.Editors
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrolldown", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
             {
                 // TODO
+                UpdateIndex(index, index + 2);
             }
             
-            GUILayout.Space(20);
+            GUILayout.Space(12);
 
             var tempValue = EditorGUILayout.TextField(category, TextFieldValueStyle(), MinHeightOption(24));
             if (tempValue.Length > MAX_CHARACTERS) tempValue = tempValue[..MAX_CHARACTERS];
@@ -252,6 +255,12 @@ namespace LocalizationTool.Editors
         private static void UpdateCategory(string oldLanguage, string newValue)
         {
             LocalizationManager.Instance.ChangeCategoryName(oldLanguage, newValue);
+        }
+
+        private static void UpdateIndex(int oldIndex, int newIndex)
+        {
+            if(oldIndex == 1) return;
+            LocalizationManager.Instance.ChangeCategoryIndex(oldIndex, newIndex);
         }
 
         #endregion

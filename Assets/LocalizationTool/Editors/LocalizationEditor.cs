@@ -207,7 +207,7 @@ namespace LocalizationTool.Editors
             GUILayout.Label(label, SubSectionHeaderStyle());
             GUILayout.Space(5);
 
-            if (LocalizationManager.Categories != null)
+            if (LocalizationManager.OrderedCategories != null)
             {
                 if (LocalizationManager.Categories.IndexOf(categoryValue) != -1)
                 {
@@ -217,7 +217,7 @@ namespace LocalizationTool.Editors
                 else
                 {
                     EditorGUILayout.Popup(0, LocalizationManager.Categories.ToArray(), AddCategoryStyle());
-                    if (LocalizationManager.Categories.Count > 0) categoryValue = LocalizationManager.Categories[0];
+                    if (LocalizationManager.OrderedCategories.Count > 0) categoryValue = LocalizationManager.Categories[0];
                 }
             }
 
