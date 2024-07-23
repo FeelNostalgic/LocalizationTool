@@ -86,7 +86,7 @@ namespace LocalizationTool.Editors
             ShowHorizontalLine(5);
             GUILayout.Space(10);
 
-            GUILayout.Label("CATEGORIES", SubSectionHeaderStyle());
+            GUILayout.Label("CATEGORY", SubSectionHeaderStyle());
             GUILayout.Space(8);
 
             GUILayout.BeginHorizontal();
@@ -186,7 +186,7 @@ namespace LocalizationTool.Editors
             
             //Number
             var tempIndex = EditorGUILayout.IntField(index, IntFieldValueStyle(), GUILayout.Width(35), GUILayout.Height(24));
-            UpdateIndex(index, tempIndex);
+            if(!category.Equals("None")) UpdateIndex(index, tempIndex);
             
             GUILayout.Space(5);
             
@@ -194,16 +194,14 @@ namespace LocalizationTool.Editors
             
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrollup", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
             {
-                // TODO
-                UpdateIndex(index, index - 2);
+                if(!category.Equals("None")) UpdateIndex(index, index - 2);
             }
             
             GUILayout.Space(3);
             
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrolldown", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
             {
-                // TODO
-                UpdateIndex(index, index + 2);
+                if(!category.Equals("None")) UpdateIndex(index, index + 2);
             }
             
             GUILayout.Space(12);
@@ -259,7 +257,6 @@ namespace LocalizationTool.Editors
 
         private static void UpdateIndex(int oldIndex, int newIndex)
         {
-            if(oldIndex == 1) return;
             LocalizationManager.Instance.ChangeCategoryIndex(oldIndex, newIndex);
         }
 

@@ -10,7 +10,6 @@ namespace LocalizationTool.Data.Binary
     {
         //This is always ordered
         public List<CategoryTuple> OrderedCategories = new();
-
         public List<string> Categories => OrderedCategories.Select(c => c.Category).ToList();
 
         public void Add(string category)
@@ -25,15 +24,9 @@ namespace LocalizationTool.Data.Binary
             OrderedCategories = OrderedCategories.OrderBy(tuple => tuple.Index).ToList();
         }
 
-        public void ChangeName(string oldName, string newName)
-        {
-            var tuple = OrderedCategories.First(tuple => tuple.Category.Equals(oldName));
-            tuple.Category = newName;
-        }
-
         public bool Contains(string category)
         {
-            return OrderedCategories.FirstOrDefault(c => c.Category.Equals(category)) != default;
+            return OrderedCategories.FirstOrDefault(tuple => tuple.Category.Equals(category)) != default;
         }
 
         public void Remove(string category)
@@ -41,6 +34,12 @@ namespace LocalizationTool.Data.Binary
             var tuple = OrderedCategories.First(tuple => tuple.Category.Equals(category));
             OrderedCategories.Remove(tuple);
             UpdateIndexes();
+        }
+
+        public void ChangeName(string oldName, string newName)
+        {
+            var tuple = OrderedCategories.First(tuple => tuple.Category.Equals(oldName));
+            tuple.Category = newName;
         }
 
         public string ChangeIndex(int oldIndex, int newIndex)

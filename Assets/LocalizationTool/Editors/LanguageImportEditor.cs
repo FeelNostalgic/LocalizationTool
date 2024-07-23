@@ -153,18 +153,23 @@ namespace LocalizationTool.Editors
             await LocalizationManager.Instance.ImportLanguage(headerItems[2]);
 
             var nKeys = 0;
+            var nCategories = 0;
             while (!reader.EndOfStream)
             {
-                nKeys++;
                 var nextLine = await reader.ReadLineAsync();
                 var lineItems = nextLine.Split(separator);
                 var key = lineItems[0];
                 var category = lineItems[1];
                 var value = lineItems[2];
+                
+                nKeys++;
+                if(!LocalizationManager.Instance.ExistCategory(category)) nCategories++;
 
                 await LocalizationManager.Instance.ImportKey(key, category, _language, value);
             }
 
+            var categories = nCategories > 1 ? "Categories" : "Category";
+            sb.AppendLine($"{nCategories} new {categories} imported");
             sb.AppendLine($"{nKeys} keys imported");
 
             EditorUtility.DisplayDialog("CSV imported", sb.ToString(), "OK");
@@ -180,12 +185,17 @@ namespace LocalizationTool.Editors
             await LocalizationManager.Instance.ImportLanguage(data.Language);
 
             var nKeys = 0;
+            var nCategories = 0;
             foreach (var keyCategoryLanguage in data.Data)
             {
                 nKeys++;
+                if(!LocalizationManager.Instance.ExistCategory(keyCategoryLanguage.Category)) nCategories++;
+
                 await LocalizationManager.Instance.ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, _language, keyCategoryLanguage.Value);
             }
 
+            var categories = nCategories > 1 ? "Categories" : "Category";
+            sb.AppendLine($"{nCategories} new {categories} imported");
             sb.AppendLine($"{nKeys} keys imported");
 
             EditorUtility.DisplayDialog("File imported", sb.ToString(), "OK");

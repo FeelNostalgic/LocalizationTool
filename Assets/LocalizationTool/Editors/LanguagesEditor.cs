@@ -162,9 +162,9 @@ namespace LocalizationTool.Editors
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
             try
             {
-                foreach (var language in LocalizationManager.ActiveLanguages)
+                foreach (var (index, language) in LocalizationManager.OrderedLanguages)
                 {
-                    UnitCenterScrollViewContent(language);
+                    UnitCenterScrollViewContent(index, language);
                 }
             }
             catch
@@ -175,7 +175,7 @@ namespace LocalizationTool.Editors
             EditorGUILayout.EndScrollView();
         }
 
-        private void UnitCenterScrollViewContent(string language)
+        private void UnitCenterScrollViewContent(int index, string language)
         {
             GUILayout.Space(10);
 
@@ -184,7 +184,8 @@ namespace LocalizationTool.Editors
             GUILayout.Space(10);
 
             //Number
-            var tempIndex = EditorGUILayout.IntField(100, IntFieldValueStyle(), GUILayout.Width(35), GUILayout.Height(24));
+            var tempIndex = EditorGUILayout.IntField(index, IntFieldValueStyle(), GUILayout.Width(35), GUILayout.Height(24));
+            UpdateIndex(index, tempIndex);
             
             GUILayout.Space(5);
             
@@ -192,17 +193,17 @@ namespace LocalizationTool.Editors
             
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrollup", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
             {
-                // TODO
+                UpdateIndex(index, index - 2);
             }
             
             GUILayout.Space(3);
             
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrolldown", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
             {
-                // TODO
+                UpdateIndex(index, index + 2);
             }
             
-            GUILayout.Space(20);
+            GUILayout.Space(12);
             
             if (LocalizationManager.Instance.FavouriteLanguage.Equals(language))
             {
@@ -284,6 +285,11 @@ namespace LocalizationTool.Editors
         private static void UpdateLanguage(string oldLanguage, string newValue)
         {
             LocalizationManager.Instance.ChangeLanguageValue(oldLanguage, newValue);
+        }
+        
+        private static void UpdateIndex(int oldIndex, int newIndex)
+        {
+            LocalizationManager.Instance.ChangeLanguageIndex(oldIndex, newIndex);
         }
 
         #endregion

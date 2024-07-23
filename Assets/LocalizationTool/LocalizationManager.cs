@@ -20,14 +20,15 @@ namespace LocalizationTool.Manager
 
         public static LocalizationManager Instance => _instance ??= new LocalizationManager();
 
-        public static List<string> ActiveLanguages => _languagesData.Languagues ?? new List<string>();
+        public static List<LanguagesData.LanguageTuple> OrderedLanguages => _languagesData.OrderedLanguages ?? new List<LanguagesData.LanguageTuple>();
+        public static List<string> ActiveLanguages => _languagesData.Languages ?? new List<string>();
         public static List<CategoriesData.CategoryTuple> OrderedCategories => _categoriesData?.OrderedCategories ?? new List<CategoriesData.CategoryTuple>();
         public static List<string> Categories => _categoriesData?.Categories ?? new List<string>();
         public static ConfigurationData Configuration => _configurationData ?? new ConfigurationData();
 
         public static Dictionary<string, KeyData> Dictionary => _dynamicDictionary ?? new Dictionary<string, KeyData>();
         public string CurrentLanguageInDictionarySection { get; set; }
-        public int CurrentToolbarLanguageIndex => _languagesData.Languagues.IndexOf(CurrentLanguageInDictionarySection);
+        public int CurrentToolbarLanguageIndex => _languagesData.Languages.IndexOf(CurrentLanguageInDictionarySection);
         public string FavouriteLanguage => _languagesData.FavouriteLanguage;
         public bool IsInitalized => _isInitialized;
         public Texture2D YellowIcon { get; set; }
@@ -163,7 +164,7 @@ namespace LocalizationTool.Manager
                 return;
             }
 
-            if (ActiveLanguages.Exists(l => l.Equals(newLanguage)))
+            if (_languagesData.Contains(newLanguage))
             {
                 if (!showLogs) return;
                 if (editor != null && editor.AddLanguageFeedbackLabelText != "") return;
@@ -175,9 +176,9 @@ namespace LocalizationTool.Manager
             if (editor != null) editor.AddLanguageFeedbackLabelText = $"Language '{newLanguage}' added correctly";
 
             //Add language to Binary 
-            _languagesData.Languagues.Add(newLanguage);
+            _languagesData.Add(newLanguage);
 
-            if (_languagesData.Languagues.Count == 1)
+            if (_languagesData.Count() == 1)
             {
                 _languagesData.FavouriteLanguage = newLanguage;
                 CurrentLanguageInDictionarySection = newLanguage;
@@ -200,10 +201,10 @@ namespace LocalizationTool.Manager
         public async void RemoveLanguage(string language)
         {
             //Change BINARY file 
-            _languagesData.Languagues.Remove(language);
-            if (_languagesData.Languagues.Count == 1)
+            _languagesData.Remove(language);
+            if (_languagesData.Count() == 1)
             {
-                _languagesData.FavouriteLanguage = _languagesData.Languagues[0];
+                _languagesData.FavouriteLanguage = _languagesData.Languages[0];
             }
             
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
@@ -223,11 +224,10 @@ namespace LocalizationTool.Manager
         public async void ChangeLanguageValue(string oldLanguageName, string newLanguageName)
         {
             if (newLanguageName.Length == 0) return; //TODO: mostrar warning de alguna manera
-            if (_languagesData.Languagues.FirstOrDefault(l => l.Equals(newLanguageName)) != default) return; //the new value is the same
+            if (_languagesData.Contains(oldLanguageName)) return; //the new value is the same
 
             //Change BINARY file 
-            _languagesData.Languagues.Remove(oldLanguageName);
-            _languagesData.Languagues.Add(newLanguageName);
+            _languagesData.ChangeName(oldLanguageName, newLanguageName);
 
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
 
@@ -251,6 +251,20 @@ namespace LocalizationTool.Manager
             _languagesData.FavouriteLanguage = newLanguage;
 
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
+        }
+        
+        public async void ChangeLanguageIndex(int oldIndex, int newIndex)
+        {
+            if (oldIndex == newIndex) return; //the new index is the same
+            
+            //Change binary file
+            var language = _languagesData.ChangeIndex(oldIndex, newIndex);
+            
+            await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
+            
+            Log($"Language '{language}' update to index '{newIndex}' correctly");
+            
+            //GUI.FocusControl(null);
         }
 
         #endregion
@@ -399,9 +413,9 @@ namespace LocalizationTool.Manager
             if (_languagesData.Contains(language)) return;
 
             //Add language to Binary 
-            _languagesData.Languagues.Add(language);
+            _languagesData.Add(language);
 
-            if (_languagesData.Languagues.Count == 1)
+            if (_languagesData.Count() == 1)
             {
                 _languagesData.FavouriteLanguage = language;
                 CurrentLanguageInDictionarySection = language;
@@ -506,6 +520,11 @@ namespace LocalizationTool.Manager
             _dynamicDictionary = _dictionaryData.ListDictionaryKeyCategoryLanguages.ToDictionary(data => data.Key, data => new KeyData { Category = data.Category, LanguagesData = data.DictionaryLanguageValue });
         }
 
+        public bool ExistCategory(string category)
+        {
+            return _categoriesData.Contains(category);
+        }
+
         #endregion
 
         #region RefreshData
@@ -602,7 +621,7 @@ namespace LocalizationTool.Manager
             if (_languagesData == null)
             {
                 _languagesData = new LanguagesData();
-                _languagesData.Languagues.Add("English");
+                _languagesData.Add("English");
                 _languagesData.FavouriteLanguage = "English";
                 await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
             }
@@ -619,7 +638,6 @@ namespace LocalizationTool.Manager
 
             if (_categoriesData == null)
             {
-                Log("Categories empty");
                 _categoriesData = new CategoriesData();
                 _categoriesData.Add("None");
                 await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);

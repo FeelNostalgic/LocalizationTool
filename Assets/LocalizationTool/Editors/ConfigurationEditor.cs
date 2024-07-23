@@ -530,14 +530,17 @@ namespace LocalizationTool.Editors
             }
 
             var nKeys = 0;
+            var nCategories = 0;
             while (!reader.EndOfStream)
             {
-                nKeys++;
                 var nextLine = await reader.ReadLineAsync();
                 var lineItems = nextLine.Split(separator);
                 var key = lineItems[0];
                 var category = lineItems[1];
                 var values = new Dictionary<string, string>();
+                
+                nKeys++;
+                if(!LocalizationManager.Instance.ExistCategory(category)) nCategories++;
 
                 for (var i = 0; i < lineItems.Length - 2; i++)
                 {
@@ -549,12 +552,14 @@ namespace LocalizationTool.Editors
                 // await Task.Delay(50);
             }
 
+            var categories = nCategories > 1 ? "Categories" : "Category";
+            sb.AppendLine($"{nCategories} new {categories} imported");
             sb.AppendLine($"{nKeys} keys imported");
 
             EditorUtility.DisplayDialog("CSV imported", sb.ToString(), "OK");
         }
 
-        private async void ImportSerializedData(string path, ISerializerService serializer)
+        private static async void ImportSerializedData(string path, ISerializerService serializer)
         {
             var data = await LocalizationManager.LoadFile<DictionaryTemplate>(path, serializer);
 
@@ -567,15 +572,21 @@ namespace LocalizationTool.Editors
             }
 
             var nKeys = 0;
+            var nCategories = 0;
+
             foreach (var keyCategoryLanguage in data.DictionaryKeyCategoryLanguages)
             {
                 nKeys++;
+                if(!LocalizationManager.Instance.ExistCategory(keyCategoryLanguage.Category)) nCategories++;
+
                 foreach (var languageValue in keyCategoryLanguage.LanguageValues)
                 {
                     await LocalizationManager.Instance.ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, languageValue.Language, languageValue.Value);
                 }
             }
 
+            var categories = nCategories > 1 ? "Categories" : "Category";
+            sb.AppendLine($"{nCategories} new {categories} imported");
             sb.AppendLine($"{nKeys} keys imported");
 
             EditorUtility.DisplayDialog("File imported", sb.ToString(), "OK");
