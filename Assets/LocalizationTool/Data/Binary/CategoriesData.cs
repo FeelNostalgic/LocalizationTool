@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace LocalizationTool.Data.Binary
 {
     [Serializable]
     public class CategoriesData
     {
+        public string DefaultCategory;
+        
         //This is always ordered
         public List<CategoryTuple> OrderedCategories = new();
         public List<string> Categories => OrderedCategories.Select(c => c.Category).ToList();
@@ -51,6 +52,16 @@ namespace LocalizationTool.Data.Binary
             
             UpdateIndexes();
             return itemToChange.Category;
+        }
+
+        public void ChangeIndex(string category, int newIndex)
+        {
+            var itemToChange = OrderedCategories.First(tuple => tuple.Category.Equals(category));
+            itemToChange.Index = newIndex;
+            
+            OrderedCategories = OrderedCategories.OrderBy(tuple => tuple.Index).ToList();
+            
+            UpdateIndexes();
         }
 
         private void UpdateIndexes()

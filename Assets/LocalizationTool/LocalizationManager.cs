@@ -29,10 +29,17 @@ namespace LocalizationTool.Manager
         public static Dictionary<string, KeyData> Dictionary => _dynamicDictionary ?? new Dictionary<string, KeyData>();
         public string CurrentLanguageInDictionarySection { get; set; }
         public int CurrentToolbarLanguageIndex => _languagesData.Languages.IndexOf(CurrentLanguageInDictionarySection);
-        public string FavouriteLanguage => _languagesData.FavouriteLanguage;
-        public bool IsInitalized => _isInitialized;
-        public Texture2D YellowIcon { get; set; }
+        public static string DefaultCategory => _categoriesData.DefaultCategory;
+        public static bool IsDataLoaded { get; private set; }
+        public Texture2D YellowIcon { get; private set; }
 
+        #region Actions
+
+        public Action<string> OnDefaultCategoryUpdate { get; set; }
+
+        #endregion
+        
+        
         #endregion
 
         #region PRIVATE VARIABLES
@@ -61,7 +68,7 @@ namespace LocalizationTool.Manager
 
         #endregion
 
-        private bool _isInitialized;
+        private static bool _isInitialized;
 
         private static Dictionary<string, KeyData> _dynamicDictionary;
 
@@ -206,7 +213,7 @@ namespace LocalizationTool.Manager
             {
                 _languagesData.FavouriteLanguage = _languagesData.Languages[0];
             }
-            
+
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
 
             //Update JSON
@@ -252,19 +259,24 @@ namespace LocalizationTool.Manager
 
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
         }
-        
+
         public async void ChangeLanguageIndex(int oldIndex, int newIndex)
         {
             if (oldIndex == newIndex) return; //the new index is the same
-            
+
             //Change binary file
             var language = _languagesData.ChangeIndex(oldIndex, newIndex);
-            
+
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
-            
+
             Log($"Language '{language}' update to index '{newIndex}' correctly");
-            
+
             //GUI.FocusControl(null);
+        }
+
+        public static bool IsFavouriteLanguage(string language)
+        {
+            return _languagesData.FavouriteLanguage.Equals(language);
         }
 
         #endregion
@@ -326,7 +338,7 @@ namespace LocalizationTool.Manager
         public async void ChangeCategoryName(string oldCategoryName, string newCategoryName)
         {
             if (_categoriesData.Contains(newCategoryName)) return; //the new value is the same
-            
+
             //Change BINARY file 
             _categoriesData.ChangeName(oldCategoryName, newCategoryName);
 
@@ -350,15 +362,31 @@ namespace LocalizationTool.Manager
         public async void ChangeCategoryIndex(int oldIndex, int newIndex)
         {
             if (oldIndex == newIndex) return; //the new index is the same
-            
+
             //Change binary file
-            var category =_categoriesData.ChangeIndex(oldIndex, newIndex);
-            
+            var category = _categoriesData.ChangeIndex(oldIndex, newIndex);
+
+            await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
+
+            Log($"Category '{category}' update to index '{newIndex}' correctly");
+
+            //GUI.FocusControl(null);
+        }
+
+        public async void ChangeDefaultCategory(string newCategory)
+        {
+            //Change BINARY file 
+            _categoriesData.DefaultCategory = newCategory;
+            _categoriesData.ChangeIndex(newCategory, 0);
+
             await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
             
-            Log($"Category '{category}' update to index '{newIndex}' correctly");
-            
-            GUI.FocusControl(null);
+            OnDefaultCategoryUpdate?.Invoke(newCategory);
+        }
+
+        public static bool IsDefaultCategory(string category)
+        {
+            return _categoriesData.DefaultCategory.Equals(category);
         }
 
         #endregion
@@ -486,11 +514,11 @@ namespace LocalizationTool.Manager
 
             if (_dynamicDictionary.ContainsKey(key))
             {
+                AddNewCategory(category.Equals("") ? _categoriesData.DefaultCategory : category, null, false);
+                
                 if (_dynamicDictionary[key].Category != category)
                 {
                     //Change category
-                    if (!_categoriesData.Contains(category)) AddNewCategory(category.Equals("") ? "None" : category, null, false);
-
                     _dictionaryData.UpdateCategoryName(key, category);
                 }
 
@@ -501,7 +529,7 @@ namespace LocalizationTool.Manager
             {
                 //Add new key
 
-                if (!_categoriesData.Contains(category)) AddNewCategory(category.Equals("") ? "None" : category, null, false);
+                AddNewCategory(category.Equals("") ? _categoriesData.DefaultCategory : category, null, false);
 
                 var interDic = ActiveLanguages.ToDictionary(l => l, _ => "");
                 interDic[language] = value;
@@ -568,14 +596,15 @@ namespace LocalizationTool.Manager
         private LocalizationManager()
         {
 #pragma warning disable CS4014
-            Init();
+            //TODO: te if this is necessary => Init();
 #pragma warning restore CS4014
         }
 
         public async Task Init()
         {
-            if (_isInitialized) return;
+            if (_isInitialized) return; // Just the first call
             _isInitialized = true;
+            
             CreateFiles();
             _serializerJson = new UnityJsonSerializer();
             _serializerBinary = new BinarySerializer();
@@ -587,6 +616,7 @@ namespace LocalizationTool.Manager
             await LoadCategoriesDataFromBINARY();
             YellowIcon = GetColoredIcon("d_Favorite", Color.yellow);
 
+            IsDataLoaded = true;
             Log("Manager initialized");
         }
 
@@ -620,14 +650,16 @@ namespace LocalizationTool.Manager
 
             if (_languagesData == null)
             {
-                _languagesData = new LanguagesData();
+                _languagesData = new LanguagesData
+                {
+                    FavouriteLanguage = "English"
+                };
                 _languagesData.Add("English");
-                _languagesData.FavouriteLanguage = "English";
                 await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
             }
 
             CurrentLanguageInDictionarySection = _languagesData.FavouriteLanguage;
-            LocalizationToolController.Instance.ActiveLanguage = FavouriteLanguage;
+            LocalizationToolController.Instance.ActiveLanguage = _languagesData.FavouriteLanguage;
 
             Log("Languages loaded");
         }
@@ -638,7 +670,10 @@ namespace LocalizationTool.Manager
 
             if (_categoriesData == null)
             {
-                _categoriesData = new CategoriesData();
+                _categoriesData = new CategoriesData
+                {
+                    DefaultCategory = "None"
+                };
                 _categoriesData.Add("None");
                 await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
             }
@@ -702,7 +737,7 @@ namespace LocalizationTool.Manager
             }
             catch (Exception e)
             {
-                if(e is not IOException) Debug.LogError(e);
+                if (e is not IOException) Debug.LogError($"{path}: {e}");
             }
         }
 
@@ -717,7 +752,7 @@ namespace LocalizationTool.Manager
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                Debug.LogError($"{path}: {e}");
             }
 
             return default;

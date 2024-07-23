@@ -59,6 +59,17 @@ namespace LocalizationTool.Editors
 
         #region PUBLIC METHODS
 
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            LocalizationManager.Instance.OnDefaultCategoryUpdate += OnDefaultCategoryUpdate;
+        }
+
+        protected override void OnDisable()
+        {
+            LocalizationManager.Instance.OnDefaultCategoryUpdate -= OnDefaultCategoryUpdate;
+        }
+
         public void ShowLayout()
         {
             GUILayout.BeginVertical(MinHeightOption(_windowSize.y));
@@ -318,7 +329,7 @@ namespace LocalizationTool.Editors
             }
 
             GUILayout.Space(10);
-            if (category == "") category = NONE;
+            if (category == "") category = LocalizationManager.DefaultCategory;
             var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), CategoryPopupStyle(), GUILayout.Width(250));
             UpdateCategory(key, LocalizationManager.Categories[tempCategory]);
 
@@ -380,6 +391,11 @@ namespace LocalizationTool.Editors
 
             _currentKeyValueDictionary[key] = tempValue;
             await LocalizationManager.Instance.ChangeValue(key, tempValue);
+        }
+
+        private void OnDefaultCategoryUpdate(string category)
+        {
+            _addCategoryValue = category;
         }
 
         #endregion

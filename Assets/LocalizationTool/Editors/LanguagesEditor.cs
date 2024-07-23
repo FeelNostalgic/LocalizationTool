@@ -205,7 +205,8 @@ namespace LocalizationTool.Editors
             
             GUILayout.Space(12);
             
-            if (LocalizationManager.Instance.FavouriteLanguage.Equals(language))
+            // Favourite Button
+            if (LocalizationManager.IsFavouriteLanguage(language))
             {
                 if (GUILayout.Button(LocalizationManager.Instance.YellowIcon, CenterButtonWithIconStyle()))
                 {
@@ -221,14 +222,18 @@ namespace LocalizationTool.Editors
                 }
             }
 
-            GUILayout.Space(10);
+            GUILayout.Space(8);
 
+            // FIELDS
+            
+            // Text
             var tempValue = EditorGUILayout.TextField(language, TextFieldValueStyle(), MinHeightOption(24));
             if (tempValue.Length > MAX_CHARACTERS) tempValue = tempValue[..MAX_CHARACTERS];
             UpdateLanguage(language, tempValue);
 
             GUILayout.Space(10);
 
+            // Import Button
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), CenterButtonWithIconStyle()))
             {
                 LanguageImportEditor.ShowWindow(language);
@@ -236,6 +241,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.Space(10);
 
+            // Export Button
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CenterButtonWithIconStyle()))
             {
                 LanguageExportEditor.ShowWindow(language);
@@ -243,7 +249,8 @@ namespace LocalizationTool.Editors
 
             GUILayout.Space(10);
 
-            if (LocalizationManager.Instance.FavouriteLanguage.Equals(language))
+            // Delete button
+            if (LocalizationManager.IsFavouriteLanguage(language))
             {
                 if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Delete"), CenterButtonWithIconStyle()))
                 {

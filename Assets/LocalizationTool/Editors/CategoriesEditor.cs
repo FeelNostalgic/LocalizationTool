@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using LocalizationTool.Manager;
 using UnityEditor;
@@ -186,7 +187,7 @@ namespace LocalizationTool.Editors
             
             //Number
             var tempIndex = EditorGUILayout.IntField(index, IntFieldValueStyle(), GUILayout.Width(35), GUILayout.Height(24));
-            if(!category.Equals("None")) UpdateIndex(index, tempIndex);
+            if(!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, tempIndex);
             
             GUILayout.Space(5);
             
@@ -194,29 +195,52 @@ namespace LocalizationTool.Editors
             
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrollup", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
             {
-                if(!category.Equals("None")) UpdateIndex(index, index - 2);
+                if(!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index - 2);
             }
             
             GUILayout.Space(3);
             
             if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrolldown", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
             {
-                if(!category.Equals("None")) UpdateIndex(index, index + 2);
+                if(!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index + 2);
             }
             
             GUILayout.Space(12);
 
+            // Favourite Button
+            if (LocalizationManager.IsDefaultCategory(category))
+            {
+                if (GUILayout.Button(LocalizationManager.Instance.YellowIcon, CenterButtonWithIconStyle()))
+                {
+                    // Nothing
+                }
+            }
+            else
+            {
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Make favourite"), CenterButtonWithIconStyle()))
+                {
+                    LocalizationManager.Instance.ChangeDefaultCategory(category);
+                    LocalizationManager.Log($"Category '{category}' is now default");
+                }
+            }
+
+            GUILayout.Space(8);
+            
+            // FIELDS
+            
+            // Text
             var tempValue = EditorGUILayout.TextField(category, TextFieldValueStyle(), MinHeightOption(24));
             if (tempValue.Length > MAX_CHARACTERS) tempValue = tempValue[..MAX_CHARACTERS];
             UpdateCategory(category, tempValue);
 
             GUILayout.Space(10);
 
-            if (category.Equals(NONE))
+            // Delete Button
+            if (LocalizationManager.IsDefaultCategory(category))
             {
                 if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Locked"), CenterButtonWithIconStyle()))
                 {
-                    if (EditorUtility.DisplayDialog("Warning", $"You can not remove None category", "Ok"))
+                    if (EditorUtility.DisplayDialog("Warning", $"You can not remove Default category", "Ok"))
                     {
                     }
                 }

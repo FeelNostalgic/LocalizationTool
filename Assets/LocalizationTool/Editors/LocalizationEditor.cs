@@ -10,9 +10,7 @@ namespace LocalizationTool.Editors
     public class LocalizationEditor : EditorWindow
     {
         #region PROTECTED VARIABLES
-
-        protected const string NONE = "None";
-
+        
         #endregion
 
         #region EDITOR VARIABLES
@@ -46,10 +44,19 @@ namespace LocalizationTool.Editors
             window.titleContent = new GUIContent("Localization Tool");
         }
 
-        protected void OnGUI()
+        protected virtual void OnEnable()
         {
             LoadData();
-            if (!LocalizationManager.Instance.IsInitalized) return;
+        }
+
+        protected virtual void OnDisable()
+        {
+            //
+        }
+        
+        protected void OnGUI()
+        {
+            if (!LocalizationManager.IsDataLoaded) return;
             WindowToolbar();
             switch (_currentWindow)
             {
@@ -70,35 +77,27 @@ namespace LocalizationTool.Editors
             }
         }
 
-        private void Update()
-        {
-            switch (_currentWindow)
-            {
-                case Enums.GUI_WINDOW.Dictionary:
-                    //TODO
-                    break;
-                case Enums.GUI_WINDOW.Languages:
-                    // TODO
-                    break;
-                case Enums.GUI_WINDOW.Categories:
-                    // TODO
-                    break;
-                case Enums.GUI_WINDOW.Configuration:
-                    // TODO
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        // private void OnDisable()
+        // private void Update()
         // {
-        //     foreach (var (_, value) in _currentKeyValueDictionary)
+        //     switch (_currentWindow)
         //     {
-        //         value.Dispose();
+        //         case Enums.GUI_WINDOW.Dictionary:
+        //             //TODO
+        //             break;
+        //         case Enums.GUI_WINDOW.Languages:
+        //             // TODO
+        //             break;
+        //         case Enums.GUI_WINDOW.Categories:
+        //             // TODO
+        //             break;
+        //         case Enums.GUI_WINDOW.Configuration:
+        //             // TODO
+        //             break;
+        //         default:
+        //             throw new ArgumentOutOfRangeException();
         //     }
         // }
-
+        
         private async void LoadData()
         {
             await LocalizationManager.Instance.Init();
@@ -207,9 +206,9 @@ namespace LocalizationTool.Editors
             GUILayout.Label(label, SubSectionHeaderStyle());
             GUILayout.Space(5);
 
-            if (LocalizationManager.OrderedCategories != null)
+            if (LocalizationManager.OrderedCategories != null) //To avoid possible errors while loading data
             {
-                if (LocalizationManager.Categories.IndexOf(categoryValue) != -1)
+                if (LocalizationManager.Categories.IndexOf(categoryValue) != -1) //Category value is empty when loading
                 {
                     var index = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(categoryValue), LocalizationManager.Categories.ToArray(), AddCategoryStyle());
                     categoryValue = LocalizationManager.Categories[index];
