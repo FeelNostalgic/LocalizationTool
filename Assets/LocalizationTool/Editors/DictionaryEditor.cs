@@ -49,7 +49,6 @@ namespace LocalizationTool.Editors
         #region DIMENSION VARIABLES
 
         private const float LEFT_SECTION_WIDTH_PERCENT = 0.225f;
-        private readonly GUILayoutOption _height = GUILayout.Height(40);
 
         private float _dividerPosition = 305f;
         private const float dividerWidth = 5f;
@@ -250,6 +249,7 @@ namespace LocalizationTool.Editors
         {
             try
             {
+                GUILayout.Space(10);
                 GUILayout.BeginHorizontal();
                 _scrollToolbar = EditorGUILayout.BeginScrollView(_scrollToolbar, GUILayout.Height(40));
                 var toolbarItems = LocalizationManager.ActiveLanguages.Select(t => t).ToArray();
@@ -262,9 +262,7 @@ namespace LocalizationTool.Editors
                         GUI.FocusControl(null);
                     }
                 }
-
                 EditorGUILayout.EndScrollView();
-                GUILayout.Space(5);
 
                 GUILayout.EndHorizontal();
             }
@@ -395,7 +393,6 @@ namespace LocalizationTool.Editors
             UpdateValue(key, tempValue);
             EditorGUILayout.EndScrollView();
             GUILayout.EndHorizontal();
-
             
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginHorizontal("box");

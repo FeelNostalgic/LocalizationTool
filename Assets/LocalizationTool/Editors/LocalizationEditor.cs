@@ -33,7 +33,9 @@ namespace LocalizationTool.Editors
         #region DIMENSION VARIABLES
 
         protected static readonly Vector2 _windowSize = new(1400, 750);
+        protected readonly GUILayoutOption _height = GUILayout.Height(40);
 
+        
         #endregion
 
         [MenuItem("Tool/LocalizationEditor")]

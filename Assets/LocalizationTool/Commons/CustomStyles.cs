@@ -223,7 +223,10 @@ namespace LocalizationTool.Commons
                         alignment = TextAnchor.MiddleLeft,
                         richText = true,
                         wordWrap = true,
-                        fontSize = 13,
+                        fontSize = 14,
+                        border = {left = 0, right = 0, top = 0, bottom = 0},
+                        margin = {left = 0, right = 0, top = 0, bottom = 0},
+                        padding = {left = 15, right = 0, top = 0, bottom = 0}, 
                         normal =
                         {
                             textColor = Color.white
@@ -234,7 +237,7 @@ namespace LocalizationTool.Commons
                     Enums.CustomStyleName.OrderIntField, new GUIStyle(GUI.skin.textField)
                     {
                         alignment = TextAnchor.MiddleCenter,
-                        fontSize = 13,
+                        fontSize = 14,
                         normal =
                         {
                             textColor = Color.white
@@ -259,9 +262,10 @@ namespace LocalizationTool.Commons
                         alignment = TextAnchor.MiddleLeft,
                         richText = true,
                         fixedHeight = 0,
+                        fontSize = 12,
                         border = {left = 0, right = 0, top = 0, bottom = 0},
                         margin = {left = 0, right = 0, top = 0, bottom = 0},
-                        padding = {left = 1, right = 1, top = 1, bottom = 1}, 
+                        padding = {left = 3, right = 3, top = 2, bottom = 1}, 
                         normal = {
                             background = GetTexture2DFromColor(Colors.Alpha(Color.black, 0)), 
                             textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black

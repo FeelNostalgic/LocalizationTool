@@ -29,7 +29,7 @@ namespace LocalizationTool.Editors
         private string _addCategoryFeedbackLabelText = "";
 
         private Vector2 _scrollCenter;
-        
+
         private const int MAX_CHARACTERS = 100;
 
         #endregion
@@ -104,7 +104,7 @@ namespace LocalizationTool.Editors
                 LocalizationManager.Instance.AddNewCategory(_addCategoryValue, this);
                 ControlTextAreaFeedbackDuration(1f);
             }
-            
+
             if (GUI.GetNameOfFocusedControl() == "CATEGORY")
             {
                 if (Event.current is { keyCode: (KeyCode.Return or KeyCode.KeypadEnter) })
@@ -181,66 +181,113 @@ namespace LocalizationTool.Editors
 
         private void UnitCenterScrollViewContent(int index, string category)
         {
+            GUI.backgroundColor = EditorGUIUtility.isProSkin ? Color.white : Colors.Alpha(Color.cyan, .1f);
+            GUILayout.BeginHorizontal("box", _height);
+            GUI.backgroundColor = Color.clear;
             GUILayout.Space(10);
 
-            GUILayout.BeginHorizontal();
-
-            GUILayout.Space(10);
+            Column1(index, category);
             
+            Column2(index, category);
+            
+            Column3(index, category);
+
+            Column4(category);
+            
+            Column5(category);
+            
+            GUILayout.EndHorizontal();
+        }
+
+        private void Column1(int index, string category)
+        {
             //Number
-            var tempIndex = EditorGUILayout.IntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Width(35), GUILayout.Height(24));
-            if(!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, tempIndex);
+            GUILayout.BeginVertical("box", GUILayout.Width(35), _height);
+            GUI.backgroundColor = Colors.DEFAULT;
             
-            GUILayout.Space(5);
-            
-            //Buttons To move
-            
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrollup", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
-            {
-                if(!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index - 2);
-            }
-            
-            GUILayout.Space(3);
-            
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrolldown", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
-            {
-                if(!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index + 2);
-            }
-            
-            GUILayout.Space(12);
+            GUILayout.FlexibleSpace();
+            var tempIndex = EditorGUILayout.IntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Height(30));
+            if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, tempIndex);
+            GUILayout.EndVertical();
+        }
 
+        private void Column2(int index, string category)
+        {
+            //Button To move UP
+            GUI.backgroundColor = Color.clear;
+            GUILayout.BeginVertical("box", GUILayout.Width(23), _height);
+            GUI.backgroundColor = Colors.DEFAULT;
+            
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrollup", "Locked"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            {
+                if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index - 2);
+            }
+            GUILayout.EndVertical();
+        }
+
+        private void Column3(int index, string category)
+        {
+            //Button To move DOWN
+            GUI.backgroundColor = Color.clear;
+            GUILayout.BeginVertical("box", GUILayout.Width(23), _height);
+            GUI.backgroundColor = Colors.DEFAULT;
+            
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrolldown", "Locked"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            {
+                if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index + 2);
+            }
+            GUILayout.EndVertical();
+        }
+
+        private void Column4(string category)
+        {
             // Favourite Button
+            GUI.backgroundColor = Color.clear;
+            GUILayout.BeginVertical("box", GUILayout.Width(26), _height);
+            GUI.backgroundColor = Colors.DEFAULT;
+            
+            GUILayout.FlexibleSpace();
             if (LocalizationManager.IsDefaultCategory(category))
             {
-                if (GUILayout.Button(LocalizationManager.Instance.YellowIcon, CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
+                if (GUILayout.Button(LocalizationManager.Instance.YellowIcon, CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     // Nothing
                 }
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Make favourite"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Make favourite"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     LocalizationManager.Instance.ChangeDefaultCategory(category);
                     LocalizationManager.Log($"Category '{category}' is now default");
                 }
             }
+            GUILayout.EndVertical();
+        }
 
-            GUILayout.Space(8);
+        private void Column5(string category)
+        {
+            GUI.backgroundColor = Color.clear;
+            GUILayout.BeginHorizontal("box", _height, GUILayout.ExpandWidth(true));
+            GUI.backgroundColor = Colors.DEFAULT;
             
             // FIELDS
-            
+
             // Text
-            var tempValue = EditorGUILayout.TextField(category, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), MinHeightOption(24));
+            var tempValue = EditorGUILayout.TextField(category, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), GUILayout.Height(40));
             if (tempValue.Length > MAX_CHARACTERS) tempValue = tempValue[..MAX_CHARACTERS];
             UpdateCategory(category, tempValue);
-
-            GUILayout.Space(10);
-
+            
             // Delete Button
+            GUI.backgroundColor = Color.clear;
+            GUILayout.BeginVertical("box", GUILayout.Width(23));
+            GUI.backgroundColor = Colors.DEFAULT;
+            GUILayout.Space(2);
             if (LocalizationManager.IsDefaultCategory(category))
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Locked"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Locked"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     if (EditorUtility.DisplayDialog("Warning", $"You can not remove Default category", "Ok"))
                     {
@@ -249,7 +296,7 @@ namespace LocalizationTool.Editors
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     if (LocalizationManager.Configuration.CategoryDeleteConfirmation)
                     {
@@ -266,12 +313,11 @@ namespace LocalizationTool.Editors
                     }
                 }
             }
-
-            GUILayout.Space(10);
-
+            GUILayout.EndVertical();
+            
             GUILayout.EndHorizontal();
         }
-
+        
         #endregion
 
         #region UPDATE METHODS
