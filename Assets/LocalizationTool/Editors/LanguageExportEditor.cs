@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using LocalizationTool.Commons;
 using LocalizationTool.Data;
 using LocalizationTool.Data.Json;
 using LocalizationTool.Data.Templates;
@@ -68,12 +69,12 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal();
             
             GUILayout.Space(10);
-            GUILayout.Label("CSV", SubHeaderStyle());
+            GUILayout.Label("CSV", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleLeft14Label));
 
             GUILayout.BeginHorizontal();
             GUILayout.Space(125);
-            _selectedCsvSeparatorIndexForExport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForExport, _csvSeparators, SeparatorCSVLanguageWindowStyle());
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CenterButtonWithIconStyle()))
+            _selectedCsvSeparatorIndexForExport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForExport, _csvSeparators, CustomStyles.GetStyle(Enums.CustomStyleName.SeparatorsCsvLanguageWindowPopup));
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
             {
                 var path = EditorUtility.SaveFilePanel("Save CSV File", "", $"{_language}.csv", "csv");
 
@@ -111,9 +112,9 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal();
             
             GUILayout.Space(10);
-            GUILayout.Label("JSON", SubHeaderStyle());
+            GUILayout.Label("JSON", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleLeft14Label));
             
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CenterButtonWithIconStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
             {
                 var path = EditorUtility.SaveFilePanel("Save JSON File", "", $"{_language}.json", "json");
 
@@ -133,9 +134,9 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal();
             
             GUILayout.Space(10);
-            GUILayout.Label("XML", SubHeaderStyle());
+            GUILayout.Label("XML", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleLeft14Label));
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CenterButtonWithIconStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
             {
                 var path = EditorUtility.SaveFilePanel("Save XML File", "", $"{_language}.xml", "xml");
 

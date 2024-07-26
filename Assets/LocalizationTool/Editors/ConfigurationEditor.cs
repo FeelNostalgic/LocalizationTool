@@ -1,18 +1,15 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using LocalizationTool.Commons;
 using LocalizationTool.Data;
 using LocalizationTool.Data.Templates;
 using LocalizationTool.ExportSerializer;
 using LocalizationTool.Manager;
 using LocalizationTool.Serializer;
 using UnityEditor;
-using UnityEditor.VersionControl;
 using UnityEngine;
-using Task = System.Threading.Tasks.Task;
 
 namespace LocalizationTool.Editors
 {
@@ -121,13 +118,13 @@ namespace LocalizationTool.Editors
             UpdateAllDeleteConfirmation(_toggleAllDeleteConfirmation, tempToogle);
 
             _dictionaryDeleteConfirmation = EditorGUILayout.ToggleLeft("Show delete confirmation in DICTIONARY", LocalizationManager.Configuration.DictionaryDeleteConfirmation, MinHeightOption(24));
-            UpdateDeleteConfirmation(Enums.GUI_WINDOW.Dictionary);
+            UpdateDeleteConfirmation(Enums.GUIWindow.Dictionary);
 
             _languageDeleteConfirmation = EditorGUILayout.ToggleLeft("Show delete confirmation in LANGUAGES", LocalizationManager.Configuration.LanguageDeleteConfirmation, MinHeightOption(24));
-            UpdateDeleteConfirmation(Enums.GUI_WINDOW.Languages);
+            UpdateDeleteConfirmation(Enums.GUIWindow.Languages);
 
             _categoryDeleteConfirmation = EditorGUILayout.ToggleLeft("Show delete confirmation in CATEGORIES", LocalizationManager.Configuration.CategoryDeleteConfirmation, MinHeightOption(24));
-            UpdateDeleteConfirmation(Enums.GUI_WINDOW.Categories);
+            UpdateDeleteConfirmation(Enums.GUIWindow.Categories);
             GUILayout.EndVertical();
         }
 
@@ -135,7 +132,7 @@ namespace LocalizationTool.Editors
         {
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
             ShowSubHeader("Search");
-            _searchTypeIndex = EditorGUILayout.Popup(LocalizationManager.Configuration.SearchTypeIndex, Enums.SEARCH_TYPE, SearchTypeStyle());
+            _searchTypeIndex = EditorGUILayout.Popup(LocalizationManager.Configuration.SearchTypeIndex, Enums.SEARCH_TYPE, CustomStyles.GetStyle(Enums.CustomStyleName.SearchTypePopup));
             UpdateSearchType();
             GUILayout.Space(5);
             GUILayout.EndVertical();
@@ -222,15 +219,15 @@ namespace LocalizationTool.Editors
 
             GUILayout.BeginHorizontal();
 
-            ShowExportSubHeader("CSV", GUILayout.Width(50), GUILayout.Height(25));
+            ShowExportImportSubHeader("CSV", GUILayout.Width(50), GUILayout.Height(25));
 
-            _selectedCsvSeparatorIndexForExport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForExport, _csvSeparators, SeparatorCSVStyle());
+            _selectedCsvSeparatorIndexForExport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForExport, _csvSeparators, CustomStyles.GetStyle(Enums.CustomStyleName.SeparatorsCsvPopup));
 
             GUILayout.EndHorizontal();
 
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), BiggerButtonWithIconStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
             {
                 var path = EditorUtility.SaveFilePanel("Save CSV File", "", "LocalizationData.csv", "csv");
 
@@ -262,13 +259,13 @@ namespace LocalizationTool.Editors
         {
             GUILayout.BeginHorizontal();
 
-            ShowExportSubHeader("JSON", GUILayout.Width(50), GUILayout.Height(25));
+            ShowExportImportSubHeader("JSON", GUILayout.Width(50), GUILayout.Height(25));
 
             GUILayout.Space(200);
             GUILayout.FlexibleSpace();
 
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), BiggerButtonWithIconStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
             {
                 var path = EditorUtility.SaveFilePanel("Save JSON File", "", "LocalizationData.json", "json");
 
@@ -288,13 +285,13 @@ namespace LocalizationTool.Editors
         private void ShowExportXMLSection()
         {
             GUILayout.BeginHorizontal();
-            ShowExportSubHeader("XML", GUILayout.Width(50), GUILayout.Height(25));
+            ShowExportImportSubHeader("XML", GUILayout.Width(50), GUILayout.Height(25));
 
             GUILayout.Space(200);
 
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), BiggerButtonWithIconStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
             {
                 var path = EditorUtility.SaveFilePanel("Save XML File", "", "LocalizationData.xml", "xml");
 
@@ -321,15 +318,15 @@ namespace LocalizationTool.Editors
 
             GUILayout.BeginHorizontal();
 
-            ShowExportSubHeader("CSV", GUILayout.Width(50), GUILayout.Height(25));
+            ShowExportImportSubHeader("CSV", GUILayout.Width(50), GUILayout.Height(25));
 
-            _selectedCsvSeparatorIndexForImport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForImport, _csvSeparators, SeparatorCSVStyle());
+            _selectedCsvSeparatorIndexForImport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForImport, _csvSeparators, CustomStyles.GetStyle(Enums.CustomStyleName.SeparatorsCsvPopup));
 
             GUILayout.EndHorizontal();
 
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), BiggerButtonWithIconStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
             {
                 var path = EditorUtility.OpenFilePanel("Load CSV File", "", "csv");
 
@@ -347,13 +344,13 @@ namespace LocalizationTool.Editors
         private void ShowImportJsonSection()
         {
             GUILayout.BeginHorizontal();
-            ShowExportSubHeader("JSON", GUILayout.Width(50), GUILayout.Height(25));
+            ShowExportImportSubHeader("JSON", GUILayout.Width(50), GUILayout.Height(25));
 
             GUILayout.Space(200);
 
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), BiggerButtonWithIconStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
             {
                 var path = EditorUtility.OpenFilePanel("Load JSON File", "", "json");
 
@@ -371,13 +368,13 @@ namespace LocalizationTool.Editors
         private void ShowImportXmlSection()
         {
             GUILayout.BeginHorizontal();
-            ShowExportSubHeader("XML", GUILayout.Width(50), GUILayout.Height(25));
+            ShowExportImportSubHeader("XML", GUILayout.Width(50), GUILayout.Height(25));
 
             GUILayout.Space(200);
 
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), BiggerButtonWithIconStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
             {
                 var path = EditorUtility.OpenFilePanel("Load XML File", "", "xml");
 
@@ -401,26 +398,26 @@ namespace LocalizationTool.Editors
             if (oldValue == newValue) return;
             _toggleAllDeleteConfirmation = newValue;
             _dictionaryDeleteConfirmation = newValue;
-            UpdateDeleteConfirmation(Enums.GUI_WINDOW.Dictionary);
+            UpdateDeleteConfirmation(Enums.GUIWindow.Dictionary);
 
             _languageDeleteConfirmation = newValue;
-            UpdateDeleteConfirmation(Enums.GUI_WINDOW.Languages);
+            UpdateDeleteConfirmation(Enums.GUIWindow.Languages);
 
             _categoryDeleteConfirmation = newValue;
-            UpdateDeleteConfirmation(Enums.GUI_WINDOW.Categories);
+            UpdateDeleteConfirmation(Enums.GUIWindow.Categories);
         }
 
-        private void UpdateDeleteConfirmation(Enums.GUI_WINDOW window)
+        private void UpdateDeleteConfirmation(Enums.GUIWindow window)
         {
             switch (window)
             {
-                case Enums.GUI_WINDOW.Dictionary:
+                case Enums.GUIWindow.Dictionary:
                     LocalizationManager.Instance.UpdateDeleteConfirmation(_dictionaryDeleteConfirmation, window);
                     break;
-                case Enums.GUI_WINDOW.Languages:
+                case Enums.GUIWindow.Languages:
                     LocalizationManager.Instance.UpdateDeleteConfirmation(_languageDeleteConfirmation, window);
                     break;
-                case Enums.GUI_WINDOW.Categories:
+                case Enums.GUIWindow.Categories:
                     LocalizationManager.Instance.UpdateDeleteConfirmation(_categoryDeleteConfirmation, window);
                     break;
             }

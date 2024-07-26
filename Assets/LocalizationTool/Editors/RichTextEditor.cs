@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using LocalizationTool.Commons;
 using LocalizationTool.Data;
 using UnityEditor;
 using UnityEngine;
@@ -51,7 +52,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.Space(5);
 
-            EditorGUILayout.SelectableLabel(_key, KeyLabelStyle());
+            EditorGUILayout.SelectableLabel(_key, CustomStyles.GetStyle(Enums.CustomStyleName.KeyFixedHeightSelectableLabel));
 
             GUILayout.Space(10);
 
@@ -79,7 +80,7 @@ namespace LocalizationTool.Editors
             _richText = EditorGUILayout.TextArea(_richText, richTextStyle, GUILayout.Height(450));
             EditorGUILayout.EndHorizontal();
 
-            if (GUILayout.Button("Apply", ButtonStyle(), MinHeightOption(30)))
+            if (GUILayout.Button("Apply", CustomStyles.GetStyle(Enums.CustomStyleName.CloseRichTextEditorButton), MinHeightOption(30)))
             {
                 _onTextChanged?.Invoke(_richText);
                 Close();
@@ -100,7 +101,7 @@ namespace LocalizationTool.Editors
             if (_currentFontSizeIndex != _fontSizeIndex)
             {
                 _currentFontSizeIndex = _fontSizeIndex;
-                ApplyStyle(Enums.RICH_TEXT_STYLE.FontSize);
+                ApplyStyle(Enums.RichTextStyle.FontSize);
             }
 
             if (GUILayout.Button("+", GUILayout.Width(30)))
@@ -108,7 +109,7 @@ namespace LocalizationTool.Editors
                 if (_fontSizeIndex < _fontSizes.Length - 1)
                 {
                     _fontSizeIndex++;
-                    ApplyStyle(Enums.RICH_TEXT_STYLE.FontSize);
+                    ApplyStyle(Enums.RichTextStyle.FontSize);
                 }
             }
 
@@ -117,7 +118,7 @@ namespace LocalizationTool.Editors
                 if (_fontSizeIndex > 0)
                 {
                     _fontSizeIndex--;
-                    ApplyStyle(Enums.RICH_TEXT_STYLE.FontSize);
+                    ApplyStyle(Enums.RichTextStyle.FontSize);
                 }
             }
 
@@ -128,12 +129,12 @@ namespace LocalizationTool.Editors
         {
             if (GUILayout.Button("B", GUILayout.Width(30)))
             {
-                ApplyStyle(Enums.RICH_TEXT_STYLE.Bold);
+                ApplyStyle(Enums.RichTextStyle.Bold);
             }
 
             if (GUILayout.Button("I", GUILayout.Width(30)))
             {
-                ApplyStyle(Enums.RICH_TEXT_STYLE.Italic);
+                ApplyStyle(Enums.RichTextStyle.Italic);
             }
 
             //TODO: Fixed this
@@ -143,7 +144,7 @@ namespace LocalizationTool.Editors
             // }
         }
 
-        private void ApplyStyle(Enums.RICH_TEXT_STYLE style)
+        private void ApplyStyle(Enums.RichTextStyle style)
         {
             // Get the current TextEditor
             var tEditor = typeof(EditorGUI).GetField("activeEditor", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null) as TextEditor;
@@ -160,7 +161,7 @@ namespace LocalizationTool.Editors
             bool removeOrAdd;
             string styledText;
 
-            if (style == Enums.RICH_TEXT_STYLE.FontSize)
+            if (style == Enums.RichTextStyle.FontSize)
             {
                 removeOrAdd = !selectedText.Contains("size");
                 if (removeOrAdd)
@@ -221,13 +222,13 @@ namespace LocalizationTool.Editors
             GUI.FocusControl(null);
         }
 
-        private (string, string) GetTags(Enums.RICH_TEXT_STYLE style)
+        private (string, string) GetTags(Enums.RichTextStyle style)
         {
             return style switch
             {
-                Enums.RICH_TEXT_STYLE.Bold => ("<b>", "</b>"),
-                Enums.RICH_TEXT_STYLE.Italic => ("<i>", "</i>"),
-                Enums.RICH_TEXT_STYLE.FontSize => ($"<size={_fontSizes[_fontSizeIndex]}>", "</size>"),
+                Enums.RichTextStyle.Bold => ("<b>", "</b>"),
+                Enums.RichTextStyle.Italic => ("<i>", "</i>"),
+                Enums.RichTextStyle.FontSize => ($"<size={_fontSizes[_fontSizeIndex]}>", "</size>"),
                 _ => throw new ArgumentOutOfRangeException(nameof(style), style, null)
             };
         }

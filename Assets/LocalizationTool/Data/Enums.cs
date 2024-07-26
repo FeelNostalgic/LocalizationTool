@@ -5,7 +5,7 @@ namespace LocalizationTool.Data
 {
     public class Enums
     {
-        public enum GUI_WINDOW
+        public enum GUIWindow
         {
             Dictionary = 0,
             Languages = 1,
@@ -13,11 +13,34 @@ namespace LocalizationTool.Data
             Configuration = 3
         }
 
-        public enum RICH_TEXT_STYLE
+        public enum RichTextStyle
         {
             Bold = 0,
             Italic = 1,
             FontSize = 2
+        }
+        
+        public enum CustomStyleName
+        {
+            CenteredButtonWithIcon,
+            ConfigurationExportImportButton,
+            KeyTextField,
+            SeparatorsCsvPopup,
+            SeparatorsCsvLanguageWindowPopup,
+            ScrollViewCategoryPopup,
+            CategoryPopup,
+            SearchTypePopup,
+            FeedbackLabel,
+            CloseRichTextEditorButton,
+            Header1BoldMiddleCenter20Label,
+            Header2BoldMiddleCenter14Label,
+            Header2BoldMiddleLeft14Label,
+            Header1BoldMiddleCenter15Label,
+            Header2LowerCenter14Label,
+            KeyFixedHeightFixedWidthSelectableLabel,
+            KeyFixedHeightSelectableLabel,
+            ValueMiddleLeftTextField,
+            OrderIntField
         }
         
         public static string[] SEARCH_TYPE = {"By key", "By value", "By both"};

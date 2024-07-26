@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using LocalizationTool.Commons;
+using LocalizationTool.Data;
 using LocalizationTool.Data.Templates;
 using LocalizationTool.Manager;
 using LocalizationTool.Serializer;
@@ -65,12 +67,12 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal();
 
             GUILayout.Space(10);
-            GUILayout.Label("CSV", SubHeaderStyle());
+            GUILayout.Label("CSV", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleLeft14Label));
 
             GUILayout.BeginHorizontal();
             GUILayout.Space(125);
-            _selectedCsvSeparatorIndexForImport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForImport, _csvSeparators, SeparatorCSVLanguageWindowStyle());
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Export"), CenterButtonWithIconStyle()))
+            _selectedCsvSeparatorIndexForImport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForImport, _csvSeparators, CustomStyles.GetStyle(Enums.CustomStyleName.SeparatorsCsvLanguageWindowPopup));
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
             {
                 var path = EditorUtility.OpenFilePanel("Load CSV File", "", "csv");
 
@@ -91,9 +93,9 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal();
 
             GUILayout.Space(10);
-            GUILayout.Label("JSON", SubHeaderStyle());
+            GUILayout.Label("JSON", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleLeft14Label));
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Export"), CenterButtonWithIconStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
             {
                 //TODO:
                 var path = EditorUtility.OpenFilePanel("Load JSON File", "", "json");
@@ -113,9 +115,9 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal();
 
             GUILayout.Space(10);
-            GUILayout.Label("XML", SubHeaderStyle());
+            GUILayout.Label("XML", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleLeft14Label));
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Export"), CenterButtonWithIconStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
             {
                 //TODO:
                 var path = EditorUtility.OpenFilePanel("Load XML File", "", "xml");

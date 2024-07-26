@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LocalizationTool.Commons;
 using LocalizationTool.Controller;
 using LocalizationTool.Data;
 using LocalizationTool.Manager;
@@ -175,7 +176,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.Space(20);
 
-            TableTitleCenterSection();
+            ColumnsTitleCenterSection();
 
             GenerateCenterScrollViewContent();
 
@@ -190,13 +191,13 @@ namespace LocalizationTool.Editors
             {
                 if (_searchCategoryIndex >= LocalizationManager.OrderedCategories.Count) _searchCategoryIndex = 0;
                 GUI.SetNextControlName("Popup");
-                _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, LocalizationManager.Categories.ToArray(), AddCategoryStyle(), GUILayout.Width(200));
+                _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, LocalizationManager.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup), GUILayout.Width(200));
             }
 
             GUILayout.Space(5);
             
             GUI.SetNextControlName("Search");
-            _searchKeyValue = EditorGUILayout.TextField(_searchKeyValue, AddTextFieldStyle());
+            _searchKeyValue = EditorGUILayout.TextField(_searchKeyValue, CustomStyles.GetStyle(Enums.CustomStyleName.KeyTextField));
             GUILayout.Space(5);
 
             GUILayout.EndHorizontal();
@@ -212,24 +213,27 @@ namespace LocalizationTool.Editors
 
             GUILayout.FlexibleSpace();
             
-            GUILayout.Label(LocalizationManager.Instance.CurrentLanguageInDictionarySection, HeaderStyle());
+            GUILayout.Label(LocalizationManager.Instance.CurrentLanguageInDictionarySection, CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter20Label));
 
             GUILayout.FlexibleSpace();
 
             GUILayout.EndHorizontal();
         }
 
-        private void TableTitleCenterSection()
+        private void ColumnsTitleCenterSection()
         {
+            //GUI.backgroundColor = Colors.DEEP_GRAY_A;
             GUILayout.BeginHorizontal();
-
             GUILayout.Label("KEY", SubSectionHeaderStyle(325));
+            
             GUILayout.Label("CATEGORY", SubSectionHeaderStyle(250));
             GUILayout.FlexibleSpace();
-            GUILayout.Label("VALUE", SubSectionHeaderStyle());
+            GUILayout.Label("VALUE", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter14Label));
             GUILayout.FlexibleSpace();
             GUILayout.Space(100);
             GUILayout.EndHorizontal();
+            
+           // GUI.backgroundColor;
         }
 
         private void LanguageToolBarSection()
@@ -322,7 +326,7 @@ namespace LocalizationTool.Editors
             
             GUILayout.Space(10);
 
-            if (GUILayout.Button(key, SelectableLabelStyle()))
+            if (GUILayout.Button(key, CustomStyles.GetStyle(Enums.CustomStyleName.KeyFixedHeightFixedWidthSelectableLabel)))
             {
                 EditorGUIUtility.systemCopyBuffer = key;
                 LocalizationManager.Log($"Key '{key}' copied to clipboard");
@@ -330,19 +334,19 @@ namespace LocalizationTool.Editors
 
             GUILayout.Space(10);
             if (category == "") category = LocalizationManager.DefaultCategory;
-            var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), CategoryPopupStyle(), GUILayout.Width(250));
+            var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.ScrollViewCategoryPopup), GUILayout.Width(250));
             UpdateCategory(key, LocalizationManager.Categories[tempCategory]);
 
             GUILayout.Space(10);
             
             _currentKeyScrollPosition[key] = EditorGUILayout.BeginScrollView(_currentKeyScrollPosition[key], GUIStyle.none, GUIStyle.none, GUILayout.Height(28), GUILayout.ExpandWidth(true));
-            var tempValue = EditorGUILayout.TextArea(value, TextFieldValueStyle(), GUILayout.ExpandHeight(true));
+            var tempValue = EditorGUILayout.TextArea(value, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), GUILayout.ExpandHeight(true));
             EditorGUILayout.EndScrollView();
             UpdateValue(key, tempValue);
             
             GUILayout.Space(8);
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("Customized", "Edit"), CenterButtonWithIconStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("Customized", "Edit"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
             {
                 RichTextEditor.ShowWindow(tempValue, key, delegate(string s) { UpdateValue(key, s); });
                 LocalizationManager.Log($"Editing key '{key}'");
@@ -350,7 +354,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.Space(8);
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CenterButtonWithIconStyle()))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
             {
                 if (LocalizationManager.Configuration.DictionaryDeleteConfirmation)
                 {

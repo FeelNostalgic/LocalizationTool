@@ -11,6 +11,7 @@ using LocalizationTool.Editors;
 using LocalizationTool.Serializer;
 using UnityEditor;
 using UnityEngine;
+using static LocalizationTool.Commons.GameUtils;
 
 namespace LocalizationTool.Manager
 {
@@ -393,19 +394,19 @@ namespace LocalizationTool.Manager
 
         #region CONFIGURATION
 
-        public async void UpdateDeleteConfirmation(bool newValue, Enums.GUI_WINDOW window)
+        public async void UpdateDeleteConfirmation(bool newValue, Enums.GUIWindow window)
         {
             switch (window)
             {
-                case Enums.GUI_WINDOW.Dictionary:
+                case Enums.GUIWindow.Dictionary:
                     if (_configurationData.DictionaryDeleteConfirmation == newValue) return;
                     _configurationData.DictionaryDeleteConfirmation = newValue;
                     break;
-                case Enums.GUI_WINDOW.Languages:
+                case Enums.GUIWindow.Languages:
                     if (_configurationData.LanguageDeleteConfirmation == newValue) return;
                     _configurationData.LanguageDeleteConfirmation = newValue;
                     break;
-                case Enums.GUI_WINDOW.Categories:
+                case Enums.GUIWindow.Categories:
                     if (_configurationData.CategoryDeleteConfirmation == newValue) return;
                     _configurationData.CategoryDeleteConfirmation = newValue;
                     break;
@@ -766,33 +767,7 @@ namespace LocalizationTool.Manager
         }
 
         #endregion
-
-        private static Texture2D GetColoredIcon(string iconName, Color color)
-        {
-            var originalTexture = EditorGUIUtility.IconContent(iconName).image as Texture2D;
-            if (originalTexture == null)
-            {
-                return null;
-            }
-
-            var coloredTexture = new Texture2D(originalTexture.width, originalTexture.height, TextureFormat.RGBA32, false);
-
-            Graphics.CopyTexture(originalTexture, coloredTexture);
-
-            for (var y = 0; y < coloredTexture.height; y++)
-            {
-                for (var x = 0; x < coloredTexture.width; x++)
-                {
-                    var originalColor = coloredTexture.GetPixel(x, y);
-                    var newColor = originalColor * color;
-                    coloredTexture.SetPixel(x, y, newColor);
-                }
-            }
-
-            coloredTexture.Apply();
-            return coloredTexture;
-        }
-
+        
         private void PrintDictionary()
         {
             foreach (var l in _dynamicDictionary)

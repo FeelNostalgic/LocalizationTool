@@ -1,5 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using LocalizationTool.Commons;
+using LocalizationTool.Data;
 using LocalizationTool.Manager;
 using UnityEditor;
 using UnityEngine;
@@ -87,7 +89,7 @@ namespace LocalizationTool.Editors
             ShowHorizontalLine(5);
             GUILayout.Space(10);
 
-            GUILayout.Label("CATEGORY", SubSectionHeaderStyle());
+            GUILayout.Label("CATEGORY", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter14Label));
             GUILayout.Space(8);
 
             GUILayout.BeginHorizontal();
@@ -152,7 +154,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.FlexibleSpace();
 
-            GUILayout.Label("CATEGORIES", HeaderStyle());
+            GUILayout.Label("CATEGORIES", CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter20Label));
 
             GUILayout.FlexibleSpace();
 
@@ -186,7 +188,7 @@ namespace LocalizationTool.Editors
             GUILayout.Space(10);
             
             //Number
-            var tempIndex = EditorGUILayout.IntField(index, IntFieldValueStyle(), GUILayout.Width(35), GUILayout.Height(24));
+            var tempIndex = EditorGUILayout.IntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Width(35), GUILayout.Height(24));
             if(!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, tempIndex);
             
             GUILayout.Space(5);
@@ -210,14 +212,14 @@ namespace LocalizationTool.Editors
             // Favourite Button
             if (LocalizationManager.IsDefaultCategory(category))
             {
-                if (GUILayout.Button(LocalizationManager.Instance.YellowIcon, CenterButtonWithIconStyle()))
+                if (GUILayout.Button(LocalizationManager.Instance.YellowIcon, CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
                 {
                     // Nothing
                 }
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Make favourite"), CenterButtonWithIconStyle()))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Make favourite"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
                 {
                     LocalizationManager.Instance.ChangeDefaultCategory(category);
                     LocalizationManager.Log($"Category '{category}' is now default");
@@ -229,7 +231,7 @@ namespace LocalizationTool.Editors
             // FIELDS
             
             // Text
-            var tempValue = EditorGUILayout.TextField(category, TextFieldValueStyle(), MinHeightOption(24));
+            var tempValue = EditorGUILayout.TextField(category, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), MinHeightOption(24));
             if (tempValue.Length > MAX_CHARACTERS) tempValue = tempValue[..MAX_CHARACTERS];
             UpdateCategory(category, tempValue);
 
@@ -238,7 +240,7 @@ namespace LocalizationTool.Editors
             // Delete Button
             if (LocalizationManager.IsDefaultCategory(category))
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Locked"), CenterButtonWithIconStyle()))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Locked"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
                 {
                     if (EditorUtility.DisplayDialog("Warning", $"You can not remove Default category", "Ok"))
                     {
@@ -247,7 +249,7 @@ namespace LocalizationTool.Editors
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CenterButtonWithIconStyle()))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
                 {
                     if (LocalizationManager.Configuration.CategoryDeleteConfirmation)
                     {
