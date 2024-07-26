@@ -305,28 +305,7 @@ namespace LocalizationTool.Editors
         }
 
         #endregion
-
-        #region Styles
         
-        protected GUIStyle SubSectionHeaderStyle(float fixedWidth)
-        {
-            var style = new GUIStyle
-            {
-                alignment = TextAnchor.MiddleCenter,
-                fontStyle = FontStyle.Bold,
-                fontSize = 13,
-                fixedWidth = fixedWidth,
-                normal =
-                {
-                    textColor = Color.white
-                }
-            };
-
-            return style;
-        }
-        
-        #endregion
-
         #endregion
     }
 #endif

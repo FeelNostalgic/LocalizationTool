@@ -8,6 +8,7 @@ using LocalizationTool.Data;
 using LocalizationTool.Manager;
 using UnityEditor;
 using UnityEngine;
+using static LocalizationTool.Commons.GameUtils;
 
 namespace LocalizationTool.Editors
 {
@@ -48,6 +49,7 @@ namespace LocalizationTool.Editors
         #region DIMENSION VARIABLES
 
         private const float LEFT_SECTION_WIDTH_PERCENT = 0.225f;
+        private readonly GUILayoutOption _height = GUILayout.Height(40);
 
         private float _dividerPosition = 305f;
         private const float dividerWidth = 5f;
@@ -74,7 +76,7 @@ namespace LocalizationTool.Editors
         public void ShowLayout()
         {
             GUILayout.BeginVertical(MinHeightOption(_windowSize.y));
-            
+
             ShowHorizontalLine(5);
 
             GUILayout.BeginHorizontal();
@@ -88,7 +90,7 @@ namespace LocalizationTool.Editors
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
         }
-        
+
         #endregion
 
         #region PRRIVATE METHODS
@@ -118,7 +120,7 @@ namespace LocalizationTool.Editors
                 ShowLabelPopupSelection("CATEGORY", ref _addCategoryValue);
 
                 GUILayout.Space(20);
-                
+
                 if (GUILayout.Button(EditorGUIUtility.IconContent("d_ol_plus", "Add new language"), GUILayout.MaxWidth(500), GUILayout.MaxHeight(25)))
                 {
                     LocalizationManager.Instance.AddNewKey(_addKeyValue, _addCategoryValue, this);
@@ -195,7 +197,7 @@ namespace LocalizationTool.Editors
             }
 
             GUILayout.Space(5);
-            
+
             GUI.SetNextControlName("Search");
             _searchKeyValue = EditorGUILayout.TextField(_searchKeyValue, CustomStyles.GetStyle(Enums.CustomStyleName.KeyTextField));
             GUILayout.Space(5);
@@ -212,7 +214,7 @@ namespace LocalizationTool.Editors
             }
 
             GUILayout.FlexibleSpace();
-            
+
             GUILayout.Label(LocalizationManager.Instance.CurrentLanguageInDictionarySection, CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter20Label));
 
             GUILayout.FlexibleSpace();
@@ -222,18 +224,26 @@ namespace LocalizationTool.Editors
 
         private void ColumnsTitleCenterSection()
         {
-            //GUI.backgroundColor = Colors.DEEP_GRAY_A;
+            GUI.backgroundColor = EditorGUIUtility.isProSkin ? Colors.DEEP_GRAY : Colors.DEEP_GRAY_A;
             GUILayout.BeginHorizontal();
-            GUILayout.Label("KEY", SubSectionHeaderStyle(325));
-            
-            GUILayout.Label("CATEGORY", SubSectionHeaderStyle(250));
-            GUILayout.FlexibleSpace();
-            GUILayout.Label("VALUE", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter14Label));
-            GUILayout.FlexibleSpace();
-            GUILayout.Space(100);
+            // Column 1
+            GUILayout.BeginVertical("box");
+            GUILayout.Label("KEY", CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel), GUILayout.Width(300));
+            GUILayout.EndVertical();
+
+            // Column 2
+            GUILayout.BeginVertical("box");
+            GUILayout.Label("CATEGORY", CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel), GUILayout.Width(200));
+            GUILayout.EndVertical();
+
+            // Column 3
+            GUILayout.BeginVertical("box", GUILayout.ExpandWidth(true));
+            GUILayout.Label("VALUE", CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel));
+            GUILayout.EndVertical();
+
             GUILayout.EndHorizontal();
-            
-           // GUI.backgroundColor;
+
+            GUI.backgroundColor = Colors.DEFAULT;
         }
 
         private void LanguageToolBarSection()
@@ -252,6 +262,7 @@ namespace LocalizationTool.Editors
                         GUI.FocusControl(null);
                     }
                 }
+
                 EditorGUILayout.EndScrollView();
                 GUILayout.Space(5);
 
@@ -274,6 +285,7 @@ namespace LocalizationTool.Editors
                 {
                     UnitCenterScrollViewContent(keyData.Key, keyData.Value.Category, keyData.Value.LanguagesData[LocalizationManager.Instance.CurrentLanguageInDictionarySection]);
                 }
+
                 EditorGUILayout.EndScrollView();
             }
             catch
@@ -300,9 +312,9 @@ namespace LocalizationTool.Editors
                     break;
                 case 2: //By Both
                     if (!_searchKeyValue.Equals(""))
-                        filteredDicToIterate = filteredDicToIterate.Where(pair => 
+                        filteredDicToIterate = filteredDicToIterate.Where(pair =>
                                 pair.Key.Contains(_searchKeyValue, StringComparison.InvariantCulture)
-                                || LocalizationToolController.Instance.GetValueByKey(pair.Key).Contains(_searchKeyValue, StringComparison.InvariantCulture) )
+                                || LocalizationToolController.Instance.GetValueByKey(pair.Key).Contains(_searchKeyValue, StringComparison.InvariantCulture))
                             .ToDictionary(kv => (kv.Key), kv => kv.Value);
                     break;
             }
@@ -310,7 +322,7 @@ namespace LocalizationTool.Editors
             if (_searchCategoryIndex != 0)
                 filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Value.Category == LocalizationManager.Categories[_searchCategoryIndex])
                     .ToDictionary(kv => (kv.Key), kv => kv.Value);
-            
+
             return filteredDicToIterate;
         }
 
@@ -318,43 +330,88 @@ namespace LocalizationTool.Editors
         {
             if (!_currentKeyValueDictionary.ContainsKey(key)) _currentKeyValueDictionary.Add(key, value);
             if (!_currentKeyGroupDictionary.ContainsKey(key)) _currentKeyGroupDictionary.Add(key, category);
-            if(!_currentKeyScrollPosition.ContainsKey(key)) _currentKeyScrollPosition.Add(key, Vector2.zero);
+            if (!_currentKeyScrollPosition.ContainsKey(key)) _currentKeyScrollPosition.Add(key, Vector2.zero);
 
-            GUILayout.Space(10);
+            GUI.backgroundColor = EditorGUIUtility.isProSkin ? Color.white : Colors.Alpha(Color.cyan, .1f);
+            GUILayout.BeginHorizontal("box", _height);
+            GUI.backgroundColor = Color.clear;
 
-            GUILayout.BeginHorizontal();
-            
-            GUILayout.Space(10);
+            Column1(key);
 
-            if (GUILayout.Button(key, CustomStyles.GetStyle(Enums.CustomStyleName.KeyFixedHeightFixedWidthSelectableLabel)))
+            Column2(key, category);
+
+            Column3(key, value);
+
+            GUILayout.EndHorizontal();
+        }
+
+        private void Column1(string key)
+        {
+            GUILayout.BeginVertical("box", GUILayout.Width(300), _height);
+            GUI.backgroundColor = Colors.DEFAULT;
+            GUILayout.Space(5);
+
+            if (GUILayout.Button(new GUIContent(key, "Tooltip"), CustomStyles.GetStyle(Enums.CustomStyleName.KeySelectableLabel), GUILayout.Width(300), GUILayout.Height(30)))
             {
                 EditorGUIUtility.systemCopyBuffer = key;
                 LocalizationManager.Log($"Key '{key}' copied to clipboard");
             }
 
-            GUILayout.Space(10);
+            GUILayout.EndVertical();
+        }
+
+        private void Column2(string key, string category)
+        {
+            GUI.backgroundColor = Color.clear;
+            GUILayout.BeginVertical("box", _height);
+
+            GUILayout.Space(3);
+            GUILayout.BeginHorizontal(GUILayout.Width(200));
+            EditorGUI.BeginChangeCheck();
+
             if (category == "") category = LocalizationManager.DefaultCategory;
-            var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.ScrollViewCategoryPopup), GUILayout.Width(250));
-            UpdateCategory(key, LocalizationManager.Categories[tempCategory]);
+            GUI.backgroundColor = Colors.DEFAULT;
+            var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.ScrollViewCategoryPopup));
 
-            GUILayout.Space(10);
-            
-            _currentKeyScrollPosition[key] = EditorGUILayout.BeginScrollView(_currentKeyScrollPosition[key], GUIStyle.none, GUIStyle.none, GUILayout.Height(28), GUILayout.ExpandWidth(true));
-            var tempValue = EditorGUILayout.TextArea(value, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), GUILayout.ExpandHeight(true));
-            EditorGUILayout.EndScrollView();
+            if (EditorGUI.EndChangeCheck())
+                UpdateCategory(key, LocalizationManager.Categories[tempCategory]);
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndVertical();
+        }
+
+        private void Column3(string key, string value)
+        {
+            GUI.backgroundColor = Color.clear;
+
+            GUILayout.BeginHorizontal("box", _height, GUILayout.ExpandWidth(true));
+
+            GUI.backgroundColor = Colors.DEFAULT;
+
+            GUILayout.BeginHorizontal(CustomStyles.GetStyle(Enums.CustomStyleName.ValueEditorPreviewBox));
+            _currentKeyScrollPosition[key] = EditorGUILayout.BeginScrollView(_currentKeyScrollPosition[key], GUILayout.ExpandWidth(true), GUILayout.Height(40));
+            var tempValue = EditorGUILayout.TextArea(value, CustomStyles.GetStyle(Enums.CustomStyleName.ValueEditorPreviewTextArea), GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
             UpdateValue(key, tempValue);
-            
-            GUILayout.Space(8);
+            EditorGUILayout.EndScrollView();
+            GUILayout.EndHorizontal();
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("Customized", "Edit"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
+            
+            GUI.backgroundColor = Color.clear;
+            GUILayout.BeginHorizontal("box");
+            GUI.backgroundColor = Colors.DEFAULT;
+            
+            var icon = EditorGUIUtility.IconContent("Customized").image;
+
+            if (GUILayout.Button(new GUIContent(icon, "tooltip"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 RichTextEditor.ShowWindow(tempValue, key, delegate(string s) { UpdateValue(key, s); });
                 LocalizationManager.Log($"Editing key '{key}'");
             }
 
-            GUILayout.Space(8);
+            GUILayout.Space(5);
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 if (LocalizationManager.Configuration.DictionaryDeleteConfirmation)
                 {
@@ -369,10 +426,9 @@ namespace LocalizationTool.Editors
                     LocalizationManager.Instance.RemoveKey(key);
                     LocalizationManager.Log($"Key '{key}' removed");
                 }
-
             }
 
-            GUILayout.Space(14);
+            GUILayout.EndHorizontal();
 
             GUILayout.EndHorizontal();
         }
@@ -411,7 +467,7 @@ namespace LocalizationTool.Editors
             _addValueFeedbackLabelText = "";
             base.ControlTextAreaFeedbackDuration(durationInSeconds);
         }
-        
+
         #endregion
     }
 #endif

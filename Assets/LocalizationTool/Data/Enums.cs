@@ -23,6 +23,7 @@ namespace LocalizationTool.Data
         public enum CustomStyleName
         {
             CenteredButtonWithIcon,
+            BiggerCenteredButtonWithIcon,
             ConfigurationExportImportButton,
             KeyTextField,
             SeparatorsCsvPopup,
@@ -37,10 +38,13 @@ namespace LocalizationTool.Data
             Header2BoldMiddleLeft14Label,
             Header1BoldMiddleCenter15Label,
             Header2LowerCenter14Label,
-            KeyFixedHeightFixedWidthSelectableLabel,
+            KeySelectableLabel,
             KeyFixedHeightSelectableLabel,
             ValueMiddleLeftTextField,
-            OrderIntField
+            OrderIntField,
+            ColumnsTitleBoldMiddleLeftLabel,
+            ValueEditorPreviewTextArea,
+            ValueEditorPreviewBox
         }
         
         public static string[] SEARCH_TYPE = {"By key", "By value", "By both"};

@@ -28,6 +28,13 @@ namespace LocalizationTool.Commons
                     }
                 },
                 {
+                    Enums.CustomStyleName.BiggerCenteredButtonWithIcon, new GUIStyle(GUI.skin.button)
+                    {
+                        fixedHeight = 28,
+                        fixedWidth = 28
+                    }
+                },
+                {
                     Enums.CustomStyleName.ConfigurationExportImportButton, new GUIStyle(GUI.skin.button)
                     {
                         fixedHeight = 30,
@@ -75,14 +82,8 @@ namespace LocalizationTool.Commons
                 {
                     Enums.CustomStyleName.ScrollViewCategoryPopup, new GUIStyle(EditorStyles.popup)
                     {
-                        alignment = TextAnchor.MiddleLeft,
-                        fixedHeight = 25,
-                        fixedWidth = 250,
-                        fontSize = 12,
-                        normal =
-                        {
-                            textColor = Color.white
-                        }
+                        fixedHeight = 30,
+                        fixedWidth = 0
                     }
                 },
                 {
@@ -194,12 +195,10 @@ namespace LocalizationTool.Commons
                     }
                 },
                 {
-                    Enums.CustomStyleName.KeyFixedHeightFixedWidthSelectableLabel, new GUIStyle(GUI.skin.textField)
+                    Enums.CustomStyleName.KeySelectableLabel, new GUIStyle(GUI.skin.textField)
                     {
                         alignment = TextAnchor.MiddleCenter,
                         fontSize = 13,
-                        fixedHeight = 24,
-                        fixedWidth = 300,
                         normal =
                         {
                             textColor = Color.white
@@ -240,6 +239,50 @@ namespace LocalizationTool.Commons
                         {
                             textColor = Color.white
                         }
+                    }
+                },
+                {
+                    Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel, new GUIStyle(GUI.skin.label)
+                    {
+                        alignment = TextAnchor.MiddleCenter,
+                        fontStyle = FontStyle.Bold,
+                        fontSize = 13,
+                        normal =
+                        {
+                            textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black
+                        }
+                    }
+                },
+                {
+                    Enums.CustomStyleName.ValueEditorPreviewTextArea, new GUIStyle(GUI.skin.textArea)
+                    {
+                        alignment = TextAnchor.MiddleLeft,
+                        richText = true,
+                        fixedHeight = 0,
+                        border = {left = 0, right = 0, top = 0, bottom = 0},
+                        margin = {left = 0, right = 0, top = 0, bottom = 0},
+                        padding = {left = 1, right = 1, top = 1, bottom = 1}, 
+                        normal = {
+                            background = GetTexture2DFromColor(Colors.Alpha(Color.black, 0)), 
+                            textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black
+                        },
+                        active = {background = GetTexture2DFromColor(Colors.Alpha(Color.black, 0))},
+                        focused = {background = GetTexture2DFromColor(Colors.Alpha(Color.black, 0))}
+                    }
+                },
+                {
+                    Enums.CustomStyleName.ValueEditorPreviewBox, new GUIStyle(GUI.skin.box)
+                    {
+                        alignment = TextAnchor.MiddleCenter,
+                        fontStyle = FontStyle.Bold,
+                        border = {left = 0, right = 0, top = 0, bottom = 0},
+                        margin = {left = 0, right = 0, top = 0, bottom = 0},
+                        padding = {left = 1, right = 1, top = 1, bottom = 1},
+                        normal = {
+                            background = GetTexture2DFromColor(EditorGUIUtility.isProSkin ? Colors.Alpha(Color.black, .1f) : Colors.Alpha(Color.white,.5f)), 
+                            textColor = EditorGUIUtility.isProSkin ? Colors.Alpha(Color.white) : Colors.Alpha(Color.black, .7f)
+                        },
+                        hover = {textColor = EditorGUIUtility.isProSkin ? Colors.Alpha(Color.white) : Colors.Alpha(Color.black, .7f)}
                     }
                 }
             };

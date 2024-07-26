@@ -11,6 +11,7 @@ namespace LocalizationTool.Commons
         public static readonly Color LIGHT_TURKEASE = new Color(170 / 255f, 225 / 255f, 230 / 255f, 1f);
         public static readonly Color LIGHT_RED = new Color(255 / 255f, 210 / 255f, 210 / 255f, 1f);
         public static readonly Color DEEP_DEEP_GRAY = new Color(50 / 255f, 50 / 255f, 50 / 255f, 1f);
+        public static readonly Color DEFAULT = Color.white;
 
         private Colors()
         {
