@@ -269,11 +269,10 @@ namespace LocalizationTool.Editors
 
         private void Column5(string category)
         {
+            // FIELDS
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginHorizontal("box", _height, GUILayout.ExpandWidth(true));
             GUI.backgroundColor = Colors.DEFAULT;
-            
-            // FIELDS
 
             // Text
             var tempValue = EditorGUILayout.TextField(category, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), GUILayout.Height(40));
@@ -284,7 +283,7 @@ namespace LocalizationTool.Editors
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginVertical("box", GUILayout.Width(23));
             GUI.backgroundColor = Colors.DEFAULT;
-            GUILayout.Space(2);
+            //GUILayout.Space(2);
             if (LocalizationManager.IsDefaultCategory(category))
             {
                 if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Locked"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))

@@ -179,82 +179,130 @@ namespace LocalizationTool.Editors
 
         private void UnitCenterScrollViewContent(int index, string language)
         {
+            GUI.backgroundColor = EditorGUIUtility.isProSkin ? Color.white : Colors.Alpha(Color.cyan, .1f);
+            GUILayout.BeginHorizontal("box", _height);
+            GUI.backgroundColor = Color.clear;
             GUILayout.Space(10);
 
-            GUILayout.BeginHorizontal();
+            Column1(index);
 
-            GUILayout.Space(10);
+            Column2(index);
 
+            Column3(index);
+
+            Column4(language);
+            
+            Column5(language);
+            
+            GUILayout.EndHorizontal();
+        }
+
+        private void Column1(int index)
+        {
             //Number
-            var tempIndex = EditorGUILayout.IntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Width(35), GUILayout.Height(24));
+            GUILayout.BeginVertical("box", GUILayout.Width(35), _height);
+            GUI.backgroundColor = Colors.DEFAULT;
+            GUILayout.FlexibleSpace();
+            
+            var tempIndex = EditorGUILayout.IntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Height(30));       
             UpdateIndex(index, tempIndex);
-            
-            GUILayout.Space(5);
-            
-            //Buttons To move
-            
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrollup", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
+            GUILayout.EndVertical();
+        }
+
+        private void Column2(int index)
+        {
+            //Button To move UP
+            GUI.backgroundColor = Color.clear;
+            GUILayout.BeginVertical("box", GUILayout.Width(23), _height);
+            GUI.backgroundColor = Colors.DEFAULT;
+            GUILayout.FlexibleSpace();
+
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrollup", "Locked"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 UpdateIndex(index, index - 2);
             }
+            GUILayout.EndVertical();
+
+        }
+
+        private void Column3(int index)
+        {
+            //Button To move DOWN
+            GUI.backgroundColor = Color.clear;
+            GUILayout.BeginVertical("box", GUILayout.Width(23), _height);
+            GUI.backgroundColor = Colors.DEFAULT;
             
-            GUILayout.Space(3);
-            
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrolldown", "Locked"), GUILayout.Width(25), GUILayout.Height(24)))
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrolldown", "Locked"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 UpdateIndex(index, index + 2);
             }
-            
-            GUILayout.Space(12);
-            
+            GUILayout.EndVertical();
+        }
+
+        private void Column4(string language)
+        {
             // Favourite Button
+            GUI.backgroundColor = Color.clear;
+            GUILayout.BeginVertical("box", GUILayout.Width(26), _height);
+            GUI.backgroundColor = Colors.DEFAULT;
+            
+            GUILayout.FlexibleSpace();
             if (LocalizationManager.IsFavouriteLanguage(language))
             {
-                if (GUILayout.Button(LocalizationManager.Instance.YellowIcon, CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
+                if (GUILayout.Button(LocalizationManager.Instance.YellowIcon, CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     // Nothing
                 }
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Make favourite"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Make favourite"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     LocalizationManager.Instance.ChangeFavoriteLanguage(language);
                     LocalizationManager.Log($"Language '{language}' is now favorite");
                 }
             }
+            GUILayout.EndVertical();
+        }
 
-            GUILayout.Space(8);
-
+        private void Column5(string language)
+        {
             // FIELDS
-            
+            GUI.backgroundColor = Color.clear;
+            GUILayout.BeginHorizontal("box", _height, GUILayout.ExpandWidth(true));
+            GUI.backgroundColor = Colors.DEFAULT;
+
             // Text
-            var tempValue = EditorGUILayout.TextField(language, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), MinHeightOption(24));
+            var tempValue = EditorGUILayout.TextField(language, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), GUILayout.Height(40));
             if (tempValue.Length > MAX_CHARACTERS) tempValue = tempValue[..MAX_CHARACTERS];
             UpdateLanguage(language, tempValue);
-
-            GUILayout.Space(10);
-
+            
+            // BUTTONS
+            GUI.backgroundColor = Color.clear;
+            GUILayout.BeginHorizontal("box", GUILayout.Width(23*3+2*3));
+            GUI.backgroundColor = Colors.DEFAULT;
+            
             // Import Button
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"),  CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 LanguageImportEditor.ShowWindow(language);
             }
-
-            GUILayout.Space(10);
+            
+            GUILayout.Space(2);
 
             // Export Button
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 LanguageExportEditor.ShowWindow(language);
             }
-
-            GUILayout.Space(10);
+            
+            GUILayout.Space(2);
 
             // Delete button
             if (LocalizationManager.IsFavouriteLanguage(language))
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     if (EditorUtility.DisplayDialog("Warning", $"Favourite language can not be removed", "Ok"))
                     {
@@ -264,7 +312,7 @@ namespace LocalizationTool.Editors
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.CenteredButtonWithIcon)))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     if (LocalizationManager.Configuration.LanguageDeleteConfirmation)
                     {
@@ -281,9 +329,9 @@ namespace LocalizationTool.Editors
                     }
                 }
             }
-            
-            GUILayout.Space(10);
 
+            GUILayout.EndHorizontal();
+            
             GUILayout.EndHorizontal();
         }
 
