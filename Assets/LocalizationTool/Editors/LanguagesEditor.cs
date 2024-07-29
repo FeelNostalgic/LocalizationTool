@@ -85,19 +85,21 @@ namespace LocalizationTool.Editors
         private void ShowAddSection()
         {
             ShowHorizontalLine(5);
-            GUILayout.Space(10);
-
-            GUILayout.Label("LANGUAGE", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter14Label));
-            GUILayout.Space(8);
-
+            GUILayout.BeginVertical("box");
+            GUILayout.Space(5);
+            
+            GUILayout.Label("LANGUAGE", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label));
+            GUILayout.Space(5);
+            
             GUILayout.BeginHorizontal();
+            GUILayout.Space(3);
 
             GUI.SetNextControlName("LANGUAGE");
-            _addLanguageValue = EditorGUILayout.TextField(_addLanguageValue, MinHeightOption(25));
+            _addLanguageValue = EditorGUILayout.TextField(_addLanguageValue, CustomStyles.GetStyle(Enums.CustomStyleName.KeyTextField), GUILayout.Height(30));
 
             GUILayout.Space(5);
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_ol_plus", "Add new language"), GUILayout.MaxWidth(25), GUILayout.MaxHeight(25)))
+            if (GUILayout.Button(GetGUIContent(AddIcon, "Add new language"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 LocalizationManager.Instance.AddNewLanguage(_addLanguageValue, this);
                 ControlTextAreaFeedbackDuration(1f);
@@ -112,12 +114,14 @@ namespace LocalizationTool.Editors
                 }
             }
 
+            GUILayout.Space(3);
             GUILayout.EndHorizontal();
-            GUILayout.Space(10);
+            GUILayout.Space(5);
 
             ShowTextAreaFeedback(_addLanguageFeedbackLabelText);
-
-            GUILayout.Space(10);
+            
+            GUILayout.EndVertical();
+            
             ShowHorizontalLine(5);
         }
 
@@ -145,7 +149,7 @@ namespace LocalizationTool.Editors
         private void TitleCenterSection()
         {
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_Refresh", "Refresh data loading"), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
+            if (GUILayout.Button(GetGUIContent(RefreshIcon, "Reload data"), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
             {
                 LocalizationManager.Instance.RefreshLanguagesData();
             }
@@ -186,9 +190,9 @@ namespace LocalizationTool.Editors
 
             Column1(index);
 
-            Column2(index);
+            Column2(index, language);
 
-            Column3(index);
+            Column3(index, language);
 
             Column4(language);
             
@@ -203,13 +207,13 @@ namespace LocalizationTool.Editors
             GUILayout.BeginVertical("box", GUILayout.Width(35), _height);
             GUI.backgroundColor = Colors.DEFAULT;
             GUILayout.FlexibleSpace();
-            
-            var tempIndex = EditorGUILayout.IntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Height(30));       
-            UpdateIndex(index, tempIndex);
+            EditorGUI.BeginChangeCheck();
+            var tempIndex = EditorGUILayout.IntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Height(30));      
+            if(EditorGUI.EndChangeCheck()) UpdateIndex(index, tempIndex);
             GUILayout.EndVertical();
         }
 
-        private void Column2(int index)
+        private void Column2(int index, string language)
         {
             //Button To move UP
             GUI.backgroundColor = Color.clear;
@@ -217,7 +221,7 @@ namespace LocalizationTool.Editors
             GUI.backgroundColor = Colors.DEFAULT;
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrollup", "Locked"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(GetGUIContent(UpIcon, $"Move '{language}' Up"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 UpdateIndex(index, index - 2);
             }
@@ -225,7 +229,7 @@ namespace LocalizationTool.Editors
 
         }
 
-        private void Column3(int index)
+        private void Column3(int index, string language)
         {
             //Button To move DOWN
             GUI.backgroundColor = Color.clear;
@@ -233,7 +237,7 @@ namespace LocalizationTool.Editors
             GUI.backgroundColor = Colors.DEFAULT;
             
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrolldown", "Locked"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(GetGUIContent(DownIcon, $"Move '{language}' Down"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 UpdateIndex(index, index + 2);
             }
@@ -250,14 +254,14 @@ namespace LocalizationTool.Editors
             GUILayout.FlexibleSpace();
             if (LocalizationManager.IsFavouriteLanguage(language))
             {
-                if (GUILayout.Button(LocalizationManager.Instance.YellowIcon, CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                if (GUILayout.Button(GetGUIContent(LocalizationManager.Instance.YellowIcon, $"'{language}' is favourite language"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     // Nothing
                 }
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Make favourite"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                if (GUILayout.Button(GetGUIContent(FavouriteIcon, $"Make '{language}' favourite"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     LocalizationManager.Instance.ChangeFavoriteLanguage(language);
                     LocalizationManager.Log($"Language '{language}' is now favorite");
@@ -284,7 +288,7 @@ namespace LocalizationTool.Editors
             GUI.backgroundColor = Colors.DEFAULT;
             
             // Import Button
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"),  CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(GetGUIContent(ImportIcon, "Open Import Menu"),  CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 LanguageImportEditor.ShowWindow(language);
             }
@@ -292,7 +296,7 @@ namespace LocalizationTool.Editors
             GUILayout.Space(2);
 
             // Export Button
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(GetGUIContent(ExportIcon, "Open Export Menu"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 LanguageExportEditor.ShowWindow(language);
             }
@@ -302,17 +306,13 @@ namespace LocalizationTool.Editors
             // Delete button
             if (LocalizationManager.IsFavouriteLanguage(language))
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                if (GUILayout.Button(GetGUIContent(LockIcon, "Favourite language cannot be removed"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
-                    if (EditorUtility.DisplayDialog("Warning", $"Favourite language can not be removed", "Ok"))
-                    {
-                        //Nothing
-                    }
                 }
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                if (GUILayout.Button(GetGUIContent(DeleteIcon, "Remove language"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     if (LocalizationManager.Configuration.LanguageDeleteConfirmation)
                     {

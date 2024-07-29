@@ -34,7 +34,7 @@ namespace LocalizationTool.Data
             FeedbackLabel,
             CloseRichTextEditorButton,
             Header1BoldMiddleCenter20Label,
-            Header2BoldMiddleCenter14Label,
+            Header2BoldMiddleCenter15Label,
             Header2BoldMiddleLeft14Label,
             Header1BoldMiddleCenter15Label,
             Header2LowerCenter14Label,

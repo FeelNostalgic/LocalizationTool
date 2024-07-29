@@ -87,19 +87,21 @@ namespace LocalizationTool.Editors
         private void ShowAddSection()
         {
             ShowHorizontalLine(5);
-            GUILayout.Space(10);
+            GUILayout.BeginVertical("box");
+            GUILayout.Space(5);
 
-            GUILayout.Label("CATEGORY", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter14Label));
-            GUILayout.Space(8);
+            GUILayout.Label("CATEGORY", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label));
+            GUILayout.Space(5);
 
             GUILayout.BeginHorizontal();
+            GUILayout.Space(3);
 
             GUI.SetNextControlName("CATEGORY");
-            _addCategoryValue = EditorGUILayout.TextField(_addCategoryValue, MinHeightOption(25));
+            _addCategoryValue = EditorGUILayout.TextField(_addCategoryValue, CustomStyles.GetStyle(Enums.CustomStyleName.KeyTextField), GUILayout.Height(30));
 
             GUILayout.Space(5);
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_ol_plus", "Add new language"), GUILayout.MaxWidth(25), GUILayout.MaxHeight(25)))
+            if (GUILayout.Button(GetGUIContent(AddIcon, "Add new category"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 LocalizationManager.Instance.AddNewCategory(_addCategoryValue, this);
                 ControlTextAreaFeedbackDuration(1f);
@@ -114,12 +116,13 @@ namespace LocalizationTool.Editors
                 }
             }
 
+            GUILayout.Space(3);
             GUILayout.EndHorizontal();
-            GUILayout.Space(10);
+            GUILayout.Space(5);
 
             ShowTextAreaFeedback(_addCategoryFeedbackLabelText);
-
-            GUILayout.Space(10);
+            GUILayout.EndVertical();
+            
             ShowHorizontalLine(5);
         }
 
@@ -147,7 +150,7 @@ namespace LocalizationTool.Editors
         private void TitleCenterSection()
         {
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_Refresh", "Refresh data loading"), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
+            if (GUILayout.Button(GetGUIContent(RefreshIcon, "Reload data"), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
             {
                 LocalizationManager.Instance.RefreshCategoriesData();
             }
@@ -219,7 +222,7 @@ namespace LocalizationTool.Editors
             GUI.backgroundColor = Colors.DEFAULT;
             
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrollup", "Locked"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(GetGUIContent(UpIcon, $"Move '{category}' Up"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index - 2);
             }
@@ -234,7 +237,7 @@ namespace LocalizationTool.Editors
             GUI.backgroundColor = Colors.DEFAULT;
             
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_scrolldown", "Locked"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(GetGUIContent(DownIcon, $"Move '{category}' Down"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index + 2);
             }
@@ -251,14 +254,14 @@ namespace LocalizationTool.Editors
             GUILayout.FlexibleSpace();
             if (LocalizationManager.IsDefaultCategory(category))
             {
-                if (GUILayout.Button(LocalizationManager.Instance.YellowIcon, CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                if (GUILayout.Button(GetGUIContent(LocalizationManager.Instance.YellowIcon, $"'{category}' is default category"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     // Nothing
                 }
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_Favorite", "Make favourite"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                if (GUILayout.Button(GetGUIContent(FavouriteIcon, $"Make '{category}' default"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     LocalizationManager.Instance.ChangeDefaultCategory(category);
                     LocalizationManager.Log($"Category '{category}' is now default");
@@ -286,16 +289,13 @@ namespace LocalizationTool.Editors
             //GUILayout.Space(2);
             if (LocalizationManager.IsDefaultCategory(category))
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_AssemblyLock", "Locked"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                if (GUILayout.Button(GetGUIContent(LockIcon, "Default category cannot be removed"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
-                    if (EditorUtility.DisplayDialog("Warning", $"You can not remove Default category", "Ok"))
-                    {
-                    }
                 }
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                if (GUILayout.Button(GetGUIContent(DeleteIcon, "Remove category"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     if (LocalizationManager.Configuration.CategoryDeleteConfirmation)
                     {

@@ -110,17 +110,19 @@ namespace LocalizationTool.Editors
             try
             {
                 ShowHorizontalLine(5);
-
-                GUILayout.Space(10);
+                GUILayout.BeginVertical("box");
+                GUILayout.Space(5);
+                GUILayout.BeginVertical(GUILayout.Height(70));
                 ShowLabelTextFieldVertical("KEY", ref _addKeyValue);
+                GUILayout.EndVertical();
 
-                GUILayout.Space(20);
-
+                GUILayout.BeginVertical(GUILayout.Height(70));
                 ShowLabelPopupSelection("CATEGORY", ref _addCategoryValue);
+                GUILayout.EndVertical();
 
-                GUILayout.Space(20);
+                GUILayout.BeginVertical(GUILayout.Width(312), GUILayout.Height(60));
 
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_ol_plus", "Add new language"), GUILayout.MaxWidth(500), GUILayout.MaxHeight(25)))
+                if (GUILayout.Button(new GUIContent(AddIcon, "Add new key to dictionary"), GUILayout.ExpandWidth(true), GUILayout.Height(30)))
                 {
                     LocalizationManager.Instance.AddNewKey(_addKeyValue, _addCategoryValue, this);
                     ControlTextAreaFeedbackDuration(1.5f);
@@ -135,11 +137,12 @@ namespace LocalizationTool.Editors
                     }
                 }
 
-                GUILayout.Space(10);
+                GUILayout.Space(5);
 
                 ShowTextAreaFeedback(_addValueFeedbackLabelText);
+                GUILayout.EndVertical();
 
-                GUILayout.Space(10);
+                GUILayout.EndVertical();
                 ShowHorizontalLine(5);
             }
             catch (Exception e)
@@ -198,16 +201,17 @@ namespace LocalizationTool.Editors
             GUILayout.Space(5);
 
             GUI.SetNextControlName("Search");
-            _searchKeyValue = EditorGUILayout.TextField(_searchKeyValue, CustomStyles.GetStyle(Enums.CustomStyleName.KeyTextField));
+            _searchKeyValue = EditorGUILayout.TextField(_searchKeyValue, CustomStyles.GetStyle(Enums.CustomStyleName.KeyTextField), GUILayout.Height(30));
             GUILayout.Space(5);
 
             GUILayout.EndHorizontal();
         }
 
-        private void TitleCenterSection()
+        private static void TitleCenterSection()
         {
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_Refresh", "Refresh data loading"), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
+            
+            if (GUILayout.Button(new GUIContent(RefreshIcon, "Reload data"), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
             {
                 LocalizationManager.Instance.RefreshDictionaryData();
             }
@@ -221,7 +225,7 @@ namespace LocalizationTool.Editors
             GUILayout.EndHorizontal();
         }
 
-        private void ColumnsTitleCenterSection()
+        private static void ColumnsTitleCenterSection()
         {
             GUI.backgroundColor = EditorGUIUtility.isProSkin ? Colors.DEEP_GRAY : Colors.DEEP_GRAY_A;
             GUILayout.BeginHorizontal();
@@ -262,6 +266,7 @@ namespace LocalizationTool.Editors
                         GUI.FocusControl(null);
                     }
                 }
+
                 EditorGUILayout.EndScrollView();
 
                 GUILayout.EndHorizontal();
@@ -393,14 +398,12 @@ namespace LocalizationTool.Editors
             UpdateValue(key, tempValue);
             EditorGUILayout.EndScrollView();
             GUILayout.EndHorizontal();
-            
+
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginHorizontal("box");
             GUI.backgroundColor = Colors.DEFAULT;
             
-            var icon = EditorGUIUtility.IconContent("Customized").image;
-
-            if (GUILayout.Button(new GUIContent(icon, "tooltip"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(new GUIContent(EditIcon, "Open rich text editor"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 RichTextEditor.ShowWindow(tempValue, key, delegate(string s) { UpdateValue(key, s); });
                 LocalizationManager.Log($"Editing key '{key}'");
@@ -408,7 +411,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.Space(5);
 
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_TreeEditor.Trash", "Delete"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(new GUIContent(DeleteIcon, "Remove key"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 if (LocalizationManager.Configuration.DictionaryDeleteConfirmation)
                 {

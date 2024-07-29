@@ -45,8 +45,7 @@ namespace LocalizationTool.Commons
                     Enums.CustomStyleName.KeyTextField, new GUIStyle(GUI.skin.textField)
                     {
                         alignment = TextAnchor.MiddleLeft,
-                        fontSize = 12,
-                        fixedHeight = 25,
+                        fontSize = 13,
                         normal =
                         {
                             textColor = Color.white
@@ -90,8 +89,8 @@ namespace LocalizationTool.Commons
                     Enums.CustomStyleName.CategoryPopup, new GUIStyle(EditorStyles.popup)
                     {
                         alignment = TextAnchor.MiddleLeft,
-                        fixedHeight = 24,
-                        fontSize = 12,
+                        fixedHeight = 30,
+                        fixedWidth = 0,
                         normal =
                         {
                             textColor = Color.white
@@ -148,11 +147,11 @@ namespace LocalizationTool.Commons
                     }
                 },
                 {
-                    Enums.CustomStyleName.Header2BoldMiddleCenter14Label, new GUIStyle(GUI.skin.label)
+                    Enums.CustomStyleName.Header2BoldMiddleCenter15Label, new GUIStyle(GUI.skin.label)
                     {
                         alignment = TextAnchor.MiddleCenter,
                         fontStyle = FontStyle.Bold,
-                        fontSize = 14,
+                        fontSize = 15,
                         normal =
                         {
                             textColor = Color.white

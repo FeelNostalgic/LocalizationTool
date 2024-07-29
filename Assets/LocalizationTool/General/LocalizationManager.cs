@@ -87,7 +87,15 @@ namespace LocalizationTool.Manager
             {
                 if (editor != null && editor.AddValueFeedbackLabelText != "") return;
                 Log("Key cannot be an empty value");
-                editor.AddValueFeedbackLabelText = "Key cannot be an empty value";
+                if (editor != null) editor.AddValueFeedbackLabelText = "Key cannot be an empty value";
+                return;
+            }
+
+            if (key.Contains(" "))
+            {
+                if (editor != null && editor.AddValueFeedbackLabelText != "") return;
+                Log("Key cannot contain spaces");
+                if (editor != null) editor.AddValueFeedbackLabelText = "Key cannot contain spaces";
                 return;
             }
 
@@ -169,6 +177,15 @@ namespace LocalizationTool.Manager
                 if (editor != null && editor.AddLanguageFeedbackLabelText != "") return;
                 Log("Language cannot be an empty value");
                 if (editor != null) editor.AddLanguageFeedbackLabelText = "Language cannot be an empty value";
+                return;
+            }
+
+            if (newLanguage.Contains(" "))
+            {
+                if (!showLogs) return;
+                if (editor != null && editor.AddLanguageFeedbackLabelText != "") return;
+                Log("Language cannot contain spaces");
+                if (editor != null) editor.AddLanguageFeedbackLabelText = "Language cannot contain spaces";
                 return;
             }
 
@@ -293,6 +310,15 @@ namespace LocalizationTool.Manager
                 if (editor != null && editor.AddCategoryFeedbackLabelText != "") return;
                 Log("Category cannot be an empty value");
                 if (editor != null) editor.AddCategoryFeedbackLabelText = "Category cannot be an empty value";
+                return;
+            }
+
+            if (newCategory.Contains(" "))
+            {
+                if (!showEditorLogs) return;
+                if (editor != null && editor.AddCategoryFeedbackLabelText != "") return;
+                Log("Category cannot contain spaces");
+                if (editor != null) editor.AddCategoryFeedbackLabelText = "Category cannot contain spaces";
                 return;
             }
 

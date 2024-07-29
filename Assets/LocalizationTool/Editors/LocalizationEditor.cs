@@ -11,7 +11,19 @@ namespace LocalizationTool.Editors
     public class LocalizationEditor : EditorWindow
     {
         #region PROTECTED VARIABLES
-        
+
+        protected static Texture RefreshIcon => EditorGUIUtility.IconContent("d_Refresh").image;
+        protected static Texture AddIcon => EditorGUIUtility.IconContent("d_ol_plus").image;
+        protected static Texture EditIcon => EditorGUIUtility.IconContent("Customized").image;
+        protected static Texture DeleteIcon => EditorGUIUtility.IconContent("d_TreeEditor.Trash").image;
+        protected static Texture UpIcon => EditorGUIUtility.IconContent("d_scrollup").image;
+        protected static Texture DownIcon => EditorGUIUtility.IconContent("d_scrolldown").image;
+        protected static Texture FavouriteIcon => EditorGUIUtility.IconContent("d_Favorite").image;
+        protected static Texture ImportIcon => EditorGUIUtility.IconContent("d_FolderOpened Icon").image;
+        protected static Texture ExportIcon => EditorGUIUtility.IconContent("d_SaveAs").image;
+        protected static Texture LockIcon => EditorGUIUtility.IconContent("d_AssemblyLock").image;
+        protected static Texture GearIcon => EditorGUIUtility.IconContent("d__Popup").image;
+
         #endregion
 
         #region EDITOR VARIABLES
@@ -105,7 +117,7 @@ namespace LocalizationTool.Editors
         {
             await LocalizationManager.Instance.Init();
         }
-
+        
         private void ShowDictionaryLayout()
         {
             _dictionaryEditor ??= (DictionaryEditor)CreateInstance(typeof(DictionaryEditor));
@@ -173,6 +185,11 @@ namespace LocalizationTool.Editors
 
         #region COMMONS
 
+        protected GUIContent GetGUIContent(Texture t, string tooltip)
+        {
+            return new GUIContent(t, tooltip);
+        }
+        
         #region GUI ELEMENTS
 
         protected void ShowHeader(string name, params GUILayoutOption[] options)
@@ -206,7 +223,7 @@ namespace LocalizationTool.Editors
         protected void ShowLabelPopupSelection(string label, ref string categoryValue)
         {
             GUILayout.BeginVertical();
-            GUILayout.Label(label, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter14Label));
+            GUILayout.Label(label, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label));
             GUILayout.Space(5);
 
             if (LocalizationManager.OrderedCategories != null) //To avoid possible errors while loading data
@@ -230,9 +247,9 @@ namespace LocalizationTool.Editors
         {
             GUILayout.BeginVertical();
             GUI.SetNextControlName(label);
-            GUILayout.Label(label, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter14Label));
+            GUILayout.Label(label, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label));
             GUILayout.Space(5);
-            keyValue = EditorGUILayout.TextField(keyValue, CustomStyles.GetStyle(Enums.CustomStyleName.KeyTextField));
+            keyValue = EditorGUILayout.TextField(keyValue, CustomStyles.GetStyle(Enums.CustomStyleName.KeyTextField), GUILayout.Height(30));
             GUILayout.EndVertical();
         }
 
@@ -246,14 +263,18 @@ namespace LocalizationTool.Editors
             Repaint();
         }
 
-        public static void ShowVerticalLine(float width)
+        protected static void ShowVerticalLine(float width)
         {
+            GUI.backgroundColor = Colors.DEEP_GRAY;
             GUILayout.Box("", GUILayout.ExpandHeight(true), GUILayout.Width(width));
+            GUI.backgroundColor = Colors.DEFAULT;
         }
 
         public static void ShowHorizontalLine(float height)
         {
+            GUI.backgroundColor = Colors.DEEP_GRAY;
             GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(height));
+            GUI.backgroundColor = Colors.DEFAULT;
         }
 
         protected void VerticalReDimensionalDivisionLine(float width)
