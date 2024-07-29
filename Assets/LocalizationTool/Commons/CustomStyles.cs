@@ -69,8 +69,8 @@ namespace LocalizationTool.Commons
                     Enums.CustomStyleName.SeparatorsCsvLanguageWindowPopup, new GUIStyle(EditorStyles.popup)
                     {
                         alignment = TextAnchor.MiddleCenter,
-                        fixedHeight = 22,
-                        fixedWidth = 45,
+                        fixedHeight = 30,
+                        fixedWidth = 0,
                         fontSize = 15,
                         normal =
                         {
@@ -286,6 +286,19 @@ namespace LocalizationTool.Commons
                             textColor = EditorGUIUtility.isProSkin ? Colors.Alpha(Color.white) : Colors.Alpha(Color.black, .7f)
                         },
                         hover = {textColor = EditorGUIUtility.isProSkin ? Colors.Alpha(Color.white) : Colors.Alpha(Color.black, .7f)}
+                    }
+                },
+                {
+                    Enums.CustomStyleName.LanguageManageEditorEnumPopup, new GUIStyle(EditorStyles.popup)
+                    {
+                        fontSize = 13,
+                        fontStyle = FontStyle.Bold,
+                        fixedHeight = 30,
+                        fixedWidth = 0,
+                        normal =
+                        {
+                            textColor = Color.white
+                        }
                     }
                 }
             };

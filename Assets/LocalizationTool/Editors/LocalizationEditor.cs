@@ -23,6 +23,7 @@ namespace LocalizationTool.Editors
         protected static Texture ExportIcon => EditorGUIUtility.IconContent("d_SaveAs").image;
         protected static Texture LockIcon => EditorGUIUtility.IconContent("d_AssemblyLock").image;
         protected static Texture GearIcon => EditorGUIUtility.IconContent("d__Popup").image;
+        protected static Texture WarningIcon => EditorGUIUtility.IconContent("d_console.warnicon.sml").image;
 
         #endregion
 
@@ -192,10 +193,17 @@ namespace LocalizationTool.Editors
         
         #region GUI ELEMENTS
 
-        protected void ShowHeader(string name, params GUILayoutOption[] options)
+        protected void ShowHeader1(string name, params GUILayoutOption[] options)
         {
             GUILayout.Space(5);
             GUILayout.Label(name, CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter20Label), options);
+            GUILayout.Space(10);
+        }
+
+        protected void ShowHeader2(string name, params GUILayoutOption[] options)
+        {
+            GUILayout.Space(5);
+            GUILayout.Label(name, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label), options);
             GUILayout.Space(10);
         }
 

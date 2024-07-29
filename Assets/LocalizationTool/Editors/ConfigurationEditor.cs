@@ -76,7 +76,7 @@ namespace LocalizationTool.Editors
         {
             GUILayout.Space(15);
 
-            ShowHeader("CONFIGURATION");
+            ShowHeader1("CONFIGURATION");
 
             GUILayout.Space(10);
         }

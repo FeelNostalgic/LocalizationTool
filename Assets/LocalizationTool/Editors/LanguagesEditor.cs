@@ -284,22 +284,22 @@ namespace LocalizationTool.Editors
             
             // BUTTONS
             GUI.backgroundColor = Color.clear;
-            GUILayout.BeginHorizontal("box", GUILayout.Width(23*3+2*3));
+            GUILayout.BeginHorizontal("box", GUILayout.Width(23*2+2*2));
             GUI.backgroundColor = Colors.DEFAULT;
             
             // Import Button
-            if (GUILayout.Button(GetGUIContent(ImportIcon, "Open Import Menu"),  CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(GetGUIContent(GearIcon, "Open Manage Menu"),  CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                LanguageImportEditor.ShowWindow(language);
+                LanguageManagerEditor.ShowWindow(language);
             }
             
-            GUILayout.Space(2);
+            //GUILayout.Space(2);
 
             // Export Button
-            if (GUILayout.Button(GetGUIContent(ExportIcon, "Open Export Menu"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
-            {
-                LanguageExportEditor.ShowWindow(language);
-            }
+            // if (GUILayout.Button(GetGUIContent(ExportIcon, "Open Export Menu"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            // {
+            //     LanguageExportEditor.ShowWindow(language);
+            // }
             
             GUILayout.Space(2);
 

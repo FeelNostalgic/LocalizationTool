@@ -19,6 +19,13 @@ namespace LocalizationTool.Data
             Italic = 1,
             FontSize = 2
         }
+
+        public enum ExportImportMethods
+        {
+            CSV,
+            JSON,
+            XML
+        }
         
         public enum CustomStyleName
         {
@@ -44,7 +51,8 @@ namespace LocalizationTool.Data
             OrderIntField,
             ColumnsTitleBoldMiddleLeftLabel,
             ValueEditorPreviewTextArea,
-            ValueEditorPreviewBox
+            ValueEditorPreviewBox,
+            LanguageManageEditorEnumPopup
         }
         
         public static string[] SEARCH_TYPE = {"By key", "By value", "By both"};
