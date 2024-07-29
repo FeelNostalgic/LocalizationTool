@@ -25,6 +25,7 @@ namespace LocalizationTool.Editors
         #region PRIVATE VARIABLES
 
         private string _language;
+        
         private Enums.ExportImportMethods _exportMethod;
         private Enums.ExportImportMethods _importMethod;
 

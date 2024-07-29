@@ -8,7 +8,6 @@ using LocalizationTool.Data;
 using LocalizationTool.Manager;
 using UnityEditor;
 using UnityEngine;
-using static LocalizationTool.Commons.GameUtils;
 
 namespace LocalizationTool.Editors
 {
@@ -74,7 +73,7 @@ namespace LocalizationTool.Editors
 
         public void ShowLayout()
         {
-            GUILayout.BeginVertical(MinHeightOption(_windowSize.y));
+            GUILayout.BeginVertical( GUILayout.ExpandHeight(true));
 
             ShowHorizontalLine(5);
 
@@ -403,7 +402,7 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal("box");
             GUI.backgroundColor = Colors.DEFAULT;
             
-            if (GUILayout.Button(new GUIContent(EditIcon, "Open rich text editor"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(new GUIContent(GearIcon, "Open rich text editor"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 RichTextEditor.ShowWindow(tempValue, key, delegate(string s) { UpdateValue(key, s); });
                 LocalizationManager.Log($"Editing key '{key}'");

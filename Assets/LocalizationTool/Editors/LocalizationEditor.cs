@@ -45,10 +45,9 @@ namespace LocalizationTool.Editors
 
         #region DIMENSION VARIABLES
 
-        protected static readonly Vector2 _windowSize = new(1400, 750);
+        protected static readonly Vector2 _windowSize = new(1400, 1000);
         protected readonly GUILayoutOption _height = GUILayout.Height(40);
 
-        
         #endregion
 
         [MenuItem("Tool/LocalizationEditor")]
@@ -79,10 +78,10 @@ namespace LocalizationTool.Editors
                 case Enums.GUIWindow.Dictionary:
                     ShowDictionaryLayout();
                     break;
-                case Enums.GUIWindow.Languages:
+                case Enums.GUIWindow.Language:
                     ShowLanguagesLayout();
                     break;
-                case Enums.GUIWindow.Categories:
+                case Enums.GUIWindow.Category:
                     ShowCategoriesLayout();
                     break;
                 case Enums.GUIWindow.Configuration:
@@ -159,14 +158,14 @@ namespace LocalizationTool.Editors
             GUILayout.Space(10);
             if (GUILayout.Button(new GUIContent("Languages"), EditorStyles.toolbarButton))
             {
-                _currentWindow = Enums.GUIWindow.Languages;
+                _currentWindow = Enums.GUIWindow.Language;
                 GUI.FocusControl(null);
             }
 
             GUILayout.Space(10);
             if (GUILayout.Button(new GUIContent("Categories"), EditorStyles.toolbarButton))
             {
-                _currentWindow = Enums.GUIWindow.Categories;
+                _currentWindow = Enums.GUIWindow.Category;
                 GUI.FocusControl(null);
             }
 
@@ -217,7 +216,7 @@ namespace LocalizationTool.Editors
         protected void ShowSubHeader(string name, params GUILayoutOption[] options)
         {
             GUILayout.Space(8);
-            GUILayout.Label(name, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleLeft14Label), options);
+            GUILayout.Label(name, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleLeft15Label), options);
             GUILayout.Space(10);
         }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,9 +33,15 @@ namespace LocalizationTool.Editors
 
         private bool _showLogs;
 
+        private Enums.ExportImportMethods _exportMethod;
+        private Enums.ExportImportMethods _importMethod;
+
         private int _selectedCsvSeparatorIndexForExport;
         private int _selectedCsvSeparatorIndexForImport;
 
+        private const string README_PATH = "Assets/LocalizationTool/Data/DoNotTouch/Info/Readme.txt";
+        private const string LICENSE_PATH = "Assets/LocalizationTool/Data/DoNotTouch/Info/License.txt";
+        
         #endregion
 
         #region DIMENSION VARIABLES
@@ -49,7 +56,7 @@ namespace LocalizationTool.Editors
 
         public void ShowLayout()
         {
-            GUILayout.BeginVertical();
+            GUILayout.BeginVertical(GUILayout.ExpandHeight(true));
 
             Title();
 
@@ -61,7 +68,7 @@ namespace LocalizationTool.Editors
 
             ShowVerticalLine(5);
 
-            ExportSection();
+            ExportImportSection();
 
             GUILayout.EndHorizontal();
 
@@ -89,7 +96,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.FlexibleSpace();
 
-            GUILayout.BeginVertical(MinWidthOption(275));
+            GUILayout.BeginVertical(MinWidthOption(300));
 
             DeleteConfirmationSection();
 
@@ -108,29 +115,30 @@ namespace LocalizationTool.Editors
 
         private void DeleteConfirmationSection()
         {
-            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
             ShowSubHeader("Delete Confirmation");
 
             if (_dictionaryDeleteConfirmation && _languageDeleteConfirmation && _categoryDeleteConfirmation) _toggleAllDeleteConfirmation = true;
             else _toggleAllDeleteConfirmation = false;
 
-            var tempToogle = EditorGUILayout.Toggle(_toggleAllDeleteConfirmation);
+            var tempToogle = EditorGUILayout.Toggle(_toggleAllDeleteConfirmation, GUILayout.Height(28));
             UpdateAllDeleteConfirmation(_toggleAllDeleteConfirmation, tempToogle);
 
-            _dictionaryDeleteConfirmation = EditorGUILayout.ToggleLeft("Show delete confirmation in DICTIONARY", LocalizationManager.Configuration.DictionaryDeleteConfirmation, MinHeightOption(24));
-            UpdateDeleteConfirmation(Enums.GUIWindow.Dictionary);
+            _dictionaryDeleteConfirmation = ToggleLeft(LocalizationManager.Configuration.DictionaryDeleteConfirmation, "Show delete confirmation in DICTIONARY",
+                delegate { UpdateDeleteConfirmation(Enums.GUIWindow.Dictionary); });
 
-            _languageDeleteConfirmation = EditorGUILayout.ToggleLeft("Show delete confirmation in LANGUAGES", LocalizationManager.Configuration.LanguageDeleteConfirmation, MinHeightOption(24));
-            UpdateDeleteConfirmation(Enums.GUIWindow.Languages);
+            _languageDeleteConfirmation = ToggleLeft(LocalizationManager.Configuration.LanguageDeleteConfirmation, "Show delete confirmation in LANGUAGES",
+                delegate { UpdateDeleteConfirmation(Enums.GUIWindow.Language); });
 
-            _categoryDeleteConfirmation = EditorGUILayout.ToggleLeft("Show delete confirmation in CATEGORIES", LocalizationManager.Configuration.CategoryDeleteConfirmation, MinHeightOption(24));
-            UpdateDeleteConfirmation(Enums.GUIWindow.Categories);
+            _categoryDeleteConfirmation = ToggleLeft(LocalizationManager.Configuration.CategoryDeleteConfirmation, "Show delete confirmation in CATEGORIES",
+                delegate { UpdateDeleteConfirmation(Enums.GUIWindow.Category); });
+
             GUILayout.EndVertical();
         }
 
         private void SearchSection()
         {
-            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
             ShowSubHeader("Search");
             _searchTypeIndex = EditorGUILayout.Popup(LocalizationManager.Configuration.SearchTypeIndex, Enums.SEARCH_TYPE, CustomStyles.GetStyle(Enums.CustomStyleName.SearchTypePopup));
             UpdateSearchType();
@@ -140,253 +148,268 @@ namespace LocalizationTool.Editors
 
         private void LogsSection()
         {
-            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
             ShowSubHeader("Logs");
-            _showLogs = EditorGUILayout.ToggleLeft("Show logs in Console", LocalizationManager.Configuration.ShowLogsInConsole, MinHeightOption(24));
-            UpdateShowLogs();
+            _showLogs = ToggleLeft(LocalizationManager.Configuration.ShowLogsInConsole, "Show logs in Console", delegate { UpdateShowLogs(); });
             GUILayout.EndVertical();
         }
 
         private void ReadmeSection()
         {
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
-            ShowSubHeader("Readme");
-            //TODO: poner boton para abrir readme/documentation o link
+            ShowSubHeader("Info");
+
+            if (GUILayout.Button("Readme", CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationReadmeButton)))
+            {
+                //TODO: fill readme
+                InfoEditor.ShowWindow("Readme", GetInfoText(README_PATH));
+            }
+            
+            GUILayout.Space(5);
+
+            if (GUILayout.Button("Documentation", CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationReadmeButton)))
+            {
+                //TODO: Open documentation window or link / open pdf
+            }
+            
+            GUILayout.Space(5);
+            
+            if (GUILayout.Button("License", CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationReadmeButton)))
+            {
+                //TODO: fill license
+                InfoEditor.ShowWindow("License", GetInfoText(LICENSE_PATH));
+            }
+            
             GUILayout.EndVertical();
+        }
+
+        #endregion
+
+        #region COMMONS
+
+        private bool ToggleLeft(bool value, string label, Action action)
+        {
+            GUILayout.BeginHorizontal();
+            var temp = EditorGUILayout.Toggle(value, GUILayout.Height(28), GUILayout.Width(15));
+            EditorGUILayout.LabelField(label, CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationToggleLabel), GUILayout.Height(28));
+            action.Invoke();
+            GUILayout.EndHorizontal();
+
+            return temp;
+        }
+
+        private string GetInfoText(string path)
+        {
+            using var reader = new StreamReader(path);
+            return reader.ReadToEnd();
         }
 
         #endregion
 
         #region EXPORT SECTION
 
-        private void ExportSection()
+        private void ExportImportSection()
         {
             GUILayout.BeginVertical(); // 0
 
-            GUILayout.BeginVertical(MinHeightOption(_windowSize.y * 0.5f)); // 1
+            {
+                // Export
+                GUILayout.BeginVertical(GUILayout.Height(200)); // 1
 
-            GUILayout.BeginHorizontal(); // 2
+                GUILayout.BeginHorizontal(); // 2
 
-            GUILayout.FlexibleSpace(); //To center section
-            GUILayout.BeginVertical(GUILayout.Width(300)); // 3
-            ShowSectionHeader("EXPORT");
+                GUILayout.FlexibleSpace(); //To center section
+                GUILayout.BeginVertical(GUILayout.Width(300)); // 3
+                ShowSectionHeader("EXPORT");
 
-            GUILayout.Space(10);
-            ShowExportCsvSection();
-            GUILayout.Space(15);
-            ShowExportJsonSection();
-            GUILayout.Space(15);
-            ShowExportXMLSection();
+                GUILayout.Space(10);
+                ShowExportSection();
 
-            GUILayout.EndVertical(); // 3
-            GUILayout.FlexibleSpace(); //To center section
+                GUILayout.EndVertical(); // 3
+                GUILayout.FlexibleSpace(); //To center section
 
-            GUILayout.EndHorizontal(); // 2
+                GUILayout.EndHorizontal(); // 2
 
-            GUILayout.EndVertical(); // 1
-
-            GUILayout.BeginVertical(GUILayout.ExpandHeight(true)); // 4
+                GUILayout.EndVertical(); // 1
+            }
             ShowHorizontalLine(5);
+            {
+                // Import
+                GUILayout.BeginVertical(GUILayout.Height(200)); // 4
 
-            GUILayout.BeginHorizontal(); // 5
-            GUILayout.FlexibleSpace(); //To center section
+                GUILayout.BeginHorizontal(); // 5
+                GUILayout.FlexibleSpace(); //To center section
 
-            GUILayout.BeginVertical(GUILayout.Width(200)); // 6
-            ShowSectionHeader("IMPORT");
+                GUILayout.BeginVertical(GUILayout.Width(300)); // 6
+                ShowSectionHeader("IMPORT");
 
-            GUILayout.Space(10);
-            ShowImportCsvSection();
-            GUILayout.Space(15);
-            ShowImportJsonSection();
-            GUILayout.Space(15);
-            ShowImportXmlSection();
+                GUILayout.Space(10);
+                ShowImportSection();
 
-            GUILayout.EndVertical(); // 6
+                GUILayout.EndVertical(); // 6
 
-            GUILayout.FlexibleSpace(); //To center section
-            GUILayout.EndHorizontal(); // 5
+                GUILayout.FlexibleSpace(); //To center section
+                GUILayout.EndHorizontal(); // 5
 
-            GUILayout.EndVertical(); // 4
+                GUILayout.EndVertical(); // 4
+            }
 
             GUILayout.EndVertical(); // 0
         }
 
-        private void ShowExportCsvSection()
+        private void ShowExportSection()
         {
-            GUILayout.BeginVertical();
+            GUILayout.BeginVertical(GUILayout.Height(50));
+            GUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
+            GUILayout.Space(8);
+            _exportMethod = (Enums.ExportImportMethods)EditorGUILayout.EnumPopup(_exportMethod, CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportEnumPopup), GUILayout.Width(125));
 
-            GUILayout.BeginHorizontal();
-
-            GUILayout.BeginHorizontal();
-
-            ShowExportImportSubHeader("CSV", GUILayout.Width(50), GUILayout.Height(25));
-
-            _selectedCsvSeparatorIndexForExport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForExport, _csvSeparators, CustomStyles.GetStyle(Enums.CustomStyleName.SeparatorsCsvPopup));
-
-            GUILayout.EndHorizontal();
-
-            GUILayout.FlexibleSpace();
-
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
+            switch (_exportMethod)
             {
-                var path = EditorUtility.SaveFilePanel("Save CSV File", "", "LocalizationData.csv", "csv");
+                case Enums.ExportImportMethods.CSV:
+                    GUILayout.Space(5);
 
-                if (!string.IsNullOrEmpty(path))
-                {
-                    var fileContent = BuildCSV();
-                    // Create and save the file
-                    LocalizationManager.SaveFile(path, fileContent, "File Saved", "File has been saved successfully!", "OK");
-                }
+                    _selectedCsvSeparatorIndexForExport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForExport, _csvSeparators, CustomStyles.GetStyle(Enums.CustomStyleName.SeparatorsCsvPopup),
+                        GUILayout.Width(55));
+
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button(GetGUIContent(ExportIcon, "Save CSV file"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
+                    {
+                        var path = EditorUtility.SaveFilePanel("Save CSV File", "", "LocalizationData.csv", "csv");
+
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            var fileContent = BuildCSV();
+                            // Create and save the file
+                            LocalizationManager.SaveFile(path, fileContent, "File Saved", "File has been saved successfully!", "OK");
+                        }
+                    }
+
+                    GUILayout.Space(8);
+                    GUILayout.EndHorizontal();
+                    GUILayout.Space(3);
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(10);
+                    GUILayout.Label(EditorGUIUtility.IconContent("d_console.warnicon.sml"));
+                    var style = new GUIStyle(GUI.skin.label) { wordWrap = true, };
+                    GUILayout.Label("Line breaks are removed when exporting to CSV", style);
+                    GUILayout.EndHorizontal();
+
+                    break;
+                case Enums.ExportImportMethods.JSON:
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button(GetGUIContent(ExportIcon, "Save JSON file"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
+                    {
+                        var path = EditorUtility.SaveFilePanel("Save JSON File", "", "LocalizationData.json", "json");
+
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            var fileContent = BuildSerializedData(new UnityJsonSerializer());
+                            // Create and save the file
+                            LocalizationManager.SaveFile(path, fileContent, "File Saved", "File has been saved successfully!", "OK");
+                        }
+                    }
+
+                    GUILayout.Space(8);
+                    GUILayout.EndHorizontal();
+                    break;
+                case Enums.ExportImportMethods.XML:
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button(GetGUIContent(ExportIcon, "Save XML file"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
+                    {
+                        var path = EditorUtility.SaveFilePanel("Save XML File", "", "LocalizationData.xml", "xml");
+
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            var fileContent = BuildSerializedData(new XmlSerializerService());
+                            // Create and save the file
+                            LocalizationManager.SaveFile(path, fileContent, "File Saved", "File has been saved successfully!", "OK");
+                        }
+                    }
+
+                    GUILayout.Space(8);
+                    GUILayout.EndHorizontal();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
-
-            GUILayout.FlexibleSpace();
-
-            GUILayout.EndHorizontal();
-            GUILayout.Space(5);
-
-            GUILayout.BeginHorizontal();
-
-            GUILayout.Label(EditorGUIUtility.IconContent("d_console.warnicon.sml"));
-
-            GUILayout.Label("Line breaks are removed when exporting to CSV");
-
-            GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
-        }
-
-        private void ShowExportJsonSection()
-        {
-            GUILayout.BeginHorizontal();
-
-            ShowExportImportSubHeader("JSON", GUILayout.Width(50), GUILayout.Height(25));
-
-            GUILayout.Space(200);
-            GUILayout.FlexibleSpace();
-
-
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
-            {
-                var path = EditorUtility.SaveFilePanel("Save JSON File", "", "LocalizationData.json", "json");
-
-                if (!string.IsNullOrEmpty(path))
-                {
-                    var fileContent = BuildSerializedData(new UnityJsonSerializer());
-                    // Create and save the file
-                    LocalizationManager.SaveFile(path, fileContent, "File Saved", "File has been saved successfully!", "OK");
-                }
-            }
-
-            GUILayout.FlexibleSpace();
-
-            GUILayout.EndHorizontal();
-        }
-
-        private void ShowExportXMLSection()
-        {
-            GUILayout.BeginHorizontal();
-            ShowExportImportSubHeader("XML", GUILayout.Width(50), GUILayout.Height(25));
-
-            GUILayout.Space(200);
-
-            GUILayout.FlexibleSpace();
-
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_SaveAs", "Export"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
-            {
-                var path = EditorUtility.SaveFilePanel("Save XML File", "", "LocalizationData.xml", "xml");
-
-                if (!string.IsNullOrEmpty(path))
-                {
-                    var fileContent = BuildSerializedData(new XmlSerializerService());
-                    // Create and save the file
-                    LocalizationManager.SaveFile(path, fileContent, "File Saved", "File has been saved successfully!", "OK");
-                }
-            }
-
-            GUILayout.FlexibleSpace();
-
-            GUILayout.EndHorizontal();
         }
 
         #endregion
 
         #region IMPORT SECTION
 
-        private void ShowImportCsvSection()
+        private void ShowImportSection()
         {
-            GUILayout.BeginHorizontal();
+            GUILayout.BeginVertical(GUILayout.Height(50));
+            GUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
+            GUILayout.Space(8);
+            _importMethod = (Enums.ExportImportMethods)EditorGUILayout.EnumPopup(_importMethod, CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportEnumPopup), GUILayout.Width(125));
 
-            GUILayout.BeginHorizontal();
-
-            ShowExportImportSubHeader("CSV", GUILayout.Width(50), GUILayout.Height(25));
-
-            _selectedCsvSeparatorIndexForImport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForImport, _csvSeparators, CustomStyles.GetStyle(Enums.CustomStyleName.SeparatorsCsvPopup));
-
-            GUILayout.EndHorizontal();
-
-            GUILayout.FlexibleSpace();
-
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
+            switch (_importMethod)
             {
-                var path = EditorUtility.OpenFilePanel("Load CSV File", "", "csv");
+                case Enums.ExportImportMethods.CSV:
+                    GUILayout.Space(5);
 
-                if (!string.IsNullOrEmpty(path))
-                {
-                    ImportCSV(path);
-                }
+                    _selectedCsvSeparatorIndexForImport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForImport, _csvSeparators, CustomStyles.GetStyle(Enums.CustomStyleName.SeparatorsCsvPopup),
+                        GUILayout.Width(55));
+
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button(GetGUIContent(ImportIcon, "Load CSV file"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
+                    {
+                        var path = EditorUtility.OpenFilePanel("Load CSV File", "", "csv");
+
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            ImportCSV(path);
+                        }
+                    }
+
+                    GUILayout.Space(8);
+                    GUILayout.EndHorizontal();
+
+                    break;
+                case Enums.ExportImportMethods.JSON:
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button(GetGUIContent(ImportIcon, "Load JSON file"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
+                    {
+                        var path = EditorUtility.OpenFilePanel("Load JSON File", "", "json");
+
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            ImportSerializedData(path, new UnityJsonSerializer());
+                        }
+                    }
+
+                    GUILayout.Space(8);
+                    GUILayout.EndHorizontal();
+
+                    break;
+                case Enums.ExportImportMethods.XML:
+                    GUILayout.FlexibleSpace();
+
+                    if (GUILayout.Button(GetGUIContent(ImportIcon, "Load XML file"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
+                    {
+                        var path = EditorUtility.OpenFilePanel("Load XML File", "", "xml");
+
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            ImportSerializedData(path, new XmlSerializerService());
+                        }
+                    }
+
+                    GUILayout.Space(8);
+                    GUILayout.EndHorizontal();
+
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
-            GUILayout.FlexibleSpace();
-
-            GUILayout.EndHorizontal();
-        }
-
-        private void ShowImportJsonSection()
-        {
-            GUILayout.BeginHorizontal();
-            ShowExportImportSubHeader("JSON", GUILayout.Width(50), GUILayout.Height(25));
-
-            GUILayout.Space(200);
-
-            GUILayout.FlexibleSpace();
-
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
-            {
-                var path = EditorUtility.OpenFilePanel("Load JSON File", "", "json");
-
-                if (!string.IsNullOrEmpty(path))
-                {
-                    ImportSerializedData(path, new UnityJsonSerializer());
-                }
-            }
-
-            GUILayout.FlexibleSpace();
-
-            GUILayout.EndHorizontal();
-        }
-
-        private void ShowImportXmlSection()
-        {
-            GUILayout.BeginHorizontal();
-            ShowExportImportSubHeader("XML", GUILayout.Width(50), GUILayout.Height(25));
-
-            GUILayout.Space(200);
-
-            GUILayout.FlexibleSpace();
-
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_FolderOpened Icon", "Import"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
-            {
-                var path = EditorUtility.OpenFilePanel("Load XML File", "", "xml");
-
-                if (!string.IsNullOrEmpty(path))
-                {
-                    ImportSerializedData(path, new XmlSerializerService());
-                }
-            }
-
-            GUILayout.FlexibleSpace();
-
-            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
         }
 
         #endregion
@@ -401,10 +424,10 @@ namespace LocalizationTool.Editors
             UpdateDeleteConfirmation(Enums.GUIWindow.Dictionary);
 
             _languageDeleteConfirmation = newValue;
-            UpdateDeleteConfirmation(Enums.GUIWindow.Languages);
+            UpdateDeleteConfirmation(Enums.GUIWindow.Language);
 
             _categoryDeleteConfirmation = newValue;
-            UpdateDeleteConfirmation(Enums.GUIWindow.Categories);
+            UpdateDeleteConfirmation(Enums.GUIWindow.Category);
         }
 
         private void UpdateDeleteConfirmation(Enums.GUIWindow window)
@@ -414,10 +437,10 @@ namespace LocalizationTool.Editors
                 case Enums.GUIWindow.Dictionary:
                     LocalizationManager.Instance.UpdateDeleteConfirmation(_dictionaryDeleteConfirmation, window);
                     break;
-                case Enums.GUIWindow.Languages:
+                case Enums.GUIWindow.Language:
                     LocalizationManager.Instance.UpdateDeleteConfirmation(_languageDeleteConfirmation, window);
                     break;
-                case Enums.GUIWindow.Categories:
+                case Enums.GUIWindow.Category:
                     LocalizationManager.Instance.UpdateDeleteConfirmation(_categoryDeleteConfirmation, window);
                     break;
             }
@@ -535,9 +558,9 @@ namespace LocalizationTool.Editors
                 var key = lineItems[0];
                 var category = lineItems[1];
                 var values = new Dictionary<string, string>();
-                
+
                 nKeys++;
-                if(!LocalizationManager.Instance.ExistCategory(category)) nCategories++;
+                if (!LocalizationManager.Instance.ExistCategory(category)) nCategories++;
 
                 for (var i = 0; i < lineItems.Length - 2; i++)
                 {
@@ -574,7 +597,7 @@ namespace LocalizationTool.Editors
             foreach (var keyCategoryLanguage in data.DictionaryKeyCategoryLanguages)
             {
                 nKeys++;
-                if(!LocalizationManager.Instance.ExistCategory(keyCategoryLanguage.Category)) nCategories++;
+                if (!LocalizationManager.Instance.ExistCategory(keyCategoryLanguage.Category)) nCategories++;
 
                 foreach (var languageValue in keyCategoryLanguage.LanguageValues)
                 {

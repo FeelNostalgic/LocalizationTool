@@ -8,8 +8,8 @@ namespace LocalizationTool.Data
         public enum GUIWindow
         {
             Dictionary = 0,
-            Languages = 1,
-            Categories = 2,
+            Language = 1,
+            Category = 2,
             Configuration = 3
         }
 
@@ -42,7 +42,7 @@ namespace LocalizationTool.Data
             CloseRichTextEditorButton,
             Header1BoldMiddleCenter20Label,
             Header2BoldMiddleCenter15Label,
-            Header2BoldMiddleLeft14Label,
+            Header2BoldMiddleLeft15Label,
             Header1BoldMiddleCenter15Label,
             Header2LowerCenter14Label,
             KeySelectableLabel,
@@ -52,7 +52,10 @@ namespace LocalizationTool.Data
             ColumnsTitleBoldMiddleLeftLabel,
             ValueEditorPreviewTextArea,
             ValueEditorPreviewBox,
-            LanguageManageEditorEnumPopup
+            LanguageManageEditorEnumPopup,
+            ConfigurationExportImportEnumPopup,
+            ConfigurationToggleLabel,
+            ConfigurationReadmeButton
         }
         
         public static string[] SEARCH_TYPE = {"By key", "By value", "By both"};

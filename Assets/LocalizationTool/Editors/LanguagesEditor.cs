@@ -49,7 +49,7 @@ namespace LocalizationTool.Editors
 
         public void ShowLayout()
         {
-            GUILayout.BeginVertical(MinHeightOption(_windowSize.y));
+            GUILayout.BeginVertical(GUILayout.ExpandHeight(true));
 
             GUILayout.Space(5);
             ShowHorizontalLine(5);
@@ -292,14 +292,6 @@ namespace LocalizationTool.Editors
             {
                 LanguageManagerEditor.ShowWindow(language);
             }
-            
-            //GUILayout.Space(2);
-
-            // Export Button
-            // if (GUILayout.Button(GetGUIContent(ExportIcon, "Open Export Menu"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
-            // {
-            //     LanguageExportEditor.ShowWindow(language);
-            // }
             
             GUILayout.Space(2);
 

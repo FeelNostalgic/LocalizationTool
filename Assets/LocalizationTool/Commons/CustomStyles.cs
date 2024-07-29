@@ -37,8 +37,8 @@ namespace LocalizationTool.Commons
                 {
                     Enums.CustomStyleName.ConfigurationExportImportButton, new GUIStyle(GUI.skin.button)
                     {
-                        fixedHeight = 30,
-                        fixedWidth = 30
+                        fixedHeight = 32,
+                        fixedWidth = 32
                     }
                 },
                 {
@@ -56,8 +56,7 @@ namespace LocalizationTool.Commons
                     Enums.CustomStyleName.SeparatorsCsvPopup, new GUIStyle(EditorStyles.popup)
                     {
                         alignment = TextAnchor.UpperCenter,
-                        fixedHeight = 28,
-                        fixedWidth = 55,
+                        fixedHeight = 32,
                         fontSize = 18,
                         normal =
                         {
@@ -101,9 +100,9 @@ namespace LocalizationTool.Commons
                     Enums.CustomStyleName.SearchTypePopup, new GUIStyle(EditorStyles.popup)
                     {
                         alignment = TextAnchor.MiddleLeft,
-                        fixedHeight = 24,
+                        fixedHeight = 32,
                         fixedWidth = 150,
-                        fontSize = 12,
+                        fontSize = 13,
                         normal =
                         {
                             textColor = Color.white
@@ -156,19 +155,19 @@ namespace LocalizationTool.Commons
                         {
                             textColor = Color.white
                         }
-                    }  
+                    }
                 },
                 {
-                    Enums.CustomStyleName.Header2BoldMiddleLeft14Label, new GUIStyle(GUI.skin.label)
+                    Enums.CustomStyleName.Header2BoldMiddleLeft15Label, new GUIStyle(GUI.skin.label)
                     {
                         alignment = TextAnchor.MiddleLeft,
                         fontStyle = FontStyle.Bold,
-                        fontSize = 14,
+                        fontSize = 15,
                         normal =
                         {
                             textColor = Color.white
                         }
-                    }  
+                    }
                 },
                 {
                     Enums.CustomStyleName.Header2LowerCenter14Label, new GUIStyle(GUI.skin.label)
@@ -223,9 +222,9 @@ namespace LocalizationTool.Commons
                         richText = true,
                         wordWrap = true,
                         fontSize = 14,
-                        border = {left = 0, right = 0, top = 0, bottom = 0},
-                        margin = {left = 0, right = 0, top = 0, bottom = 0},
-                        padding = {left = 15, right = 0, top = 0, bottom = 0}, 
+                        border = { left = 0, right = 0, top = 0, bottom = 0 },
+                        margin = { left = 0, right = 0, top = 0, bottom = 0 },
+                        padding = { left = 15, right = 0, top = 0, bottom = 0 },
                         normal =
                         {
                             textColor = Color.white
@@ -262,15 +261,16 @@ namespace LocalizationTool.Commons
                         richText = true,
                         fixedHeight = 0,
                         fontSize = 12,
-                        border = {left = 0, right = 0, top = 0, bottom = 0},
-                        margin = {left = 0, right = 0, top = 0, bottom = 0},
-                        padding = {left = 3, right = 3, top = 2, bottom = 1}, 
-                        normal = {
-                            background = GetTexture2DFromColor(Colors.Alpha(Color.black, 0)), 
+                        border = { left = 0, right = 0, top = 0, bottom = 0 },
+                        margin = { left = 0, right = 0, top = 0, bottom = 0 },
+                        padding = { left = 3, right = 3, top = 2, bottom = 1 },
+                        normal =
+                        {
+                            background = GetTexture2DFromColor(Colors.Alpha(Color.black, 0)),
                             textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black
                         },
-                        active = {background = GetTexture2DFromColor(Colors.Alpha(Color.black, 0))},
-                        focused = {background = GetTexture2DFromColor(Colors.Alpha(Color.black, 0))}
+                        active = { background = GetTexture2DFromColor(Colors.Alpha(Color.black, 0)) },
+                        focused = { background = GetTexture2DFromColor(Colors.Alpha(Color.black, 0)) }
                     }
                 },
                 {
@@ -278,14 +278,15 @@ namespace LocalizationTool.Commons
                     {
                         alignment = TextAnchor.MiddleCenter,
                         fontStyle = FontStyle.Bold,
-                        border = {left = 0, right = 0, top = 0, bottom = 0},
-                        margin = {left = 0, right = 0, top = 0, bottom = 0},
-                        padding = {left = 1, right = 1, top = 1, bottom = 1},
-                        normal = {
-                            background = GetTexture2DFromColor(EditorGUIUtility.isProSkin ? Colors.Alpha(Color.black, .1f) : Colors.Alpha(Color.white,.5f)), 
+                        border = { left = 0, right = 0, top = 0, bottom = 0 },
+                        margin = { left = 0, right = 0, top = 0, bottom = 0 },
+                        padding = { left = 1, right = 1, top = 1, bottom = 1 },
+                        normal =
+                        {
+                            background = GetTexture2DFromColor(EditorGUIUtility.isProSkin ? Colors.Alpha(Color.black, .1f) : Colors.Alpha(Color.white, .5f)),
                             textColor = EditorGUIUtility.isProSkin ? Colors.Alpha(Color.white) : Colors.Alpha(Color.black, .7f)
                         },
-                        hover = {textColor = EditorGUIUtility.isProSkin ? Colors.Alpha(Color.white) : Colors.Alpha(Color.black, .7f)}
+                        hover = { textColor = EditorGUIUtility.isProSkin ? Colors.Alpha(Color.white) : Colors.Alpha(Color.black, .7f) }
                     }
                 },
                 {
@@ -295,6 +296,43 @@ namespace LocalizationTool.Commons
                         fontStyle = FontStyle.Bold,
                         fixedHeight = 30,
                         fixedWidth = 0,
+                        normal =
+                        {
+                            textColor = Color.white
+                        }
+                    }
+                },
+                {
+                    Enums.CustomStyleName.ConfigurationExportImportEnumPopup, new GUIStyle(EditorStyles.popup)
+                    {
+                        fontSize = 15,
+                        fontStyle = FontStyle.Bold,
+                        fixedHeight = 32,
+                        fixedWidth = 0,
+                        normal =
+                        {
+                            textColor = Color.white
+                        }
+                    }
+                },
+                {
+                    Enums.CustomStyleName.ConfigurationToggleLabel, new GUIStyle(EditorStyles.label)
+                    {
+                        alignment = TextAnchor.MiddleLeft,
+                        fontSize = 13,
+                        normal =
+                        {
+                            textColor = Color.white
+                        }
+                    }
+                },
+                {
+                    Enums.CustomStyleName.ConfigurationReadmeButton, new GUIStyle(GUI.skin.button)
+                    {
+                        alignment = TextAnchor.MiddleCenter,
+                        fontSize = 13,
+                        fixedHeight = 32,
+                        fixedWidth = 150,
                         normal =
                         {
                             textColor = Color.white

@@ -428,11 +428,11 @@ namespace LocalizationTool.Manager
                     if (_configurationData.DictionaryDeleteConfirmation == newValue) return;
                     _configurationData.DictionaryDeleteConfirmation = newValue;
                     break;
-                case Enums.GUIWindow.Languages:
+                case Enums.GUIWindow.Language:
                     if (_configurationData.LanguageDeleteConfirmation == newValue) return;
                     _configurationData.LanguageDeleteConfirmation = newValue;
                     break;
-                case Enums.GUIWindow.Categories:
+                case Enums.GUIWindow.Category:
                     if (_configurationData.CategoryDeleteConfirmation == newValue) return;
                     _configurationData.CategoryDeleteConfirmation = newValue;
                     break;
