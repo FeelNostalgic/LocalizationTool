@@ -17,7 +17,10 @@ namespace LocalizationTool.Data
         {
             Bold = 0,
             Italic = 1,
-            FontSize = 2
+            Underline = 2,
+            StrikeOut = 3,
+            Color = 4,
+            FontSize = 5
         }
 
         public enum ExportImportMethods
@@ -55,7 +58,10 @@ namespace LocalizationTool.Data
             LanguageManageEditorEnumPopup,
             ConfigurationExportImportEnumPopup,
             ConfigurationToggleLabel,
-            ConfigurationReadmeButton
+            ConfigurationReadmeButton,
+            OptionRichTextButton,
+            OptionRichTextFontSizePopup,
+            OptionRichTextZoomLabel
         }
         
         public static string[] SEARCH_TYPE = {"By key", "By value", "By both"};

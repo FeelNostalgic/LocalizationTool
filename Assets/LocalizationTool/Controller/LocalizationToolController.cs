@@ -8,7 +8,7 @@ namespace LocalizationTool.Controller
 {
     //TODO: make this persistant between scenes
     //TODO: add this to the scene
-    [DefaultExecutionOrder(-999)]
+    [DefaultExecutionOrder(-888)]
     public class LocalizationToolController : MonoBehaviour
     {
         #region PUBLIC VARIABLES
@@ -31,12 +31,8 @@ namespace LocalizationTool.Controller
 
         private async void Awake()
         {
-            await LocalizationManager.Instance.Init();
-        }
-
-        private void Start()
-        {
-            OnLanguageUpdate.Invoke(ActiveLanguage);
+            await LocalizationManager.Instance.Init(()=> OnLanguageUpdate?.Invoke(ActiveLanguage));
+            LocalizationManager.Log("Controller Initialized");
         }
 
         #endregion

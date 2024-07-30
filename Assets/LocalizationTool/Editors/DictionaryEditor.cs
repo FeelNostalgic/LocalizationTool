@@ -230,12 +230,12 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal();
             // Column 1
             GUILayout.BeginVertical("box");
-            GUILayout.Label("KEY", CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel), GUILayout.Width(300));
+            GUILayout.Label("KEY", CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel), GUILayout.Width(275));
             GUILayout.EndVertical();
 
             // Column 2
             GUILayout.BeginVertical("box");
-            GUILayout.Label("CATEGORY", CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel), GUILayout.Width(200));
+            GUILayout.Label("CATEGORY", CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel), GUILayout.Width(175));
             GUILayout.EndVertical();
 
             // Column 3
@@ -349,11 +349,11 @@ namespace LocalizationTool.Editors
 
         private void Column1(string key)
         {
-            GUILayout.BeginVertical("box", GUILayout.Width(300), _height);
+            GUILayout.BeginVertical("box", GUILayout.Width(275), _height);
             GUI.backgroundColor = Colors.DEFAULT;
             GUILayout.Space(5);
 
-            if (GUILayout.Button(new GUIContent(key, "Tooltip"), CustomStyles.GetStyle(Enums.CustomStyleName.KeySelectableLabel), GUILayout.Width(300), GUILayout.Height(30)))
+            if (GUILayout.Button(new GUIContent(key, "Tooltip"), CustomStyles.GetStyle(Enums.CustomStyleName.KeySelectableLabel), GUILayout.Width(275), GUILayout.Height(30)))
             {
                 EditorGUIUtility.systemCopyBuffer = key;
                 LocalizationManager.Log($"Key '{key}' copied to clipboard");
@@ -368,7 +368,7 @@ namespace LocalizationTool.Editors
             GUILayout.BeginVertical("box", _height);
 
             GUILayout.Space(3);
-            GUILayout.BeginHorizontal(GUILayout.Width(200));
+            GUILayout.BeginHorizontal(GUILayout.Width(175));
             EditorGUI.BeginChangeCheck();
 
             if (category == "") category = LocalizationManager.DefaultCategory;

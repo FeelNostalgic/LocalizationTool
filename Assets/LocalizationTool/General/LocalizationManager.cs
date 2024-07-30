@@ -39,8 +39,7 @@ namespace LocalizationTool.Manager
         public Action<string> OnDefaultCategoryUpdate { get; set; }
 
         #endregion
-        
-        
+
         #endregion
 
         #region PRIVATE VARIABLES
@@ -407,7 +406,7 @@ namespace LocalizationTool.Manager
             _categoriesData.ChangeIndex(newCategory, 0);
 
             await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
-            
+
             OnDefaultCategoryUpdate?.Invoke(newCategory);
         }
 
@@ -542,7 +541,7 @@ namespace LocalizationTool.Manager
             if (_dynamicDictionary.ContainsKey(key))
             {
                 AddNewCategory(category.Equals("") ? _categoriesData.DefaultCategory : category, null, false);
-                
+
                 if (_dynamicDictionary[key].Category != category)
                 {
                     //Change category
@@ -616,6 +615,30 @@ namespace LocalizationTool.Manager
             }
         }
 
+        public static void LogWarning(string log)
+        {
+            try
+            {
+                if (_configurationData.ShowLogsInConsole) Debug.LogWarning(log);
+            }
+            catch (Exception)
+            {
+                Debug.LogWarning(log);
+            }
+        }
+
+        public static void LogError(string log)
+        {
+            try
+            {
+                if (_configurationData.ShowLogsInConsole) Debug.LogError(log);
+            }
+            catch (Exception)
+            {
+                Debug.LogError(log);
+            }
+        }
+
         #endregion
 
         #region PRIVATE METHODS
@@ -627,11 +650,15 @@ namespace LocalizationTool.Manager
 #pragma warning restore CS4014
         }
 
-        public async Task Init()
+        public async Task Init(Action onComplete = null)
         {
-            if (_isInitialized) return; // Just the first call
+            if (_isInitialized)
+            {
+                return; // Just the first call
+            }
+
             _isInitialized = true;
-            
+
             CreateFiles();
             _serializerJson = new UnityJsonSerializer();
             _serializerBinary = new BinarySerializer();
@@ -645,6 +672,7 @@ namespace LocalizationTool.Manager
 
             IsDataLoaded = true;
             Log("Manager initialized");
+            onComplete?.Invoke();
         }
 
         private static void CreateFiles()
@@ -793,7 +821,7 @@ namespace LocalizationTool.Manager
         }
 
         #endregion
-        
+
         private void PrintDictionary()
         {
             foreach (var l in _dynamicDictionary)

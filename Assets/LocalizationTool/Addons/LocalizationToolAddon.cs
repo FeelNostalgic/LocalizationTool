@@ -6,6 +6,7 @@ using UnityEngine;
 namespace LocalizationTool.Addons
 {
     [RequireComponent(typeof(TMP_Text))]
+    [DefaultExecutionOrder(-999)]
     public class LocalizationToolAddon : MonoBehaviour
     {
         #region PUBLIC VARIABLES
@@ -16,7 +17,7 @@ namespace LocalizationTool.Addons
             set => _key = value;
         }
 
-        public int KeyIndex   
+        public int KeyIndex
         {
             get => _keyIndex;
             set => _keyIndex = value;
@@ -53,7 +54,8 @@ namespace LocalizationTool.Addons
 
         private void OnLanguageUpdate(string newLanguage)
         {
-            _tmpText.text = LocalizationToolController.Instance.GetValueByKey(Key);
+            var newText = LocalizationToolController.Instance.GetValueByKey(Key);
+            _tmpText.text = newText;
         }
 
         #endregion

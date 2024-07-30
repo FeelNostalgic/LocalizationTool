@@ -24,6 +24,13 @@ namespace LocalizationTool.Editors
         protected static Texture LockIcon => EditorGUIUtility.IconContent("d_AssemblyLock").image;
         protected static Texture GearIcon => EditorGUIUtility.IconContent("d__Popup").image;
         protected static Texture WarningIcon => EditorGUIUtility.IconContent("d_console.warnicon.sml").image;
+        protected static Texture InfoIcon => EditorGUIUtility.IconContent("d_UnityEditor.InspectorWindow").image;
+        protected static Texture ChangesSavedIcon => EditorGUIUtility.IconContent("d_CacheServerConnected").image;
+        protected static Texture AddEmptyIcon => EditorGUIUtility.IconContent("d_ol_plus_act").image;
+        protected static Texture MinusEmptyIcon => EditorGUIUtility.IconContent("d_ol_minus_act").image;
+        protected static Texture ApplyStyleIcon => EditorGUIUtility.IconContent("d_Progress").image;
+        protected static Texture UndoIcon => EditorGUIUtility.IconContent("d_scrollleft").image;
+        protected static Texture RedoIcon => EditorGUIUtility.IconContent("d_scrollright").image;
 
         #endregion
 
@@ -38,6 +45,7 @@ namespace LocalizationTool.Editors
         private LanguagesEditor _languagesEditor;
         private CategoriesEditor _categoriesEditor;
         private ConfigurationEditor _configurationEditor;
+        private static bool _isWindowOpen;
 
         protected readonly string[] _csvSeparators = { ",", ";", ".", ":", "|", "=" };
 
@@ -57,18 +65,25 @@ namespace LocalizationTool.Editors
             var window = GetWindow(typeof(LocalizationEditor));
             window.minSize = _windowSize;
             window.titleContent = new GUIContent("Localization Tool");
+            _isWindowOpen = true;
+            LoadData();
         }
 
         protected virtual void OnEnable()
         {
-            LoadData();
+            if(hasFocus) LoadData();
         }
 
         protected virtual void OnDisable()
         {
             //
         }
-        
+
+        private void OnDestroy()
+        {
+            _isWindowOpen = false;
+        }
+
         protected void OnGUI()
         {
             if (!LocalizationManager.IsDataLoaded) return;
@@ -113,8 +128,9 @@ namespace LocalizationTool.Editors
         //     }
         // }
         
-        private async void LoadData()
+        private static async void LoadData()
         {
+            Debug.Log("Editor Awake");
             await LocalizationManager.Instance.Init();
         }
         

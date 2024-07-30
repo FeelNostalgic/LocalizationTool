@@ -99,7 +99,7 @@ namespace LocalizationTool.Editors
 
                     GUILayout.BeginHorizontal();
                     GUILayout.Space(10);
-                    GUILayout.Label(EditorGUIUtility.IconContent("d_console.warnicon.sml"));
+                    GUILayout.Label(WarningIcon);
                     var style = new GUIStyle(GUI.skin.label) { wordWrap = true, };
                     GUILayout.Label("Line breaks are removed when exporting to CSV", style);
                     GUILayout.EndHorizontal();

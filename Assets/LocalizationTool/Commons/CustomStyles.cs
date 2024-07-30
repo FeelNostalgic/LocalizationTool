@@ -127,6 +127,8 @@ namespace LocalizationTool.Commons
                         alignment = TextAnchor.MiddleCenter,
                         fontStyle = FontStyle.Bold,
                         fontSize = 13,
+                        fixedHeight = 30,
+                        fixedWidth = 150,
                         normal =
                         {
                             textColor = Color.white
@@ -333,6 +335,42 @@ namespace LocalizationTool.Commons
                         fontSize = 13,
                         fixedHeight = 32,
                         fixedWidth = 150,
+                        normal =
+                        {
+                            textColor = Color.white
+                        }
+                    }
+                },
+                {
+                    Enums.CustomStyleName.OptionRichTextButton, new GUIStyle(GUI.skin.button)
+                    {
+                        alignment = TextAnchor.MiddleCenter,
+                        fontSize = 12,
+                        fixedHeight = 28,
+                        fixedWidth = 28,
+                        normal =
+                        {
+                            textColor = Color.white
+                        }
+                    }
+                },
+                {
+                    Enums.CustomStyleName.OptionRichTextFontSizePopup, new GUIStyle(EditorStyles.popup)
+                    {
+                        fontSize = 12,
+                        fixedHeight = 28,
+                        fixedWidth = 0,
+                        normal =
+                        {
+                            textColor = Color.white
+                        }
+                    }
+                },
+                {
+                    Enums.CustomStyleName.OptionRichTextZoomLabel, new GUIStyle(GUI.skin.label)
+                    {
+                        fontSize = 12,
+                        fixedHeight = 28,
                         normal =
                         {
                             textColor = Color.white
