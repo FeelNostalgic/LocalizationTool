@@ -136,8 +136,7 @@ namespace LocalizationTool.Editors
 
             if (!_filterKeyText.Equals(""))
                 filteredKeys = filteredKeys.Where(key => key.Contains(_filterKeyText, StringComparison.InvariantCulture)).ToList();
-
-            //TODO: fix, now you can change default, so is not 0
+            
             if (_filterCategoryIndex != 0)
                 filteredKeys = filteredKeys.Where(key => LocalizationManager.Dictionary[key].Category == allCategories[_filterCategoryIndex]).ToList();
             return filteredKeys;

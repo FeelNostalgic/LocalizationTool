@@ -382,6 +382,7 @@ namespace LocalizationTool.Commons
                     {
                         alignment = TextAnchor.UpperLeft,
                         richText = true,
+                        wordWrap = true,
                         fontSize = 13,
                         normal =
                         {

@@ -18,7 +18,7 @@ namespace LocalizationTool.Controller
         public string ActiveLanguage { get; set; }
 
         public Action<string> OnLanguageUpdate { get; set; }
-        
+
         #endregion
 
         #region PRIVATE VARIABLES

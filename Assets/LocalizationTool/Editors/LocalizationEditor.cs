@@ -45,9 +45,9 @@ namespace LocalizationTool.Editors
         private LanguagesEditor _languagesEditor;
         private CategoriesEditor _categoriesEditor;
         private ConfigurationEditor _configurationEditor;
-        private static bool _isWindowOpen;
+        //private static bool _isWindowOpen;
 
-        protected readonly string[] _csvSeparators = { ",", ";", ".", ":", "|", "=" };
+        protected readonly string[] _csvSeparators = { ";", ",", ".", ":", "|", "=" };
 
         #endregion
 
@@ -58,14 +58,13 @@ namespace LocalizationTool.Editors
 
         #endregion
 
-        [MenuItem("Tool/LocalizationEditor")]
+        [MenuItem("Tools/LocalizationEditor")]
         public static void ShowWindow()
         {
             //Show existing window instance. If one doesn't exist, make one.
             var window = GetWindow(typeof(LocalizationEditor));
             window.minSize = _windowSize;
             window.titleContent = new GUIContent("Localization Tool");
-            _isWindowOpen = true;
             LoadData();
         }
 
@@ -79,9 +78,9 @@ namespace LocalizationTool.Editors
             //
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
-            _isWindowOpen = false;
+            //
         }
 
         protected void OnGUI()
@@ -130,7 +129,6 @@ namespace LocalizationTool.Editors
         
         private static async void LoadData()
         {
-            Debug.Log("Editor Awake");
             await LocalizationManager.Instance.Init();
         }
         

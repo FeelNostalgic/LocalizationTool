@@ -187,7 +187,7 @@ namespace LocalizationTool.Editors
 
         #region COMMONS
 
-        private bool ToggleLeft(bool value, string label, Action action)
+        private static bool ToggleLeft(bool value, string label, Action action)
         {
             GUILayout.BeginHorizontal();
             var temp = EditorGUILayout.Toggle(value, GUILayout.Height(28), GUILayout.Width(15));
@@ -198,7 +198,7 @@ namespace LocalizationTool.Editors
             return temp;
         }
 
-        private string GetInfoText(string path)
+        private static string GetInfoText(string path)
         {
             using var reader = new StreamReader(path);
             return reader.ReadToEnd();
@@ -581,6 +581,7 @@ namespace LocalizationTool.Editors
 
         private static async void ImportSerializedData(string path, ISerializerService serializer)
         {
+            
             var data = await LocalizationManager.LoadFile<DictionaryTemplate>(path, serializer);
 
             var sb = new StringBuilder();

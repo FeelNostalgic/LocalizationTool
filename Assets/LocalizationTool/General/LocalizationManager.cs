@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using LocalizationTool.Addons;
 using LocalizationTool.Controller;
 using LocalizationTool.Data;
 using LocalizationTool.Data.Binary;
 using LocalizationTool.Data.Json;
 using LocalizationTool.Editors;
 using LocalizationTool.Serializer;
+using TMPro;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static LocalizationTool.Commons.GameUtils;
 
 namespace LocalizationTool.Manager
@@ -37,7 +41,7 @@ namespace LocalizationTool.Manager
         #region Actions
 
         public Action<string> OnDefaultCategoryUpdate { get; set; }
-
+        
         #endregion
 
         #endregion
@@ -158,6 +162,23 @@ namespace LocalizationTool.Manager
             _dictionaryData.ListDictionaryKeyCategoryLanguages.Remove(data);
 
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
+
+            UpdateAddons(key);
+        }
+
+        private static void UpdateAddons(string key)
+        {
+            var tmproText = Resources.FindObjectsOfTypeAll(typeof(TextMeshProUGUI));
+            foreach (var obj in tmproText) {
+                var item = (TextMeshProUGUI) obj;
+                var addon = item.GetComponent<LocalizationToolAddon>();
+                if (addon != null) {
+                    addon.OnKeyRemoved(key);
+                }
+            }
+            
+            //Save scene
+            EditorSceneManager.SaveScene(SceneManager.GetActiveScene());
         }
 
         #endregion
@@ -536,7 +557,9 @@ namespace LocalizationTool.Manager
             if (key.Equals("")) return;
             Log($"Key '{key}' - '{category}' - '{language}' : '{value}' imported");
 
+#pragma warning disable CS4014
             ImportLanguage(language);
+#pragma warning restore CS4014
 
             if (_dynamicDictionary.ContainsKey(key))
             {
@@ -583,22 +606,30 @@ namespace LocalizationTool.Manager
 
         #region RefreshData
 
+        // ReSharper disable Unity.PerformanceAnalysis
         public void RefreshDictionaryData()
         {
             CreateFiles();
+#pragma warning disable CS4014
             LoadDictionaryDataFromJSON();
-        }
+#pragma warning restore CS4014
 
+        }
+        
         public void RefreshLanguagesData()
         {
             CreateFiles();
+#pragma warning disable CS4014
             LoadLanguagesDataFromBINARY();
+#pragma warning restore CS4014
         }
-
+        
         public void RefreshCategoriesData()
         {
             CreateFiles();
+#pragma warning disable CS4014
             LoadCategoriesDataFromBINARY();
+#pragma warning restore CS4014
         }
 
         #endregion
@@ -671,7 +702,7 @@ namespace LocalizationTool.Manager
             YellowIcon = GetColoredIcon("d_Favorite", Color.yellow);
 
             IsDataLoaded = true;
-            Log("Manager initialized");
+            Log("Localization Tool initialized");
             onComplete?.Invoke();
         }
 
@@ -695,7 +726,7 @@ namespace LocalizationTool.Manager
             if (_dictionaryData != null)
                 _dynamicDictionary = _dictionaryData.ListDictionaryKeyCategoryLanguages.ToDictionary(data => data.Key, data => new KeyData { Category = data.Category, LanguagesData = data.DictionaryLanguageValue });
 
-            Log("Dictionary loaded");
+            //Log("Dictionary loaded");
         }
 
         private async Task LoadLanguagesDataFromBINARY()
@@ -716,7 +747,7 @@ namespace LocalizationTool.Manager
             CurrentLanguageInDictionarySection = _languagesData.FavouriteLanguage;
             LocalizationToolController.Instance.ActiveLanguage = _languagesData.FavouriteLanguage;
 
-            Log("Languages loaded");
+            //Log("Languages loaded");
         }
 
         private async Task LoadCategoriesDataFromBINARY()
@@ -733,7 +764,7 @@ namespace LocalizationTool.Manager
                 await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
             }
 
-            Log("Categories loaded");
+            //Log("Categories loaded");
         }
 
         private async Task LoadConfigurationDataFromBINARY()
@@ -754,7 +785,7 @@ namespace LocalizationTool.Manager
                 await SaveFile(_configurationData, BINARY_CONFIGURATION_PATH, _serializerBinary);
             }
 
-            Log("Configuration loaded");
+            //Log("Configuration loaded");
         }
 
         #region UPDATES

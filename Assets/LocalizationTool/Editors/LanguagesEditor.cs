@@ -36,10 +36,10 @@ namespace LocalizationTool.Editors
 
         private const float LEFT_SECTION_WIDTH_PERCENT = 0.25f;
 
-        private float _dividerPosition = 305f;
-        private const float dividerWidth = 5f;
-
-        private bool isResizingDivider = false;
+        // FUTURE
+        // private float _dividerPosition = 305f;
+        // private const float dividerWidth = 5f;
+        // private bool isResizingDivider = false;
 
         #endregion
 

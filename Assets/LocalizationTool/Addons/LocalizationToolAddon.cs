@@ -1,4 +1,3 @@
-using System;
 using LocalizationTool.Controller;
 using TMPro;
 using UnityEngine;
@@ -48,10 +47,19 @@ namespace LocalizationTool.Addons
             LocalizationToolController.Instance.OnLanguageUpdate -= OnLanguageUpdate;
         }
 
+        public void OnKeyRemoved(string key)
+        {
+            if (_key.Equals(key))
+            {
+                _key = "";
+                _keyIndex = 0;
+            }
+        }
+        
         #endregion
 
         #region PRIVATE METHODS
-
+        
         private void OnLanguageUpdate(string newLanguage)
         {
             var newText = LocalizationToolController.Instance.GetValueByKey(Key);
