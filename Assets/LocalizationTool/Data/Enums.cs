@@ -25,9 +25,9 @@ namespace LocalizationTool.Data
 
         public enum ExportImportMethods
         {
-            CSV,
             JSON,
-            XML
+            XML,
+            CSV
         }
         
         public enum CustomStyleName

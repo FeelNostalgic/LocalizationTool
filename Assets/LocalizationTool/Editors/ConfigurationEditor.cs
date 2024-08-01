@@ -13,6 +13,7 @@ using LocalizationTool.Serializer;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
+using Debug = System.Diagnostics.Debug;
 
 namespace LocalizationTool.Editors
 {
@@ -365,7 +366,7 @@ namespace LocalizationTool.Editors
                         {
                             var progressWindow = ImportProgressEditor.OpenWindow("Import CSV");
                             
-                            ImportCSV(path);
+                            EditorCoroutineUtility.StartCoroutine( ImportCSVCoroutine(path, progressWindow), progressWindow);
                         }
                     }
 
@@ -384,7 +385,7 @@ namespace LocalizationTool.Editors
                         {
                             var progressWindow = ImportProgressEditor.OpenWindow("Import JSON");
 
-                            EditorCoroutineUtility.StartCoroutine(ImportSerializedDataCoroutine(path, new UnityJsonSerializer(), progressWindow, LocalizationManager.Configuration.ShowLogsInConsole), progressWindow);
+                            EditorCoroutineUtility.StartCoroutine(ImportSerializedDataCoroutine(path, new UnityJsonSerializer(), progressWindow), progressWindow);
                         }
                     }
 
@@ -403,7 +404,7 @@ namespace LocalizationTool.Editors
                         {
                             // TODO
                             var progressWindow = ImportProgressEditor.OpenWindow("Import XML");
-                            EditorCoroutineUtility.StartCoroutine(ImportSerializedDataCoroutine(path, new UnityJsonSerializer(), progressWindow, LocalizationManager.Configuration.ShowLogsInConsole), progressWindow);
+                            EditorCoroutineUtility.StartCoroutine(ImportSerializedDataCoroutine(path, new UnityJsonSerializer(), progressWindow), progressWindow);
                         }
                     }
 
@@ -526,63 +527,86 @@ namespace LocalizationTool.Editors
 
         #region IMPORTS
 
-        private async void ImportCSV(string path)
+        private IEnumerator ImportCSVCoroutine(string path, ImportProgressEditor progressWindow)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("CSV has been imported successfully!");
-
+            
             using var reader = new StreamReader(path);
+            var fileInfo = new FileInfo(path);
+            var totalBytes = fileInfo.Length;
+            long bytesRead = 0;
+            
+            progressWindow.SetStatus("Importing languages...");
 
-            var header = await reader.ReadLineAsync();
+            var header = reader.ReadLine();
+            Debug.Assert(header != null, nameof(header) + " != null");
+            bytesRead += header.Length + Environment.NewLine.Length;
+            progressWindow.SetProgress( (float)bytesRead / totalBytes);
+            
             var separator = _csvSeparators[_selectedCsvSeparatorIndexForImport];
-            var languages = header.Split(separator);
+            var languages = header?.Split(separator);
 
+            Debug.Assert(languages != null, nameof(languages) + " != null");
             if (languages.Length < 2)
             {
-                EditorUtility.DisplayDialog("Error while importing CSV", $"Separator [ {separator} ] not found", "OK");
-                return;
+                var sbResultError = new StringBuilder();
+                sbResultError.AppendLine("Error while importing CSV");
+                sbResultError.AppendLine( $"Separator [ {separator} ] not found");
+                progressWindow.Complete(sbResultError.ToString());
+                
+                yield break;
             }
-
+            
+            sb.AppendLine("CSV has been imported successfully!");
             sb.AppendLine($"{languages.Length - 2} language imported");
 
             var languageOrder = new List<string>();
             for (var i = 2; i < languages.Length; i++)
             {
                 languageOrder.Add(languages[i]);
-                await LocalizationManager.Instance.ImportLanguage(languages[i]);
+                var loadLanguageTask = LocalizationManager.Instance.ImportLanguage(languages[i]);
+                var awaiter = loadLanguageTask.GetAwaiter();
+                while (!awaiter.IsCompleted) yield return null;
             }
-
+            
+            progressWindow.SetStatus("Importing keys...");
             var nKeys = 0;
             var nCategories = 0;
             while (!reader.EndOfStream)
             {
-                var nextLine = await reader.ReadLineAsync();
-                var lineItems = nextLine.Split(separator);
-                var key = lineItems[0];
-                var category = lineItems[1];
+                var nextLine = reader.ReadLine();
+                Debug.Assert(nextLine != null, nameof(nextLine) + " != null");
+                bytesRead += nextLine.Length + Environment.NewLine.Length;
+                var lineItems = nextLine?.Split(separator);
+                var key = lineItems?[0];
+                var category = lineItems?[1];
                 var values = new Dictionary<string, string>();
 
                 nKeys++;
                 if (!LocalizationManager.Instance.ExistCategory(category)) nCategories++;
 
+                Debug.Assert(lineItems != null, nameof(lineItems) + " != null");
                 for (var i = 0; i < lineItems.Length - 2; i++)
                 {
                     values.Add(languageOrder[i], lineItems[i + 2]);
                 }
 
-                await LocalizationManager.Instance.ImportKey(key, category, values);
-
-                // await Task.Delay(50);
+                var loadKeyTask =  LocalizationManager.Instance.ImportKey(key, category, values);
+                var awaiter = loadKeyTask.GetAwaiter();
+                while (!awaiter.IsCompleted) yield return null;
+                
+                progressWindow.SetProgress( (float)bytesRead / totalBytes);
+                progressWindow.SetProgressInfo($"Key '{key}' - '{category}' imported");
             }
 
             var categories = nCategories > 1 ? "Categories" : "Category";
             sb.AppendLine($"{nCategories} new {categories} imported");
             sb.AppendLine($"{nKeys} keys imported");
 
-            EditorUtility.DisplayDialog("CSV imported", sb.ToString(), "OK");
+            progressWindow.Complete(sb.ToString());
         }
 
-        private static IEnumerator ImportSerializedDataCoroutine(string path, ISerializerService serializer, ImportProgressEditor progressWindow, bool logs)
+        private static IEnumerator ImportSerializedDataCoroutine(string path, ISerializerService serializer, ImportProgressEditor progressWindow)
         {
             var loadFileTask = LocalizationManager.LoadFile<DictionaryTemplate>(path, serializer);
             var awaiter = loadFileTask.GetAwaiter();
