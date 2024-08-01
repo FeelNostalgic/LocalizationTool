@@ -115,6 +115,7 @@ namespace LocalizationTool.Commons
                         alignment = TextAnchor.MiddleCenter,
                         fontSize = 12,
                         wordWrap = true,
+                        richText = true,
                         normal =
                         {
                             textColor = Color.white
@@ -384,6 +385,19 @@ namespace LocalizationTool.Commons
                         richText = true,
                         wordWrap = true,
                         fontSize = 13,
+                        normal =
+                        {
+                            textColor = Color.white
+                        }
+                    }
+                },
+                {
+                    Enums.CustomStyleName.ImportProgressWindowInfoLabel, new GUIStyle(GUI.skin.label)
+                    {
+                        alignment = TextAnchor.UpperCenter,
+                        fontSize = 12,
+                        wordWrap = true,
+                        richText = true,
                         normal =
                         {
                             textColor = Color.white

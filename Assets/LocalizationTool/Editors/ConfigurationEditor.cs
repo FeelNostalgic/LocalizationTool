@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,7 @@ using LocalizationTool.Data.Templates;
 using LocalizationTool.ExportSerializer;
 using LocalizationTool.Manager;
 using LocalizationTool.Serializer;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,13 +27,8 @@ namespace LocalizationTool.Editors
         #region EDITOR VARIABLES
 
         private bool _toggleAllDeleteConfirmation;
-        private bool _dictionaryDeleteConfirmation;
-        private bool _languageDeleteConfirmation;
-        private bool _categoryDeleteConfirmation;
 
         private int _searchTypeIndex;
-
-        private bool _showLogs;
 
         private Enums.ExportImportMethods _exportMethod;
         private Enums.ExportImportMethods _importMethod;
@@ -41,7 +38,7 @@ namespace LocalizationTool.Editors
 
         private const string README_PATH = "Assets/LocalizationTool/Data/DoNotTouch/Info/Readme.txt";
         private const string LICENSE_PATH = "Assets/LocalizationTool/Data/DoNotTouch/Info/License.txt";
-        
+
         #endregion
 
         #region DIMENSION VARIABLES
@@ -118,20 +115,22 @@ namespace LocalizationTool.Editors
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
             ShowSubHeader("Delete Confirmation");
 
-            if (_dictionaryDeleteConfirmation && _languageDeleteConfirmation && _categoryDeleteConfirmation) _toggleAllDeleteConfirmation = true;
+            if (LocalizationManager.Configuration.DictionaryDeleteConfirmation
+                && LocalizationManager.Configuration.LanguageDeleteConfirmation
+                && LocalizationManager.Configuration.CategoryDeleteConfirmation) _toggleAllDeleteConfirmation = true;
             else _toggleAllDeleteConfirmation = false;
 
             var tempToogle = EditorGUILayout.Toggle(_toggleAllDeleteConfirmation, GUILayout.Height(28));
             UpdateAllDeleteConfirmation(_toggleAllDeleteConfirmation, tempToogle);
 
-            _dictionaryDeleteConfirmation = ToggleLeft(LocalizationManager.Configuration.DictionaryDeleteConfirmation, "Show delete confirmation in DICTIONARY",
-                delegate { UpdateDeleteConfirmation(Enums.GUIWindow.Dictionary); });
+            ToggleLeft(LocalizationManager.Configuration.DictionaryDeleteConfirmation, "Show delete confirmation in DICTIONARY",
+                delegate(bool b) { UpdateDeleteConfirmation(b,Enums.GUIWindow.Dictionary); });
 
-            _languageDeleteConfirmation = ToggleLeft(LocalizationManager.Configuration.LanguageDeleteConfirmation, "Show delete confirmation in LANGUAGES",
-                delegate { UpdateDeleteConfirmation(Enums.GUIWindow.Language); });
+            ToggleLeft(LocalizationManager.Configuration.LanguageDeleteConfirmation, "Show delete confirmation in LANGUAGES",
+                delegate(bool b) { UpdateDeleteConfirmation(b,Enums.GUIWindow.Language); });
 
-            _categoryDeleteConfirmation = ToggleLeft(LocalizationManager.Configuration.CategoryDeleteConfirmation, "Show delete confirmation in CATEGORIES",
-                delegate { UpdateDeleteConfirmation(Enums.GUIWindow.Category); });
+            ToggleLeft(LocalizationManager.Configuration.CategoryDeleteConfirmation, "Show delete confirmation in CATEGORIES",
+                delegate(bool b) { UpdateDeleteConfirmation(b, Enums.GUIWindow.Category); });
 
             GUILayout.EndVertical();
         }
@@ -150,7 +149,7 @@ namespace LocalizationTool.Editors
         {
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
             ShowSubHeader("Logs");
-            _showLogs = ToggleLeft(LocalizationManager.Configuration.ShowLogsInConsole, "Show logs in Console", delegate { UpdateShowLogs(); });
+            ToggleLeft(LocalizationManager.Configuration.ShowLogsInConsole, "Show logs in Console", delegate(bool b) { UpdateShowLogs(b); });
             GUILayout.EndVertical();
         }
 
@@ -164,22 +163,22 @@ namespace LocalizationTool.Editors
                 //TODO: fill readme
                 InfoEditor.ShowWindow("Readme", GetInfoText(README_PATH));
             }
-            
+
             GUILayout.Space(5);
 
             if (GUILayout.Button("Documentation", CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationReadmeButton)))
             {
                 //TODO: Open documentation window or link / open pdf
             }
-            
+
             GUILayout.Space(5);
-            
+
             if (GUILayout.Button("License", CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationReadmeButton)))
             {
                 //TODO: fill license
                 InfoEditor.ShowWindow("License", GetInfoText(LICENSE_PATH));
             }
-            
+
             GUILayout.EndVertical();
         }
 
@@ -187,15 +186,15 @@ namespace LocalizationTool.Editors
 
         #region COMMONS
 
-        private static bool ToggleLeft(bool value, string label, Action action)
+        // ReSharper disable once RedundantAssignment
+        private static void ToggleLeft(bool value, string label, Action<bool> action)
         {
             GUILayout.BeginHorizontal();
-            var temp = EditorGUILayout.Toggle(value, GUILayout.Height(28), GUILayout.Width(15));
+            EditorGUI.BeginChangeCheck();
+            var newValue = EditorGUILayout.Toggle(value, GUILayout.Height(28), GUILayout.Width(15));
+            if (EditorGUI.EndChangeCheck()) action?.Invoke(newValue);
             EditorGUILayout.LabelField(label, CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationToggleLabel), GUILayout.Height(28));
-            action.Invoke();
             GUILayout.EndHorizontal();
-
-            return temp;
         }
 
         private static string GetInfoText(string path)
@@ -364,6 +363,8 @@ namespace LocalizationTool.Editors
 
                         if (!string.IsNullOrEmpty(path))
                         {
+                            var progressWindow = ImportProgressEditor.OpenWindow("Import CSV");
+                            
                             ImportCSV(path);
                         }
                     }
@@ -374,13 +375,16 @@ namespace LocalizationTool.Editors
                     break;
                 case Enums.ExportImportMethods.JSON:
                     GUILayout.FlexibleSpace();
+
                     if (GUILayout.Button(GetGUIContent(ImportIcon, "Load JSON file"), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationExportImportButton)))
                     {
                         var path = EditorUtility.OpenFilePanel("Load JSON File", "", "json");
 
                         if (!string.IsNullOrEmpty(path))
                         {
-                            ImportSerializedData(path, new UnityJsonSerializer());
+                            var progressWindow = ImportProgressEditor.OpenWindow("Import JSON");
+
+                            EditorCoroutineUtility.StartCoroutine(ImportSerializedDataCoroutine(path, new UnityJsonSerializer(), progressWindow, LocalizationManager.Configuration.ShowLogsInConsole), progressWindow);
                         }
                     }
 
@@ -397,7 +401,9 @@ namespace LocalizationTool.Editors
 
                         if (!string.IsNullOrEmpty(path))
                         {
-                            ImportSerializedData(path, new XmlSerializerService());
+                            // TODO
+                            var progressWindow = ImportProgressEditor.OpenWindow("Import XML");
+                            EditorCoroutineUtility.StartCoroutine(ImportSerializedDataCoroutine(path, new UnityJsonSerializer(), progressWindow, LocalizationManager.Configuration.ShowLogsInConsole), progressWindow);
                         }
                     }
 
@@ -420,28 +426,25 @@ namespace LocalizationTool.Editors
         {
             if (oldValue == newValue) return;
             _toggleAllDeleteConfirmation = newValue;
-            _dictionaryDeleteConfirmation = newValue;
-            UpdateDeleteConfirmation(Enums.GUIWindow.Dictionary);
+            UpdateDeleteConfirmation(newValue, Enums.GUIWindow.Dictionary);
 
-            _languageDeleteConfirmation = newValue;
-            UpdateDeleteConfirmation(Enums.GUIWindow.Language);
-
-            _categoryDeleteConfirmation = newValue;
-            UpdateDeleteConfirmation(Enums.GUIWindow.Category);
+            UpdateDeleteConfirmation(newValue,Enums.GUIWindow.Language);
+            
+            UpdateDeleteConfirmation(newValue,Enums.GUIWindow.Category);
         }
 
-        private void UpdateDeleteConfirmation(Enums.GUIWindow window)
+        private static void UpdateDeleteConfirmation(bool newValue, Enums.GUIWindow window)
         {
             switch (window)
             {
                 case Enums.GUIWindow.Dictionary:
-                    LocalizationManager.Instance.UpdateDeleteConfirmation(_dictionaryDeleteConfirmation, window);
+                    LocalizationManager.Instance.UpdateDeleteConfirmation(newValue, window);
                     break;
                 case Enums.GUIWindow.Language:
-                    LocalizationManager.Instance.UpdateDeleteConfirmation(_languageDeleteConfirmation, window);
+                    LocalizationManager.Instance.UpdateDeleteConfirmation(newValue, window);
                     break;
                 case Enums.GUIWindow.Category:
-                    LocalizationManager.Instance.UpdateDeleteConfirmation(_categoryDeleteConfirmation, window);
+                    LocalizationManager.Instance.UpdateDeleteConfirmation(newValue, window);
                     break;
             }
         }
@@ -451,9 +454,9 @@ namespace LocalizationTool.Editors
             LocalizationManager.Instance.UpdateSearchType(_searchTypeIndex);
         }
 
-        private void UpdateShowLogs()
+        private static void UpdateShowLogs(bool newValue)
         {
-            LocalizationManager.Instance.UpdateShowLog(_showLogs);
+            LocalizationManager.Instance.UpdateShowLog(newValue);
         }
 
         #endregion
@@ -579,38 +582,63 @@ namespace LocalizationTool.Editors
             EditorUtility.DisplayDialog("CSV imported", sb.ToString(), "OK");
         }
 
-        private static async void ImportSerializedData(string path, ISerializerService serializer)
+        private static IEnumerator ImportSerializedDataCoroutine(string path, ISerializerService serializer, ImportProgressEditor progressWindow, bool logs)
         {
-            
-            var data = await LocalizationManager.LoadFile<DictionaryTemplate>(path, serializer);
+            var loadFileTask = LocalizationManager.LoadFile<DictionaryTemplate>(path, serializer);
+            var awaiter = loadFileTask.GetAwaiter();
+            while (!awaiter.IsCompleted) yield return null;
+            var data = awaiter.GetResult();
+
+            var totalItems = data.DictionaryKeyCategoryLanguages[0].LanguageValues.Count + data.DictionaryKeyCategoryLanguages.Count;
+            var itemCount = 0f;
 
             var sb = new StringBuilder();
             sb.AppendLine("File has been imported successfully!");
 
+            //Languages
+            progressWindow.SetStatus("Importing languages...");
+
             foreach (var languageValue in data.DictionaryKeyCategoryLanguages[0].LanguageValues)
             {
-                await LocalizationManager.Instance.ImportLanguage(languageValue.Language);
+                var task = LocalizationManager.Instance.ImportLanguage(languageValue.Language);
+                var awaiterLanguage = task.GetAwaiter();
+                while (!awaiterLanguage.IsCompleted) yield return null;
+                progressWindow.SetProgressInfo($"'{languageValue.Language}' imported");
+                progressWindow.SetProgress(itemCount++ / totalItems);
+                yield return null;
             }
 
             var nKeys = 0;
             var nCategories = 0;
+
+            // Keys
+            progressWindow.SetStatus("Importing keys...");
 
             foreach (var keyCategoryLanguage in data.DictionaryKeyCategoryLanguages)
             {
                 nKeys++;
                 if (!LocalizationManager.Instance.ExistCategory(keyCategoryLanguage.Category)) nCategories++;
 
-                foreach (var languageValue in keyCategoryLanguage.LanguageValues)
+                foreach (var awaiterKey in keyCategoryLanguage.LanguageValues
+                             .Select(languageValue => LocalizationManager.Instance.ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, languageValue.Language, languageValue.Value))
+                             .Select(task => task.GetAwaiter()))
                 {
-                    await LocalizationManager.Instance.ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, languageValue.Language, languageValue.Value);
+                    while (!awaiterKey.IsCompleted) yield return null;
+
+                    yield return null;
                 }
+
+                progressWindow.SetProgressInfo($"Key '{keyCategoryLanguage.Key}' - '{keyCategoryLanguage.Category}' imported");
+                progressWindow.SetProgress(itemCount++ / totalItems);
+                yield return null;
             }
 
-            var categories = nCategories > 1 ? "Categories" : "Category";
-            sb.AppendLine($"{nCategories} new {categories} imported");
+            sb.AppendLine($"{data.DictionaryKeyCategoryLanguages[0].LanguageValues.Count} languages imported");
+            sb.AppendLine($"{nCategories} new Categories imported");
             sb.AppendLine($"{nKeys} keys imported");
 
-            EditorUtility.DisplayDialog("File imported", sb.ToString(), "OK");
+            progressWindow.Complete(sb.ToString());
+            //EditorUtility.DisplayDialog("File imported", sb.ToString(), "OK");
         }
 
         #endregion

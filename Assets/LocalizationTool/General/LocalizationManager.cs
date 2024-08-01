@@ -445,16 +445,13 @@ namespace LocalizationTool.Manager
             switch (window)
             {
                 case Enums.GUIWindow.Dictionary:
-                    if (_configurationData.DictionaryDeleteConfirmation == newValue) return;
                     _configurationData.DictionaryDeleteConfirmation = newValue;
                     break;
                 case Enums.GUIWindow.Language:
-                    if (_configurationData.LanguageDeleteConfirmation == newValue) return;
                     _configurationData.LanguageDeleteConfirmation = newValue;
                     break;
                 case Enums.GUIWindow.Category:
-                    if (_configurationData.CategoryDeleteConfirmation == newValue) return;
-                    _configurationData.CategoryDeleteConfirmation = newValue;
+                   _configurationData.CategoryDeleteConfirmation = newValue;
                     break;
             }
 
@@ -469,11 +466,9 @@ namespace LocalizationTool.Manager
             await SaveFile(_configurationData, BINARY_CONFIGURATION_PATH, _serializerBinary);
         }
 
-        public async void UpdateShowLog(bool showLogs)
+        public async void UpdateShowLog(bool newValue)
         {
-            if (_configurationData.ShowLogsInConsole == showLogs) return;
-
-            _configurationData.ShowLogsInConsole = showLogs;
+            _configurationData.ShowLogsInConsole = newValue;
             await SaveFile(_configurationData, BINARY_CONFIGURATION_PATH, _serializerBinary);
         }
 

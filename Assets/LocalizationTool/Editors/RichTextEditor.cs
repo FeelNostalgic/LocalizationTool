@@ -135,9 +135,8 @@ namespace LocalizationTool.Editors
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginHorizontal("box");
             GUI.backgroundColor = Colors.DEFAULT;
-
             
-            if (GUILayout.Button("Close", CustomStyles.GetStyle(Enums.CustomStyleName.CloseRichTextEditorButton))) { Close(); }
+            if (GUILayout.Button("Close", CustomStyles.GetStyle(Enums.CustomStyleName.CloseRichTextEditorButton))) Close(); 
 
             GUILayout.FlexibleSpace();
 
