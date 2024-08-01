@@ -376,6 +376,18 @@ namespace LocalizationTool.Commons
                             textColor = Color.white
                         }
                     }
+                },
+                {
+                    Enums.CustomStyleName.AddonSelectableTextFieldLabel, new GUIStyle(GUI.skin.textField)
+                    {
+                        alignment = TextAnchor.UpperLeft,
+                        richText = true,
+                        fontSize = 13,
+                        normal =
+                        {
+                            textColor = Color.white
+                        }
+                    }
                 }
             };
         }

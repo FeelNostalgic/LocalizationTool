@@ -61,7 +61,8 @@ namespace LocalizationTool.Data
             ConfigurationReadmeButton,
             OptionRichTextButton,
             OptionRichTextFontSizePopup,
-            OptionRichTextZoomLabel
+            OptionRichTextZoomLabel,
+            AddonSelectableTextFieldLabel
         }
         
         public static string[] SEARCH_TYPE = {"By key", "By value", "By both"};
