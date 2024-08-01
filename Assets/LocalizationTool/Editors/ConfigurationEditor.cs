@@ -364,9 +364,9 @@ namespace LocalizationTool.Editors
 
                         if (!string.IsNullOrEmpty(path))
                         {
-                            var progressWindow = ImportProgressEditor.OpenWindow("Import CSV");
+                            var progressWindow = ImportProgressWindow.OpenWindow("Import CSV");
                             
-                            EditorCoroutineUtility.StartCoroutine( ImportCSVCoroutine(path, progressWindow), progressWindow);
+                            EditorCoroutineUtility.StartCoroutine(ImportCSVCoroutine(path, progressWindow), progressWindow);
                         }
                     }
 
@@ -383,7 +383,7 @@ namespace LocalizationTool.Editors
 
                         if (!string.IsNullOrEmpty(path))
                         {
-                            var progressWindow = ImportProgressEditor.OpenWindow("Import JSON");
+                            var progressWindow = ImportProgressWindow.OpenWindow("Import JSON");
 
                             EditorCoroutineUtility.StartCoroutine(ImportSerializedDataCoroutine(path, new UnityJsonSerializer(), progressWindow), progressWindow);
                         }
@@ -403,7 +403,7 @@ namespace LocalizationTool.Editors
                         if (!string.IsNullOrEmpty(path))
                         {
                             // TODO
-                            var progressWindow = ImportProgressEditor.OpenWindow("Import XML");
+                            var progressWindow = ImportProgressWindow.OpenWindow("Import XML");
                             EditorCoroutineUtility.StartCoroutine(ImportSerializedDataCoroutine(path, new UnityJsonSerializer(), progressWindow), progressWindow);
                         }
                     }
@@ -527,7 +527,7 @@ namespace LocalizationTool.Editors
 
         #region IMPORTS
 
-        private IEnumerator ImportCSVCoroutine(string path, ImportProgressEditor progressWindow)
+        private IEnumerator ImportCSVCoroutine(string path, ImportProgressWindow progressWindow)
         {
             var sb = new StringBuilder();
             
@@ -606,7 +606,7 @@ namespace LocalizationTool.Editors
             progressWindow.Complete(sb.ToString());
         }
 
-        private static IEnumerator ImportSerializedDataCoroutine(string path, ISerializerService serializer, ImportProgressEditor progressWindow)
+        private static IEnumerator ImportSerializedDataCoroutine(string path, ISerializerService serializer, ImportProgressWindow progressWindow)
         {
             var loadFileTask = LocalizationManager.LoadFile<DictionaryTemplate>(path, serializer);
             var awaiter = loadFileTask.GetAwaiter();

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace LocalizationTool.Editors
 { 
-	public class ImportProgressEditor : EditorWindow
+	public class ImportProgressWindow : EditorWindow
 	{
 		#region PRIVATE VARIABLES
 
@@ -56,9 +56,9 @@ namespace LocalizationTool.Editors
 		
 		#region PUBLIC METHODS
 
-		public static ImportProgressEditor OpenWindow(string title)
+		public static ImportProgressWindow OpenWindow(string title)
 		{
-			var window = GetWindow<ImportProgressEditor>();
+			var window = GetWindow<ImportProgressWindow>();
 			window.titleContent = new GUIContent(title);
 			window.maxSize = window._windowSize;
 			window.minSize = window._windowSize;
