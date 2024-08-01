@@ -3,9 +3,7 @@ using System.Reflection;
 using LocalizationTool.Commons;
 using LocalizationTool.Data;
 using LocalizationTool.Manager;
-using Unity.VisualScripting;
 using UnityEditor;
-using UnityEditor.Compilation;
 using UnityEngine;
 using ColorUtility = UnityEngine.ColorUtility;
 
@@ -14,6 +12,10 @@ namespace LocalizationTool.Editors
 #if UNITY_EDITOR
     public class RichTextEditor : LocalizationEditor
     {
+        #region PUBLIC VARIABLES
+
+        #endregion
+        
         #region DIMENSION VARIABLES
 
         private static readonly Vector2 WindowSize = new(700, 650);
@@ -34,6 +36,8 @@ namespace LocalizationTool.Editors
         private int _currentZoom = 100;
         private Vector2 _scrollView;
         private Color _colorSelected = Color.white;
+
+        private string _tempValue;
         
         #endregion
 
@@ -45,7 +49,12 @@ namespace LocalizationTool.Editors
             window._key = key;
             window._richText = initialText;
         }
-        
+
+        protected override void OnDestroy()
+        {
+            UpdateValue(_key, _tempValue);
+        }
+
         #region PRIVATE METHODS
 
         private new void OnGUI()
@@ -53,9 +62,8 @@ namespace LocalizationTool.Editors
             GUILayout.BeginVertical();
 
             GUILayout.Space(5);
-
-            //TODO: poder editar key
-            EditorGUILayout.SelectableLabel(_key, CustomStyles.GetStyle(Enums.CustomStyleName.KeyFixedHeightSelectableLabel));
+            
+            KeyTextField();
 
             EditorGUILayout.BeginHorizontal("box", GUILayout.Height(35));
 
@@ -92,6 +100,28 @@ namespace LocalizationTool.Editors
             GUILayout.EndVertical();
         }
 
+        private void KeyTextField()
+        {
+            GUILayout.BeginVertical("box",GUILayout.Height(FeedbackLabel.IsNotEmpty() ? 60 : 35));
+
+            GUI.SetNextControlName("VALUE");
+            var temp = EditorGUILayout.TextField(_key, CustomStyles.GetStyle(Enums.CustomStyleName.RichTextEditorKeyTextField), GUILayout.Height(30));
+            UpdateKey(_key, temp);
+
+            if (FeedbackLabel.IsNotEmpty())
+            {
+                GUILayout.Space(5);
+                GUILayout.BeginHorizontal(GUILayout.Height(20));
+                GUILayout.FlexibleSpace();
+                GUILayout.Label(WarningIcon, GUILayout.Width(20));
+                GUILayout.Label(FeedbackLabel, CustomStyles.GetStyle(Enums.CustomStyleName.RichTextEditorFeedbackLabel));
+                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
+            }
+            
+            GUILayout.EndVertical();
+        }
+
         private void TextArea()
         {
             EditorGUILayout.BeginHorizontal(GUILayout.ExpandHeight(true));
@@ -110,9 +140,9 @@ namespace LocalizationTool.Editors
 
             GUILayout.BeginHorizontal("box");
             _scrollView = GUILayout.BeginScrollView(_scrollView, GUILayout.ExpandHeight(true));
-
-            var temp = EditorGUILayout.TextArea(_richText, richTextStyle, GUILayout.ExpandHeight(true));
-            UpdateValue(_key, temp); 
+            
+            _tempValue = EditorGUILayout.TextArea(_richText, richTextStyle, GUILayout.ExpandHeight(true));
+            UpdateValue(_key, _tempValue);
 
             GUILayout.EndScrollView();
             GUILayout.EndHorizontal();
@@ -125,6 +155,16 @@ namespace LocalizationTool.Editors
             EditorGUILayout.BeginHorizontal("box", GUILayout.Height(30));
             _showRichTextTags = ToggleLeft(_showRichTextTags, "Enable rich text preview but some of the effects are only appreciate with TextMesh PRO");
             EditorGUILayout.EndHorizontal();
+        }
+        
+        private static bool ToggleLeft(bool value, string label)
+        {
+            GUILayout.BeginHorizontal();
+            var temp = EditorGUILayout.Toggle(value, GUILayout.Height(28), GUILayout.Width(15));
+            EditorGUILayout.LabelField(label, CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationToggleLabel), GUILayout.Height(28));
+            GUILayout.EndHorizontal();
+
+            return temp;
         }
 
         private void CloseButton()
@@ -148,17 +188,8 @@ namespace LocalizationTool.Editors
             GUILayout.FlexibleSpace();
             GUILayout.EndVertical();
         }
-
-        private static bool ToggleLeft(bool value, string label)
-        {
-            GUILayout.BeginHorizontal();
-            var temp = EditorGUILayout.Toggle(value, GUILayout.Height(28), GUILayout.Width(15));
-            EditorGUILayout.LabelField(label, CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationToggleLabel), GUILayout.Height(28));
-            GUILayout.EndHorizontal();
-
-            return temp;
-        }
-
+        
+        //TODO
         private void HistoryButtons()
         {
             GUILayout.BeginVertical();
@@ -453,6 +484,11 @@ namespace LocalizationTool.Editors
         {
             _richText = tempValue;
             await LocalizationManager.Instance.ChangeValue(key, tempValue);
+        }
+
+        private async void UpdateKey(string oldKey, string newKey)
+        {
+            _key = await LocalizationManager.Instance.ChangeKey(oldKey, newKey, this);
         }
 
         #endregion

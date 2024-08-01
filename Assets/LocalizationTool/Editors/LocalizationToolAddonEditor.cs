@@ -17,7 +17,7 @@ namespace LocalizationTool.Editors
     {
         #region PRIVATE VARIABLES
 
-        private int _keyIndex = 0;
+        private int _keyIndex = -1;
         private int _filterCategoryIndex = 0;
         private string _filterKeyText = "";
         private Vector2 _scrollView;
@@ -32,7 +32,6 @@ namespace LocalizationTool.Editors
 
             _target = (LocalizationToolAddon)target;
 
-            
             EditorGUILayout.BeginVertical(); 
             Row1();
 

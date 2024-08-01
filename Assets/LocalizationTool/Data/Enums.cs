@@ -63,7 +63,8 @@ namespace LocalizationTool.Data
             OptionRichTextFontSizePopup,
             OptionRichTextZoomLabel,
             AddonSelectableTextFieldLabel,
-            ImportProgressWindowInfoLabel
+            RichTextEditorKeyTextField,
+            RichTextEditorFeedbackLabel
         }
         
         public static string[] SEARCH_TYPE = {"By key", "By value", "By both"};

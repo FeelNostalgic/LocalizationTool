@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using LocalizationTool.Commons;
 using LocalizationTool.Data;
@@ -13,12 +14,6 @@ namespace LocalizationTool.Editors
     {
         #region PUBLIC VARIABLES
 
-        public string AddCategoryFeedbackLabelText
-        {
-            get => _addCategoryFeedbackLabelText;
-            set => _addCategoryFeedbackLabelText = value;
-        }
-
         #endregion
 
         #region PRIVATE VARIABLES
@@ -26,11 +21,12 @@ namespace LocalizationTool.Editors
         #region EDITOR VARIABLES
 
         private string _addCategoryValue;
-        private string _addCategoryFeedbackLabelText = "";
+
+        private const int MAX_CHARACTERS = 120;
 
         private Vector2 _scrollCenter;
 
-        private const int MAX_CHARACTERS = 100;
+        private readonly Dictionary<string, string> _feedbackList = new();
 
         #endregion
 
@@ -51,6 +47,8 @@ namespace LocalizationTool.Editors
 
         public void ShowLayout()
         {
+            ControlFocus("CATEGORY");
+            
             GUILayout.BeginVertical(GUILayout.ExpandHeight(true));
 
             GUILayout.Space(5);
@@ -67,7 +65,7 @@ namespace LocalizationTool.Editors
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
         }
-
+        
         #endregion
 
         #region PRRIVATE METHODS
@@ -104,15 +102,13 @@ namespace LocalizationTool.Editors
             if (GUILayout.Button(GetGUIContent(AddIcon, "Add new category"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 LocalizationManager.Instance.AddNewCategory(_addCategoryValue, this);
-                ControlTextAreaFeedbackDuration(1f);
             }
 
             if (GUI.GetNameOfFocusedControl() == "CATEGORY")
             {
                 if (Event.current is { keyCode: (KeyCode.Return or KeyCode.KeypadEnter) })
                 {
-                    LocalizationManager.Instance.AddNewCategory(_addCategoryValue, this);
-                    ControlTextAreaFeedbackDuration(1f);
+                    if (!AddActionRunning) LocalizationManager.Instance.AddNewCategory(_addCategoryValue, this);
                 }
             }
 
@@ -120,9 +116,9 @@ namespace LocalizationTool.Editors
             GUILayout.EndHorizontal();
             GUILayout.Space(5);
 
-            ShowTextAreaFeedback(_addCategoryFeedbackLabelText);
+            ShowTextAreaFeedback(FeedbackLabel);
             GUILayout.EndVertical();
-            
+
             ShowHorizontalLine(5);
         }
 
@@ -153,6 +149,7 @@ namespace LocalizationTool.Editors
             if (GUILayout.Button(GetGUIContent(RefreshIcon, "Reload data"), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
             {
                 LocalizationManager.Instance.RefreshCategoriesData();
+                LocalizationManager.Log("Categories loaded");
             }
 
             GUILayout.FlexibleSpace();
@@ -184,30 +181,38 @@ namespace LocalizationTool.Editors
 
         private void UnitCenterScrollViewContent(int index, string category)
         {
+            var height = _feedbackList.ContainsKey(category) ? Height : GUILayout.Height(40 + 20);
             GUI.backgroundColor = EditorGUIUtility.isProSkin ? Color.white : Colors.Alpha(Color.cyan, .1f);
-            GUILayout.BeginHorizontal("box", _height);
+            GUILayout.BeginVertical("box", height);
+
             GUI.backgroundColor = Color.clear;
+            GUILayout.BeginHorizontal(Height);
+            
             GUILayout.Space(10);
 
             Column1(index, category);
-            
+
             Column2(index, category);
-            
+
             Column3(index, category);
 
             Column4(category);
-            
+
             Column5(category);
-            
+
             GUILayout.EndHorizontal();
+
+            Feedback(category);
+
+            GUILayout.EndVertical();
         }
 
         private void Column1(int index, string category)
         {
             //Number
-            GUILayout.BeginVertical("box", GUILayout.Width(35), _height);
+            GUILayout.BeginVertical("box", GUILayout.Width(35), Height);
             GUI.backgroundColor = Colors.DEFAULT;
-            
+
             GUILayout.FlexibleSpace();
             var tempIndex = EditorGUILayout.IntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Height(30));
             if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, tempIndex);
@@ -218,14 +223,15 @@ namespace LocalizationTool.Editors
         {
             //Button To move UP
             GUI.backgroundColor = Color.clear;
-            GUILayout.BeginVertical("box", GUILayout.Width(23), _height);
+            GUILayout.BeginVertical("box", GUILayout.Width(23), Height);
             GUI.backgroundColor = Colors.DEFAULT;
-            
+
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(UpIcon, $"Move '{category}' Up"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index - 2);
             }
+
             GUILayout.EndVertical();
         }
 
@@ -233,14 +239,15 @@ namespace LocalizationTool.Editors
         {
             //Button To move DOWN
             GUI.backgroundColor = Color.clear;
-            GUILayout.BeginVertical("box", GUILayout.Width(23), _height);
+            GUILayout.BeginVertical("box", GUILayout.Width(23), Height);
             GUI.backgroundColor = Colors.DEFAULT;
-            
+
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(DownIcon, $"Move '{category}' Down"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index + 2);
             }
+
             GUILayout.EndVertical();
         }
 
@@ -248,9 +255,9 @@ namespace LocalizationTool.Editors
         {
             // Favourite Button
             GUI.backgroundColor = Color.clear;
-            GUILayout.BeginVertical("box", GUILayout.Width(26), _height);
+            GUILayout.BeginVertical("box", GUILayout.Width(26), Height);
             GUI.backgroundColor = Colors.DEFAULT;
-            
+
             GUILayout.FlexibleSpace();
             if (LocalizationManager.IsDefaultCategory(category))
             {
@@ -267,6 +274,7 @@ namespace LocalizationTool.Editors
                     LocalizationManager.Log($"Category '{category}' is now default");
                 }
             }
+
             GUILayout.EndVertical();
         }
 
@@ -274,14 +282,14 @@ namespace LocalizationTool.Editors
         {
             // FIELDS
             GUI.backgroundColor = Color.clear;
-            GUILayout.BeginHorizontal("box", _height, GUILayout.ExpandWidth(true));
+            GUILayout.BeginHorizontal("box", Height, GUILayout.ExpandWidth(true));
             GUI.backgroundColor = Colors.DEFAULT;
 
             // Text
+            EditorGUI.BeginChangeCheck();
             var tempValue = EditorGUILayout.TextField(category, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), GUILayout.Height(40));
-            if (tempValue.Length > MAX_CHARACTERS) tempValue = tempValue[..MAX_CHARACTERS];
-            UpdateCategory(category, tempValue);
-            
+            if (EditorGUI.EndChangeCheck()) UpdateCategory(category, tempValue);
+
             // Delete Button
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginVertical("box", GUILayout.Width(23));
@@ -312,18 +320,63 @@ namespace LocalizationTool.Editors
                     }
                 }
             }
+
             GUILayout.EndVertical();
-            
+
             GUILayout.EndHorizontal();
         }
-        
+
+        private void Feedback(string category)
+        {
+            //Feedback
+            if (_feedbackList.ContainsKey(category) && _feedbackList[category].IsNotEmpty())
+            {
+                GUILayout.BeginHorizontal(GUILayout.Height(20));
+                GUILayout.FlexibleSpace();
+                GUILayout.Label(WarningIcon, GUILayout.Width(20));
+                GUILayout.Label(_feedbackList[category], CustomStyles.GetStyle(Enums.CustomStyleName.RichTextEditorFeedbackLabel));
+                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
+            }
+        }
+
         #endregion
 
         #region UPDATE METHODS
 
-        private static void UpdateCategory(string oldLanguage, string newValue)
+        private void UpdateCategory(string oldCategory, string newCategory)
         {
-            LocalizationManager.Instance.ChangeCategoryName(oldLanguage, newValue);
+            if(oldCategory.Equals(newCategory)) return;
+            
+            if (!_feedbackList.ContainsKey(oldCategory)) _feedbackList.Add(oldCategory, "");
+
+            if (newCategory.Equals(""))
+            {
+                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, "Category cannot be an empty value", delegate { _feedbackList.Remove(oldCategory); });
+                return;
+            }
+
+            if (newCategory.Contains(" "))
+            {
+                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, "Category cannot contain spaces", delegate { _feedbackList.Remove(oldCategory); });
+                return;
+            }
+
+            if (newCategory.Length > MAX_CHARACTERS)
+            {
+                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, $"The maximum number of characters({MAX_CHARACTERS}) has been exceeded", delegate { _feedbackList.Remove(oldCategory); });
+                return;
+            }
+
+            if (LocalizationManager.Categories.Contains(newCategory))
+            {
+                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, $"Category '{newCategory}' value already exists", delegate { _feedbackList.Remove(oldCategory); });
+                return;
+            }
+            
+            LocalizationManager.Instance.ChangeCategoryName(oldCategory, newCategory);
+            
+            _feedbackList.Remove(oldCategory);
         }
 
         private static void UpdateIndex(int oldIndex, int newIndex)
@@ -331,14 +384,14 @@ namespace LocalizationTool.Editors
             LocalizationManager.Instance.ChangeCategoryIndex(oldIndex, newIndex);
         }
 
-        #endregion
-
-        internal override async void ControlTextAreaFeedbackDuration(float durationInSeconds)
+        public override void ClearAddTextField()
         {
-            var millisecondsDelay = (int)(durationInSeconds * 1000);
-            await Task.Delay(millisecondsDelay);
-            _addCategoryFeedbackLabelText = "";
+            _addCategoryValue = "";
+            EditorGUI.FocusTextInControl("CATEGORY");
+            RepaintGUI();
         }
+
+        #endregion
 
         #endregion
     }

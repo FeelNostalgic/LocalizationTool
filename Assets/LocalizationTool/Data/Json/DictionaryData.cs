@@ -59,6 +59,11 @@ namespace LocalizationTool.Data.Json
         {
             _languagesValue.Add(new LanguageValue{Language = newLanguage, Value = ""});
         }
+
+        public void UpdateKey(string newValue)
+        {
+            Key = newValue;
+        }
         
         public void UpdateValue(string language, string newValue)
         {
@@ -84,6 +89,11 @@ namespace LocalizationTool.Data.Json
             return Task.CompletedTask;
         }
 
+        public void UpdateCategory(string newCategoryName)
+        {
+            Category = newCategoryName;
+        }
+        
         public Task UpdateCategoryName(string oldCategoryName, string newCategoryName)
         {
             if(Category.Equals(oldCategoryName)) Category = newCategoryName;

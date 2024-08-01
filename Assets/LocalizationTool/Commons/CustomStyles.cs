@@ -392,9 +392,20 @@ namespace LocalizationTool.Commons
                     }
                 },
                 {
-                    Enums.CustomStyleName.ImportProgressWindowInfoLabel, new GUIStyle(GUI.skin.label)
+                    Enums.CustomStyleName.RichTextEditorKeyTextField, new GUIStyle(GUI.skin.textField)
                     {
-                        alignment = TextAnchor.UpperCenter,
+                        alignment = TextAnchor.MiddleCenter,
+                        fontSize = 13,
+                        normal =
+                        {
+                            textColor = Color.white
+                        }
+                    }
+                },
+                {
+                    Enums.CustomStyleName.RichTextEditorFeedbackLabel, new GUIStyle(GUI.skin.label)
+                    {
+                        alignment = TextAnchor.MiddleLeft,
                         fontSize = 12,
                         wordWrap = true,
                         richText = true,

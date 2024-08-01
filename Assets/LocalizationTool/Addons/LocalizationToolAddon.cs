@@ -49,10 +49,16 @@ namespace LocalizationTool.Addons
 
         public void OnKeyRemoved(string key)
         {
-            if (_key.Equals(key))
+            if (!_key.Equals(key)) return;
+            _key = "";
+            _keyIndex = -1;
+        }
+
+        public void OnKeyUpdate(string oldKey, string newKey)
+        {
+            if (oldKey.Equals(_key))
             {
-                _key = "";
-                _keyIndex = 0;
+                _key = newKey;
             }
         }
         

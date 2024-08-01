@@ -46,6 +46,7 @@ namespace LocalizationTool.Data.Binary
         {
             var tuple = OrderedLanguages.First(tuple => tuple.Language.Equals(oldName));
             tuple.Language = newName;
+            if (FavouriteLanguage.Equals(oldName)) FavouriteLanguage = newName;
         }
 
         public string ChangeIndex(int oldIndex, int newIndex)

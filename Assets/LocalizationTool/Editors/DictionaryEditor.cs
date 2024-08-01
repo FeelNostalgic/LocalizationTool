@@ -15,13 +15,7 @@ namespace LocalizationTool.Editors
     public class DictionaryEditor : LocalizationEditor
     {
         #region PUBLIC VARIABLES
-
-        public string AddValueFeedbackLabelText
-        {
-            get => _addValueFeedbackLabelText;
-            set => _addValueFeedbackLabelText = value;
-        }
-
+        
         #endregion
 
         #region PRIVATE VARIABLES
@@ -33,7 +27,6 @@ namespace LocalizationTool.Editors
 
         private string _addKeyValue;
         private string _addCategoryValue;
-        private string _addValueFeedbackLabelText = "";
 
         private Vector2 _scrollCenter;
         private Vector2 _scrollToolbar;
@@ -73,6 +66,8 @@ namespace LocalizationTool.Editors
 
         public void ShowLayout()
         {
+            ControlFocus("KEY");
+            
             GUILayout.BeginVertical( GUILayout.ExpandHeight(true));
 
             ShowHorizontalLine(5);
@@ -124,21 +119,19 @@ namespace LocalizationTool.Editors
                 if (GUILayout.Button(new GUIContent(AddIcon, "Add new key to dictionary"), GUILayout.ExpandWidth(true), GUILayout.Height(30)))
                 {
                     LocalizationManager.Instance.AddNewKey(_addKeyValue, _addCategoryValue, this);
-                    ControlTextAreaFeedbackDuration(1.5f);
                 }
 
                 if (GUI.GetNameOfFocusedControl() == "KEY")
                 {
                     if (Event.current is { keyCode: (KeyCode.Return or KeyCode.KeypadEnter) })
                     {
-                        LocalizationManager.Instance.AddNewKey(_addKeyValue, _addCategoryValue, this);
-                        ControlTextAreaFeedbackDuration(1.5f);
+                        if (!AddActionRunning) LocalizationManager.Instance.AddNewKey(_addKeyValue, _addCategoryValue, this);
                     }
                 }
 
                 GUILayout.Space(5);
 
-                ShowTextAreaFeedback(_addValueFeedbackLabelText);
+                ShowTextAreaFeedback(FeedbackLabel);
                 GUILayout.EndVertical();
 
                 GUILayout.EndVertical();
@@ -186,6 +179,56 @@ namespace LocalizationTool.Editors
             GUILayout.EndVertical();
         }
 
+        private void LanguageToolBarSection()
+        {
+            try
+            {
+                GUILayout.Space(10);
+                GUILayout.BeginHorizontal();
+                _scrollToolbar = EditorGUILayout.BeginScrollView(_scrollToolbar, GUILayout.Height(40));
+                var toolbarItems = LocalizationManager.ActiveLanguages.Select(t => t).ToArray();
+                if (toolbarItems.Length != 0)
+                {
+                    _currentLanguageToolbarIndex = GUILayout.Toolbar(LocalizationManager.Instance.CurrentToolbarLanguageIndex, toolbarItems);
+                    if (LocalizationManager.Instance.CurrentLanguageInDictionarySection != LocalizationManager.ActiveLanguages[_currentLanguageToolbarIndex])
+                    {
+                        LocalizationManager.Instance.CurrentLanguageInDictionarySection = LocalizationManager.ActiveLanguages[_currentLanguageToolbarIndex];
+                        GUI.FocusControl(null);
+                    }
+                }
+
+                EditorGUILayout.EndScrollView();
+
+                GUILayout.EndHorizontal();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+                Debug.Log(_currentLanguageToolbarIndex);
+                //Ignore
+            }
+        }
+
+        private static void TitleCenterSection()
+        {
+            GUILayout.BeginHorizontal();
+            
+            if (GUILayout.Button(new GUIContent(RefreshIcon, "Reload data"), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
+            {
+                LocalizationManager.Instance.RefreshDictionaryData();
+                LocalizationManager.Log("Dictionary loaded");
+
+            }
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.Label(LocalizationManager.Instance.CurrentLanguageInDictionarySection, CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter20Label));
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.EndHorizontal();
+        }
+
         private void SearchBarCenterSection()
         {
             GUILayout.BeginHorizontal();
@@ -199,27 +242,9 @@ namespace LocalizationTool.Editors
 
             GUILayout.Space(5);
 
-            GUI.SetNextControlName("Search");
+            GUI.SetNextControlName("SEARCH");
             _searchKeyValue = EditorGUILayout.TextField(_searchKeyValue, CustomStyles.GetStyle(Enums.CustomStyleName.KeyTextField), GUILayout.Height(30));
             GUILayout.Space(5);
-
-            GUILayout.EndHorizontal();
-        }
-
-        private static void TitleCenterSection()
-        {
-            GUILayout.BeginHorizontal();
-            
-            if (GUILayout.Button(new GUIContent(RefreshIcon, "Reload data"), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
-            {
-                LocalizationManager.Instance.RefreshDictionaryData();
-            }
-
-            GUILayout.FlexibleSpace();
-
-            GUILayout.Label(LocalizationManager.Instance.CurrentLanguageInDictionarySection, CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter20Label));
-
-            GUILayout.FlexibleSpace();
 
             GUILayout.EndHorizontal();
         }
@@ -246,34 +271,6 @@ namespace LocalizationTool.Editors
             GUILayout.EndHorizontal();
 
             GUI.backgroundColor = Colors.DEFAULT;
-        }
-
-        private void LanguageToolBarSection()
-        {
-            try
-            {
-                GUILayout.Space(10);
-                GUILayout.BeginHorizontal();
-                _scrollToolbar = EditorGUILayout.BeginScrollView(_scrollToolbar, GUILayout.Height(40));
-                var toolbarItems = LocalizationManager.ActiveLanguages.Select(t => t).ToArray();
-                if (toolbarItems.Length != 0)
-                {
-                    _currentLanguageToolbarIndex = GUILayout.Toolbar(LocalizationManager.Instance.CurrentToolbarLanguageIndex, toolbarItems);
-                    if (LocalizationManager.Instance.CurrentLanguageInDictionarySection != LocalizationManager.ActiveLanguages[_currentLanguageToolbarIndex])
-                    {
-                        LocalizationManager.Instance.CurrentLanguageInDictionarySection = LocalizationManager.ActiveLanguages[_currentLanguageToolbarIndex];
-                        GUI.FocusControl(null);
-                    }
-                }
-
-                EditorGUILayout.EndScrollView();
-
-                GUILayout.EndHorizontal();
-            }
-            catch (Exception)
-            {
-                //Ignore
-            }
         }
 
         private void GenerateCenterScrollViewContent()
@@ -335,7 +332,7 @@ namespace LocalizationTool.Editors
             if (!_currentKeyScrollPosition.ContainsKey(key)) _currentKeyScrollPosition.Add(key, Vector2.zero);
 
             GUI.backgroundColor = EditorGUIUtility.isProSkin ? Color.white : Colors.Alpha(Color.cyan, .1f);
-            GUILayout.BeginHorizontal("box", _height);
+            GUILayout.BeginHorizontal("box", Height);
             GUI.backgroundColor = Color.clear;
 
             Column1(key);
@@ -349,7 +346,7 @@ namespace LocalizationTool.Editors
 
         private void Column1(string key)
         {
-            GUILayout.BeginVertical("box", GUILayout.Width(275), _height);
+            GUILayout.BeginVertical("box", GUILayout.Width(275), Height);
             GUI.backgroundColor = Colors.DEFAULT;
             GUILayout.Space(5);
 
@@ -365,7 +362,7 @@ namespace LocalizationTool.Editors
         private void Column2(string key, string category)
         {
             GUI.backgroundColor = Color.clear;
-            GUILayout.BeginVertical("box", _height);
+            GUILayout.BeginVertical("box", Height);
 
             GUILayout.Space(3);
             GUILayout.BeginHorizontal(GUILayout.Width(175));
@@ -387,7 +384,7 @@ namespace LocalizationTool.Editors
         {
             GUI.backgroundColor = Color.clear;
 
-            GUILayout.BeginHorizontal("box", _height, GUILayout.ExpandWidth(true));
+            GUILayout.BeginHorizontal("box", Height, GUILayout.ExpandWidth(true));
 
             GUI.backgroundColor = Colors.DEFAULT;
 
@@ -457,16 +454,14 @@ namespace LocalizationTool.Editors
             _addCategoryValue = category;
         }
 
-        #endregion
-
-        internal override async void ControlTextAreaFeedbackDuration(float durationInSeconds)
+        public override void ClearAddTextField()
         {
-            var millisecondsDelay = (int)(durationInSeconds * 1000);
-            await Task.Delay(millisecondsDelay);
-            _addValueFeedbackLabelText = "";
-            base.ControlTextAreaFeedbackDuration(durationInSeconds);
+            _addKeyValue = "";
+            RepaintGUI();
         }
-
+        
+        #endregion
+        
         #endregion
     }
 #endif

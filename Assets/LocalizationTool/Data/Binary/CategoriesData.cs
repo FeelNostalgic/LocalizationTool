@@ -40,6 +40,7 @@ namespace LocalizationTool.Data.Binary
         public void ChangeName(string oldName, string newName)
         {
             var tuple = OrderedCategories.First(tuple => tuple.Category.Equals(oldName));
+            if (DefaultCategory.Equals(oldName)) DefaultCategory = newName;
             tuple.Category = newName;
         }
 

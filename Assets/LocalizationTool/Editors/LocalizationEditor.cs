@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using LocalizationTool.Commons;
 using LocalizationTool.Data;
 using LocalizationTool.Manager;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -32,6 +34,11 @@ namespace LocalizationTool.Editors
         protected static Texture UndoIcon => EditorGUIUtility.IconContent("d_scrollleft").image;
         protected static Texture RedoIcon => EditorGUIUtility.IconContent("d_scrollright").image;
 
+        protected string FeedbackLabel = "";
+        protected bool AddActionRunning;
+
+        protected readonly string[] CsvSeparators = { ";", ",", ".", ":", "|", "=" };
+
         #endregion
 
         #region EDITOR VARIABLES
@@ -44,17 +51,19 @@ namespace LocalizationTool.Editors
         private DictionaryEditor _dictionaryEditor;
         private LanguagesEditor _languagesEditor;
         private CategoriesEditor _categoriesEditor;
+
         private ConfigurationEditor _configurationEditor;
         //private static bool _isWindowOpen;
 
-        protected readonly string[] _csvSeparators = { ";", ",", ".", ":", "|", "=" };
+
+        private EditorCoroutine _currentCoroutine;
 
         #endregion
 
         #region DIMENSION VARIABLES
 
-        protected static readonly Vector2 _windowSize = new(1400, 1000);
-        protected readonly GUILayoutOption _height = GUILayout.Height(40);
+        private static readonly Vector2 WindowSize = new(1400, 1000);
+        protected readonly GUILayoutOption Height = GUILayout.Height(40);
 
         #endregion
 
@@ -63,14 +72,16 @@ namespace LocalizationTool.Editors
         {
             //Show existing window instance. If one doesn't exist, make one.
             var window = GetWindow(typeof(LocalizationEditor));
-            window.minSize = _windowSize;
+            window.minSize = WindowSize;
             window.titleContent = new GUIContent("Localization Tool");
             LoadData();
         }
 
+        #region UNITY METHODS
+
         protected virtual void OnEnable()
         {
-            if(hasFocus) LoadData();
+            if (hasFocus) LoadData();
         }
 
         protected virtual void OnDisable()
@@ -82,6 +93,42 @@ namespace LocalizationTool.Editors
         {
             //
         }
+
+        // private void Update()
+        // {
+        //     switch (_currentWindow)
+        //     {
+        //         case Enums.GUI_WINDOW.Dictionary:
+        //             //TODO
+        //             break;
+        //         case Enums.GUI_WINDOW.Languages:
+        //             // TODO
+        //             break;
+        //         case Enums.GUI_WINDOW.Categories:
+        //             // TODO
+        //             break;
+        //         case Enums.GUI_WINDOW.Configuration:
+        //             // TODO
+        //             break;
+        //         default:
+        //             throw new ArgumentOutOfRangeException();
+        //     }
+        // }
+
+        protected void RepaintGUI()
+        {
+            Repaint();
+        }
+        
+        protected static void ControlFocus(string focus)
+        {
+            if (GUI.GetNameOfFocusedControl() != focus) return;
+            if (Event.current is { isKey: true }) EditorGUI.FocusTextInControl(focus);
+        }
+
+        #endregion
+
+        #region LAYOUT
 
         protected void OnGUI()
         {
@@ -106,32 +153,6 @@ namespace LocalizationTool.Editors
             }
         }
 
-        // private void Update()
-        // {
-        //     switch (_currentWindow)
-        //     {
-        //         case Enums.GUI_WINDOW.Dictionary:
-        //             //TODO
-        //             break;
-        //         case Enums.GUI_WINDOW.Languages:
-        //             // TODO
-        //             break;
-        //         case Enums.GUI_WINDOW.Categories:
-        //             // TODO
-        //             break;
-        //         case Enums.GUI_WINDOW.Configuration:
-        //             // TODO
-        //             break;
-        //         default:
-        //             throw new ArgumentOutOfRangeException();
-        //     }
-        // }
-        
-        private static async void LoadData()
-        {
-            await LocalizationManager.Instance.Init();
-        }
-        
         private void ShowDictionaryLayout()
         {
             _dictionaryEditor ??= (DictionaryEditor)CreateInstance(typeof(DictionaryEditor));
@@ -155,6 +176,8 @@ namespace LocalizationTool.Editors
             _configurationEditor ??= (ConfigurationEditor)CreateInstance(typeof(ConfigurationEditor));
             _configurationEditor.ShowLayout();
         }
+
+        #endregion
 
         #region CENTER SECTION
 
@@ -199,49 +222,84 @@ namespace LocalizationTool.Editors
 
         #region COMMONS
 
-        protected GUIContent GetGUIContent(Texture t, string tooltip)
+        private static async void LoadData()
+        {
+            await LocalizationManager.Instance.Init();
+        }
+
+        protected static GUIContent GetGUIContent(Texture t, string tooltip)
         {
             return new GUIContent(t, tooltip);
         }
+
+        public void ControlFeedbackLabel(string text)
+        {
+            AddActionRunning = true;
+            if (_currentCoroutine != null) EditorCoroutineUtility.StopCoroutine(_currentCoroutine);
+            _currentCoroutine = EditorCoroutineUtility.StartCoroutine(FeedbackLabelCoroutine(text, delegate(string s) { FeedbackLabel = s; }, 1.6f), this);
+        }
+
+        protected void ControlFeedbackLabelInRow(Action<string> labelUpdate, string text, Action onComplete)
+        {
+            if (_currentCoroutine != null) EditorCoroutineUtility.StopCoroutine(_currentCoroutine);
+            _currentCoroutine = EditorCoroutineUtility.StartCoroutine(FeedbackLabelCoroutine(text, labelUpdate.Invoke, 2.5f, onComplete), this);
+        }
         
+        private IEnumerator FeedbackLabelCoroutine(string text, Action<string> updateFeedbackLabel, float duration, Action onComplete = null)
+        {
+            updateFeedbackLabel?.Invoke(text);
+            yield return new WaitForSecondsRealtime(duration);
+            updateFeedbackLabel?.Invoke("");
+            Repaint();
+            _currentCoroutine = null;
+            AddActionRunning = false;
+            
+            onComplete?.Invoke();
+        }
+
+        public virtual void ClearAddTextField()
+        {
+            
+        }
+
         #region GUI ELEMENTS
 
-        protected void ShowHeader1(string name, params GUILayoutOption[] options)
+        protected static void ShowHeader1(string text, params GUILayoutOption[] options)
         {
             GUILayout.Space(5);
-            GUILayout.Label(name, CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter20Label), options);
+            GUILayout.Label(text, CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter20Label), options);
             GUILayout.Space(10);
         }
 
-        protected void ShowHeader2(string name, params GUILayoutOption[] options)
+        protected static void ShowHeader2(string text, params GUILayoutOption[] options)
         {
             GUILayout.Space(5);
-            GUILayout.Label(name, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label), options);
+            GUILayout.Label(text, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label), options);
             GUILayout.Space(10);
         }
 
-        protected void ShowExportImportSubHeader(string name, params GUILayoutOption[] options)
+        protected void ShowExportImportSubHeader(string text, params GUILayoutOption[] options)
         {
             GUILayout.Space(8);
-            GUILayout.Label(name, CustomStyles.GetStyle(Enums.CustomStyleName.Header2LowerCenter14Label), options);
+            GUILayout.Label(text, CustomStyles.GetStyle(Enums.CustomStyleName.Header2LowerCenter14Label), options);
             GUILayout.Space(10);
         }
 
-        protected void ShowSubHeader(string name, params GUILayoutOption[] options)
+        protected static void ShowSubHeader(string text, params GUILayoutOption[] options)
         {
             GUILayout.Space(8);
-            GUILayout.Label(name, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleLeft15Label), options);
+            GUILayout.Label(text, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleLeft15Label), options);
             GUILayout.Space(10);
         }
 
-        protected void ShowSectionHeader(string name, params GUILayoutOption[] options)
+        protected static void ShowSectionHeader(string text, params GUILayoutOption[] options)
         {
             GUILayout.Space(8);
-            GUILayout.Label(name, CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter15Label), options);
+            GUILayout.Label(text, CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter15Label), options);
             GUILayout.Space(10);
         }
 
-        protected void ShowLabelPopupSelection(string label, ref string categoryValue)
+        protected static void ShowLabelPopupSelection(string label, ref string categoryValue)
         {
             GUILayout.BeginVertical();
             GUILayout.Label(label, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label));
@@ -264,7 +322,7 @@ namespace LocalizationTool.Editors
             GUILayout.EndVertical();
         }
 
-        protected void ShowLabelTextFieldVertical(string label, ref string keyValue)
+        protected static void ShowLabelTextFieldVertical(string label, ref string keyValue)
         {
             GUILayout.BeginVertical();
             GUI.SetNextControlName(label);
@@ -274,14 +332,9 @@ namespace LocalizationTool.Editors
             GUILayout.EndVertical();
         }
 
-        protected void ShowTextAreaFeedback(string label)
+        protected static void ShowTextAreaFeedback(string label)
         {
-            EditorGUILayout.LabelField(label, CustomStyles.GetStyle(Enums.CustomStyleName.FeedbackLabel));
-        }
-
-        internal virtual void ControlTextAreaFeedbackDuration(float durationInSeconds)
-        {
-            Repaint();
+            EditorGUILayout.LabelField(label, CustomStyles.GetStyle(Enums.CustomStyleName.FeedbackLabel), GUILayout.Height(20));
         }
 
         protected static void ShowVerticalLine(float width)
@@ -323,33 +376,33 @@ namespace LocalizationTool.Editors
             // Repaint();
         }
 
-        protected float GetWidthSize(float percent)
+        protected static float GetWidthSize(float percent)
         {
-            return percent * _windowSize.x;
+            return percent * WindowSize.x;
         }
 
-        protected GUILayoutOption MinWidthOption(float width)
+        protected static GUILayoutOption MinWidthOption(float width)
         {
             return GUILayout.MinWidth(width);
         }
 
-        protected GUILayoutOption MaxWidthOption(float width)
+        protected static GUILayoutOption MaxWidthOption(float width)
         {
             return GUILayout.MaxWidth(width);
         }
 
-        protected GUILayoutOption MinHeightOption(float height)
+        protected static GUILayoutOption MinHeightOption(float height)
         {
             return GUILayout.MinHeight(height);
         }
 
-        protected GUILayoutOption MaxHeightOption(float height)
+        protected static GUILayoutOption MaxHeightOption(float height)
         {
             return GUILayout.MaxHeight(height);
         }
 
         #endregion
-        
+
         #endregion
     }
 #endif

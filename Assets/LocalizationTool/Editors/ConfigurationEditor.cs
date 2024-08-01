@@ -269,7 +269,7 @@ namespace LocalizationTool.Editors
                 case Enums.ExportImportMethods.CSV:
                     GUILayout.Space(5);
 
-                    _selectedCsvSeparatorIndexForExport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForExport, _csvSeparators, CustomStyles.GetStyle(Enums.CustomStyleName.SeparatorsCsvPopup),
+                    _selectedCsvSeparatorIndexForExport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForExport, CsvSeparators, CustomStyles.GetStyle(Enums.CustomStyleName.SeparatorsCsvPopup),
                         GUILayout.Width(55));
 
                     GUILayout.FlexibleSpace();
@@ -291,7 +291,7 @@ namespace LocalizationTool.Editors
 
                     GUILayout.BeginHorizontal();
                     GUILayout.Space(10);
-                    GUILayout.Label(EditorGUIUtility.IconContent("d_console.warnicon.sml"));
+                    GUILayout.Label(WarningIcon);
                     var style = new GUIStyle(GUI.skin.label) { wordWrap = true, };
                     GUILayout.Label("Line breaks are removed when exporting to CSV", style);
                     GUILayout.EndHorizontal();
@@ -354,7 +354,7 @@ namespace LocalizationTool.Editors
                 case Enums.ExportImportMethods.CSV:
                     GUILayout.Space(5);
 
-                    _selectedCsvSeparatorIndexForImport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForImport, _csvSeparators, CustomStyles.GetStyle(Enums.CustomStyleName.SeparatorsCsvPopup),
+                    _selectedCsvSeparatorIndexForImport = EditorGUILayout.Popup(_selectedCsvSeparatorIndexForImport, CsvSeparators, CustomStyles.GetStyle(Enums.CustomStyleName.SeparatorsCsvPopup),
                         GUILayout.Width(55));
 
                     GUILayout.FlexibleSpace();
@@ -467,7 +467,7 @@ namespace LocalizationTool.Editors
         private string BuildCSV()
         {
             var serializer = new CSV_Serializer();
-            serializer.SetSeparator(_csvSeparators[_selectedCsvSeparatorIndexForExport]);
+            serializer.SetSeparator(CsvSeparators[_selectedCsvSeparatorIndexForExport]);
             var data = new Dictionary<string, KeyData>(LocalizationManager.Dictionary);
 
             var titles = new List<string> { "Key", "Category" };
@@ -543,7 +543,7 @@ namespace LocalizationTool.Editors
             bytesRead += header.Length + Environment.NewLine.Length;
             progressWindow.SetProgress( (float)bytesRead / totalBytes);
             
-            var separator = _csvSeparators[_selectedCsvSeparatorIndexForImport];
+            var separator = CsvSeparators[_selectedCsvSeparatorIndexForImport];
             var languages = header?.Split(separator);
 
             Debug.Assert(languages != null, nameof(languages) + " != null");

@@ -41,7 +41,7 @@ namespace LocalizationTool.Manager
         #region Actions
 
         public Action<string> OnDefaultCategoryUpdate { get; set; }
-        
+
         #endregion
 
         #endregion
@@ -80,37 +80,30 @@ namespace LocalizationTool.Manager
 
         #region PUBLIC METHODS
 
-        #region JSON
-
         #region DICTIONARY
 
-        public async void AddNewKey(string key, string category, DictionaryEditor editor = null)
+        public async void AddNewKey(string key, string category, LocalizationEditor editor = null)
         {
             if (key.Equals(""))
             {
-                if (editor != null && editor.AddValueFeedbackLabelText != "") return;
-                Log("Key cannot be an empty value");
-                if (editor != null) editor.AddValueFeedbackLabelText = "Key cannot be an empty value";
+                ShowFeedback("Key cannot be an empty value", editor);
                 return;
             }
 
             if (key.Contains(" "))
             {
-                if (editor != null && editor.AddValueFeedbackLabelText != "") return;
-                Log("Key cannot contain spaces");
-                if (editor != null) editor.AddValueFeedbackLabelText = "Key cannot contain spaces";
+                ShowFeedback("Key cannot contain spaces", editor);
                 return;
             }
 
             if (_dynamicDictionary.ContainsKey(key))
             {
-                if (editor != null && editor.AddValueFeedbackLabelText != "") return;
-                Log($"Key '{key}' already exists");
-                if (editor != null) editor.AddValueFeedbackLabelText = $"Key '{key}' already exists";
+                ShowFeedback($"Key '{key}' already exists", editor);
                 return;
             }
 
-            if (editor != null) editor.AddValueFeedbackLabelText = $"Key '{key}' added correctly";
+            //TODO: clear textField => add option in configuration to avoid or not
+            if (editor != null) editor.ClearAddTextField();
 
             var interDic = ActiveLanguages.ToDictionary(language => language, _ => "");
             var interList = ActiveLanguages.Select(l => new LanguageValue { Language = l, Value = "" }).ToList();
@@ -119,13 +112,50 @@ namespace LocalizationTool.Manager
             //Add key to JSON file
             _dictionaryData.ListDictionaryKeyCategoryLanguages.Add(new KeyCategoryLanguageValues(key, category, interList));
 
+            ShowFeedback($"Key '{key}' added correctly", editor);
+
+            await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
+        }
+
+        public async Task<string> ChangeKey(string oldKey, string newKey, LocalizationEditor editor)
+        {
+            if (oldKey.Equals(newKey)) return oldKey;
+
+            if (newKey.Equals(""))
+            {
+                ShowFeedback("Key cannot be an empty value", editor);
+                return oldKey;
+            }
+
+            if (newKey.Contains(" "))
+            {
+                ShowFeedback("Key cannot contain spaces", editor);
+                return oldKey;
+            }
+
+            if (_dynamicDictionary.ContainsKey(newKey))
+            {
+                ShowFeedback($"Key '{oldKey}' already exists", editor);
+                return oldKey;
+            }
+
+            var oldData = _dynamicDictionary[oldKey];
+            _dynamicDictionary.Remove(oldKey);
+            _dynamicDictionary.Add(newKey, oldData);
+
+            //Change JSON file 
+            _dictionaryData.ListDictionaryKeyCategoryLanguages.First(x => x.Key == oldKey).UpdateKey(newKey);
+
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
 
-            Log($"Key '{key}' added correctly");
+            UpdateAddonsOnKeyUpdated(oldKey, newKey);
+
+            return newKey;
         }
 
         public async Task ChangeValue(string key, string newValue)
         {
+            if (!_dynamicDictionary.ContainsKey(key)) return;
             if (_dynamicDictionary[key].LanguagesData != null && _dynamicDictionary[key].LanguagesData[CurrentLanguageInDictionarySection].Equals(newValue)) return;
 
             UpdateValueInDictionary(key, newValue, CurrentLanguageInDictionarySection);
@@ -145,8 +175,7 @@ namespace LocalizationTool.Manager
             _dynamicDictionary.Add(key, new KeyData { Category = newCategory, LanguagesData = oldData });
 
             //Change JSON file 
-            var data = _dictionaryData.ListDictionaryKeyCategoryLanguages.First(x => x.Key == key);
-            data.Category = newCategory;
+            _dictionaryData.ListDictionaryKeyCategoryLanguages.First(x => x.Key == key).UpdateCategory(newCategory);
 
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
 
@@ -163,62 +192,69 @@ namespace LocalizationTool.Manager
 
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
 
-            UpdateAddons(key);
+            UpdateAddonsOnKeyRemoved(key);
         }
 
-        private static void UpdateAddons(string key)
+        private static void UpdateAddonsOnKeyRemoved(string key)
         {
             var tmproText = Resources.FindObjectsOfTypeAll(typeof(TextMeshProUGUI));
-            foreach (var obj in tmproText) {
-                var item = (TextMeshProUGUI) obj;
+            foreach (var obj in tmproText)
+            {
+                var item = (TextMeshProUGUI)obj;
                 var addon = item.GetComponent<LocalizationToolAddon>();
-                if (addon != null) {
+                if (addon != null)
+                {
                     addon.OnKeyRemoved(key);
                 }
             }
-            
+
+            //Save scene
+            EditorSceneManager.SaveScene(SceneManager.GetActiveScene());
+        }
+
+        private static void UpdateAddonsOnKeyUpdated(string oldKey, string newKey)
+        {
+            var tmproText = Resources.FindObjectsOfTypeAll(typeof(TextMeshProUGUI));
+            foreach (var obj in tmproText)
+            {
+                var item = (TextMeshProUGUI)obj;
+                var addon = item.GetComponent<LocalizationToolAddon>();
+                if (addon != null)
+                {
+                    addon.OnKeyUpdate(oldKey, newKey);
+                }
+            }
+
             //Save scene
             EditorSceneManager.SaveScene(SceneManager.GetActiveScene());
         }
 
         #endregion
 
-        #endregion
-
-        #region BINARY
-
         #region LANGUAGE
 
-        public async void AddNewLanguage(string newLanguage, LanguagesEditor editor = null, bool showLogs = true)
+        public async void AddNewLanguage(string newLanguage, LocalizationEditor editor = null)
         {
             if (newLanguage.Equals(""))
             {
-                if (!showLogs) return;
-                if (editor != null && editor.AddLanguageFeedbackLabelText != "") return;
-                Log("Language cannot be an empty value");
-                if (editor != null) editor.AddLanguageFeedbackLabelText = "Language cannot be an empty value";
+                ShowFeedback("Language cannot be an empty value", editor);
                 return;
             }
 
             if (newLanguage.Contains(" "))
             {
-                if (!showLogs) return;
-                if (editor != null && editor.AddLanguageFeedbackLabelText != "") return;
-                Log("Language cannot contain spaces");
-                if (editor != null) editor.AddLanguageFeedbackLabelText = "Language cannot contain spaces";
+                ShowFeedback("Language cannot contain spaces", editor);
                 return;
             }
 
             if (_languagesData.Contains(newLanguage))
             {
-                if (!showLogs) return;
-                if (editor != null && editor.AddLanguageFeedbackLabelText != "") return;
-                Log($"Language '{newLanguage}' already exists");
-                if (editor != null) editor.AddLanguageFeedbackLabelText = $"Language '{newLanguage}' already exists";
+                ShowFeedback($"Language '{newLanguage}' already exists", editor);
                 return;
             }
 
-            if (editor != null) editor.AddLanguageFeedbackLabelText = $"Language '{newLanguage}' added correctly";
+            //TODO: clear textField => add option in configuration to avoid or not
+            if (editor != null) editor.ClearAddTextField();
 
             //Add language to Binary 
             _languagesData.Add(newLanguage);
@@ -228,6 +264,8 @@ namespace LocalizationTool.Manager
                 _languagesData.FavouriteLanguage = newLanguage;
                 CurrentLanguageInDictionarySection = newLanguage;
             }
+
+            ShowFeedback($"Language '{newLanguage}' added correctly", editor);
 
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
 
@@ -239,8 +277,6 @@ namespace LocalizationTool.Manager
 
             //Update dynamic Dictionary
             _dynamicDictionary = _dictionaryData.ListDictionaryKeyCategoryLanguages.ToDictionary(data => data.Key, data => new KeyData { Category = data.Category, LanguagesData = data.DictionaryLanguageValue });
-
-            if (showLogs) Log($"Language '{newLanguage}' added correctly");
         }
 
         public async void RemoveLanguage(string language)
@@ -268,8 +304,7 @@ namespace LocalizationTool.Manager
 
         public async void ChangeLanguageValue(string oldLanguageName, string newLanguageName)
         {
-            if (newLanguageName.Length == 0) return; //TODO: mostrar warning de alguna manera
-            if (_languagesData.Contains(oldLanguageName)) return; //the new value is the same
+            if (CurrentLanguageInDictionarySection.Equals(oldLanguageName)) CurrentLanguageInDictionarySection = newLanguageName;
 
             //Change BINARY file 
             _languagesData.ChangeName(oldLanguageName, newLanguageName);
@@ -321,45 +356,39 @@ namespace LocalizationTool.Manager
 
         #region CATEGORY
 
-        public async void AddNewCategory(string newCategory, CategoriesEditor editor = null, bool showEditorLogs = true)
+        public async void AddNewCategory(string newCategory, LocalizationEditor editor = null, bool showEditorLogs = true)
         {
             // Empty value
             if (newCategory.Equals(""))
             {
                 if (!showEditorLogs) return;
-                if (editor != null && editor.AddCategoryFeedbackLabelText != "") return;
-                Log("Category cannot be an empty value");
-                if (editor != null) editor.AddCategoryFeedbackLabelText = "Category cannot be an empty value";
+                ShowFeedback("Category cannot be an empty value", editor);
                 return;
             }
 
             if (newCategory.Contains(" "))
             {
                 if (!showEditorLogs) return;
-                if (editor != null && editor.AddCategoryFeedbackLabelText != "") return;
-                Log("Category cannot contain spaces");
-                if (editor != null) editor.AddCategoryFeedbackLabelText = "Category cannot contain spaces";
+                ShowFeedback("Category cannot contain spaces", editor);
                 return;
             }
 
             // Already in data
             if (_categoriesData.Contains(newCategory))
             {
-                if (!showEditorLogs) return;
-                if (editor != null && editor.AddCategoryFeedbackLabelText != "") return;
-                Log($"Category '{newCategory}' already exists");
-                if (editor != null) editor.AddCategoryFeedbackLabelText = $"Category '{newCategory}' already exists";
+                ShowFeedback($"Category '{newCategory}' already exists", editor);
                 return;
             }
 
-            if (editor != null) editor.AddCategoryFeedbackLabelText = $"Category '{newCategory}' added correctly";
+            //TODO: clear textField => add option in configuration to avoid or not
+            if (editor != null) editor.ClearAddTextField();
 
             //Add language to Binary 
             _categoriesData.Add(newCategory);
 
-            await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
+            if (showEditorLogs) ShowFeedback($"Category '{newCategory}' added correctly", editor);
 
-            if (showEditorLogs) Log($"Category '{newCategory}' added correctly");
+            await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
         }
 
         public async void RemoveCategory(string category)
@@ -384,8 +413,6 @@ namespace LocalizationTool.Manager
 
         public async void ChangeCategoryName(string oldCategoryName, string newCategoryName)
         {
-            if (_categoriesData.Contains(newCategoryName)) return; //the new value is the same
-
             //Change BINARY file 
             _categoriesData.ChangeName(oldCategoryName, newCategoryName);
 
@@ -451,7 +478,7 @@ namespace LocalizationTool.Manager
                     _configurationData.LanguageDeleteConfirmation = newValue;
                     break;
                 case Enums.GUIWindow.Category:
-                   _configurationData.CategoryDeleteConfirmation = newValue;
+                    _configurationData.CategoryDeleteConfirmation = newValue;
                     break;
             }
 
@@ -471,8 +498,6 @@ namespace LocalizationTool.Manager
             _configurationData.ShowLogsInConsole = newValue;
             await SaveFile(_configurationData, BINARY_CONFIGURATION_PATH, _serializerBinary);
         }
-
-        #endregion
 
         #endregion
 
@@ -608,9 +633,8 @@ namespace LocalizationTool.Manager
 #pragma warning disable CS4014
             LoadDictionaryDataFromJSON();
 #pragma warning restore CS4014
-
         }
-        
+
         public void RefreshLanguagesData()
         {
             CreateFiles();
@@ -618,7 +642,7 @@ namespace LocalizationTool.Manager
             LoadLanguagesDataFromBINARY();
 #pragma warning restore CS4014
         }
-        
+
         public void RefreshCategoriesData()
         {
             CreateFiles();
@@ -628,6 +652,8 @@ namespace LocalizationTool.Manager
         }
 
         #endregion
+
+        #region LOGS
 
         public static void Log(string log)
         {
@@ -667,6 +693,8 @@ namespace LocalizationTool.Manager
 
         #endregion
 
+        #endregion
+
         #region PRIVATE METHODS
 
         private LocalizationManager()
@@ -675,6 +703,14 @@ namespace LocalizationTool.Manager
             //TODO: te if this is necessary => Init();
 #pragma warning restore CS4014
         }
+
+        private static void ShowFeedback(string text, LocalizationEditor editor)
+        {
+            Log(text);
+            if (editor != null) editor.ControlFeedbackLabel(text);
+        }
+
+        #region LOAD FROM MEMORY
 
         public async Task Init(Action onComplete = null)
         {
@@ -782,6 +818,8 @@ namespace LocalizationTool.Manager
 
             //Log("Configuration loaded");
         }
+
+        #endregion
 
         #region UPDATES
 
