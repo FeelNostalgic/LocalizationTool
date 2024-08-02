@@ -14,6 +14,13 @@ namespace LocalizationTool.ExportSerializer
             _sb = new StringBuilder();
         }
 
+        public void AddTitle(IEnumerable<string> languages)
+        {
+            var titles = new List<string> { "Key", "Category" };
+            titles.AddRange(languages);
+            AddLine(titles);
+        }
+        
         public void SetSeparator(string separator)
         {
             _separator = separator;

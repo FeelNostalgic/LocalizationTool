@@ -300,7 +300,7 @@ namespace LocalizationTool.Editors
                 {
                     if (LocalizationManager.Configuration.CategoryDeleteConfirmation)
                     {
-                        if (EditorUtility.DisplayDialog(DELETE_DIALOG_TITLE, string.Format(DELETE_DIALOG_QUESTION, category), DIALOG_OPTION_DELETE, DIALOG_OPTION_CANCEL))
+                        if (EditorUtility.DisplayDialog(DELETE_DIALOG_TITLE, string.Format(DELETE_DIALOG_MESSAGE, category), DIALOG_OPTION_DELETE, DIALOG_OPTION_CANCEL))
                             DeleteCategory(category);
                     }
                     else

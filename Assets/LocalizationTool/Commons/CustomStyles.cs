@@ -55,7 +55,7 @@ namespace LocalizationTool.Commons
                 {
                     Enums.CustomStyleName.SeparatorsCsvPopup, new GUIStyle(EditorStyles.popup)
                     {
-                        alignment = TextAnchor.UpperCenter,
+                        alignment = TextAnchor.MiddleCenter,
                         fixedHeight = 32,
                         fontSize = 18,
                         normal =
@@ -312,6 +312,7 @@ namespace LocalizationTool.Commons
                         fontStyle = FontStyle.Bold,
                         fixedHeight = 32,
                         fixedWidth = 0,
+                        padding = {top = 0, bottom = 0, left = 10, right = 0},
                         normal =
                         {
                             textColor = Color.white

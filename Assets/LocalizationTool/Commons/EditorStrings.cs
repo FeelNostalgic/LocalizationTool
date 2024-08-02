@@ -10,6 +10,44 @@ namespace LocalizationTool.Commons
 
         public const string CATEGORIES_LABEL_UPPER = "CATEGORIES";
 
+        public const string CONFIGURATION_LABEL_UPPER = "CONFIGURATION";
+        public const string CONFIGURATION_DELETE_SECTION_LABEL = "Delete Confirmation";
+        public const string CONFIGURATION_DELETE_DICTIONARY_LABEL = " Show delete confirmation in DICTIONARY";
+        public const string CONFIGURATION_DELETE_LANGUAGES_LABEL = " Show delete confirmation in LANGUAGES";
+        public const string CONFIGURATION_DELETE_CATEGORIES_LABEL = " Show delete confirmation in CATEGORIES";
+        public const string CONFIGURATION_CLEAR_ADD_SECTION_LABEL = "Clear Add Text Field";
+        public const string CONFIGURATION_CLEAR_ADD_DICTIONARY_LABEL = " Clear key when adding in DICTIONARY";
+        public const string CONFIGURATION_CLEAR_ADD_LANGUAGES_LABEL = " Clear language when adding in LANGUAGES";
+        public const string CONFIGURATION_CLEAR_ADD_CATEGORIES_LABEL = " Clear category when adding in CATEGORIES";
+        public const string CONFIGURATION_SEARCH_SECTION_LABEL = "Search";
+        public const string CONFIGURATION_LOGS_SECTION_LABEL = "Logs";
+        public const string CONFIGURATION_LOGS_TOGGLE_LABEL = "Show logs in Console";
+        public const string CONFIGURATION_INFO_SECTION_LABEL = "Information";
+        public const string CONFIGURATION_INFO_README_BUTTON_LABEL = "Readme";
+        public const string CONFIGURATION_INFO_DOCUMENTATION_BUTTON_LABEL = "Documentation";
+        public const string CONFIGURATION_INFO_LICENSE_BUTTON_LABEL = "License";
+        
+        public const string EXPORT_LABEL_UPPER = "EXPORT";
+        public const string IMPORT_LABEL_UPPER = "IMPORT";
+        public const string CSV_LABEL_UPPER = "CSV";
+        public const string JSON_LABEL_UPPER = "JSON";
+        public const string XML_LABEL_UPPER = "XML";
+        public const string CSV_LABEL_LOWER = "csv";
+        public const string JSON_LABEL_LOWER = "json";
+        public const string XML_LABEL_LOWER = "xml";
+        public const string DEFAULT_FILE_NAME = "LocalizationData{0}";
+        public const string CSV_WARNING_LABEL = "Line breaks are removed when exporting to CSV";
+        public const string IMPORT_WINDOW_LABEL = "Import {0}";
+
+        public const string IMPORT_STATUS_LANGUAGES = "Importing languages...";
+        public const string IMPORT_STATUS_KEYS = "Importing keys...";
+        public const string IMPORT_RESULT_SUCCESS = "File has been imported successfully!";
+        public const string IMPORT_LANGUAGES_RESULT = "{0} language imported";
+        public const string IMPORT_CATEGORIES_RESULT = "{0} new categories imported";
+        public const string IMPORT_KEYS_RESULT = "{0} keys imported";
+        public const string IMPORT_PROGRESS_KEY_CATEGORY = "Key '{0}' - '{1}' imported";
+        public const string IMPORT_PROGRESS_LANGUAGE = "Language '{0}' imported";
+        
         #endregion
 
         #region TOOLTIPS
@@ -48,6 +86,17 @@ namespace LocalizationTool.Commons
 
         #region Configuration
 
+        public const string CONFIGURATION_DELETE_SECTION_TOOLTIP = "Show confirmation window when deleting items";
+        public const string CONFIGURATION_CLEAR_ADD_SECTION_TOOLTIP = "When adding a new item, the text field will be cleared";
+        public const string CONFIGURATION_SEARCH_SECTION_TOOLTIP = "Select how to search for items";
+        public const string CONFIGURATION_INFO_SECTION_TOOLTIP = "Information about tool";  
+        public const string CONFIGURATION_INFO_README_BUTTON_TOOLTIP = "Open Readme";
+        public const string CONFIGURATION_INFO_DOCUMENTATION_BUTTON_TOOLTIP = "Open Documentation";
+        public const string CONFIGURATION_INFO_LICENSE_BUTTON_TOOLTIP = "Open License";
+
+        public const string EXPORT_BUTTON_TOOLTIP = "Save {0} file";
+        public const string IMPORT_BUTTON_TOOLTIP = "Load {0} file";
+
         #endregion
 
         #endregion
@@ -55,9 +104,13 @@ namespace LocalizationTool.Commons
         #region Display Dialog
         
         public const string DELETE_DIALOG_TITLE = "Confirm Delete";
-        public const string DELETE_DIALOG_QUESTION = "Are you sure you want to delete '{0}'?";
+        public const string DELETE_DIALOG_MESSAGE = "Are you sure you want to delete '{0}'?";
         public const string DIALOG_OPTION_CANCEL = "Cancel";
         public const string DIALOG_OPTION_DELETE = "Delete";
+
+        public const string FILE_SAVED_DIALOG_TITLE = "File Saved";
+        public const string FILE_SAVED_DIALOG_MESSAGE = "File has been saved successfully!";
+        public const string DIALOG_OK_OPTION = "OK";
         
         #endregion
 
