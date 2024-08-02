@@ -1,4 +1,4 @@
-using LocalizationTool.Controller;
+using LocalizationTool.API;
 using TMPro;
 using UnityEngine;
 

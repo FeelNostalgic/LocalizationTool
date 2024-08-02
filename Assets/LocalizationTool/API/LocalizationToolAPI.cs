@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using LocalizationTool.Manager;
 using UnityEngine;
+using static LocalizationTool.Commons.EditorStrings;
 
-namespace LocalizationTool.Controller
+namespace LocalizationTool.API
 {
     //TODO: make this persistant between scenes
     //TODO: add this to the scene
@@ -32,7 +33,7 @@ namespace LocalizationTool.Controller
         private async void Awake()
         {
             await LocalizationManager.Instance.Init(()=> OnLanguageUpdate?.Invoke(ActiveLanguage));
-            LocalizationManager.Log("Controller Initialized");
+            LocalizationManager.Log(API_INITIALIZED_LOG);
         }
 
         #endregion
@@ -49,7 +50,7 @@ namespace LocalizationTool.Controller
         {
             return LocalizationManager.Dictionary[key].LanguagesData.ContainsKey(ActiveLanguage)
                 ? LocalizationManager.Dictionary[key].LanguagesData[ActiveLanguage]
-                : throw new Exception($"Key not found in language '{ActiveLanguage}'");
+                : throw new Exception();
         }
 
         /// <summary>
@@ -60,11 +61,11 @@ namespace LocalizationTool.Controller
         /// <returns>The value of the key</returns>
         public string GetValueByKeyAndLanguage(string key, string language)
         {
-            if (!LocalizationManager.ActiveLanguages.Contains(language)) throw new Exception($"Language '{language}' doesnt exist");
+            if (!LocalizationManager.ActiveLanguages.Contains(language)) throw new Exception(string.Format(API_LANGUAGE_DOESNT_EXIST_EXCEPTION, language));
                 
             return LocalizationManager.Dictionary[key].LanguagesData.ContainsKey(language)
                 ? LocalizationManager.Dictionary[key].LanguagesData[ActiveLanguage]
-                : throw new Exception($"Key not found in language '{language}'");
+                : throw new Exception(string.Format(API_KEY_NOT_FOUND_EXCEPTION, language));
         }
 
         /// <summary>
@@ -109,7 +110,5 @@ namespace LocalizationTool.Controller
         #region PRIVATE METHODS
 
         #endregion
-
-
     }
 }

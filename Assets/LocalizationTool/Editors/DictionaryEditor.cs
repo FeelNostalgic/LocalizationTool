@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LocalizationTool.API;
 using LocalizationTool.Commons;
-using LocalizationTool.Controller;
 using LocalizationTool.Data;
 using LocalizationTool.Manager;
 using UnityEditor;

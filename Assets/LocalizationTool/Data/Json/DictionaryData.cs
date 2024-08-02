@@ -21,7 +21,7 @@ namespace LocalizationTool.Data.Json
         {
             if (ListDictionaryKeyCategoryLanguages.FirstOrDefault(i => i.Key == item.Key) != default)
             {
-                LocalizationManager.Log($"Key {item.Key} is already in the dictionary");
+                LocalizationManager.Log($"When importing: Key {item.Key} is already in the dictionary");
                 return;
             }
             ListDictionaryKeyCategoryLanguages.Add(item);
@@ -102,7 +102,7 @@ namespace LocalizationTool.Data.Json
 
         public Task RemoveCategory(string categoryToRemove)
         {
-            if(Category.Equals(categoryToRemove)) Category = "None";
+            if(Category.Equals(categoryToRemove)) Category = LocalizationManager.DefaultCategory;
             return Task.CompletedTask;
         }
         
