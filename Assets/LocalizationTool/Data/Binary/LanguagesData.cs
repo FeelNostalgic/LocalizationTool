@@ -49,15 +49,35 @@ namespace LocalizationTool.Data.Binary
             if (FavouriteLanguage.Equals(oldName)) FavouriteLanguage = newName;
         }
 
-        public string ChangeIndex(int oldIndex, int newIndex)
+        public LanguageTuple ChangeIndex(int oldIndex, int newIndex)
         {
             var itemToChange = OrderedLanguages.First(tuple => tuple.Index == oldIndex);
+
+            if (oldIndex < newIndex)
+            {
+                // Scroll down elements between oldIndex and newIndex
+                foreach (var item in OrderedLanguages.Where(tuple => tuple.Index > oldIndex && tuple.Index <= newIndex))
+                {
+                    item.Index--;
+                }
+            }
+            else if (oldIndex > newIndex)
+            {
+                // Scroll up elements between oldIndex and newIndex
+                foreach (var item in OrderedLanguages.Where(tuple => tuple.Index >= newIndex && tuple.Index < oldIndex))
+                {
+                    item.Index++;
+                }
+            }
+
+            // Update index
             itemToChange.Index = newIndex;
 
+            // Reorder 
             OrderedLanguages = OrderedLanguages.OrderBy(tuple => tuple.Index).ToList();
 
             UpdateIndexes();
-            return itemToChange.Language;
+            return itemToChange;
         }
 
         private void UpdateIndexes()

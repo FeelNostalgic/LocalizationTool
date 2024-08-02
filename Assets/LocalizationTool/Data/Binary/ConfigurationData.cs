@@ -9,6 +9,10 @@ namespace LocalizationTool.Data.Binary
         public bool LanguageDeleteConfirmation;
         public bool CategoryDeleteConfirmation;
 
+        public bool DictionaryClearAdd;
+        public bool LanguageClearAdd;
+        public bool CategoryClearAdd;
+        
         public int SearchTypeIndex;
 
         public bool ShowLogsInConsole;

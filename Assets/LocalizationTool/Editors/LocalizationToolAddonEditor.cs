@@ -65,7 +65,7 @@ namespace LocalizationTool.Editors
         {
             GUILayout.BeginVertical("box", GUILayout.Height(35*2+5+3), GUILayout.ExpandWidth(true));
             GUILayout.Space(2);
-            var allCategories = LocalizationToolController.Instance.GetAllCategories();
+            var allCategories = LocalizationToolAPI.Instance.GetAllCategories();
             //Text key filter
             
             _filterKeyText = EditorGUILayout.TextField(_filterKeyText, CustomStyles.GetStyle(Enums.CustomStyleName.KeyTextField), GUILayout.Height(30));
@@ -111,7 +111,7 @@ namespace LocalizationTool.Editors
             var value = "";
             try
             {
-                value = LocalizationToolController.Instance.GetValueByKey(_target.Key);
+                value = LocalizationToolAPI.Instance.GetValueByKey(_target.Key);
             }
             catch (Exception)
             {
@@ -130,7 +130,7 @@ namespace LocalizationTool.Editors
 
         private List<string> GetFilteredKeys(IReadOnlyList<string> allCategories, out List<string> filteredKeys)
         {
-            var allKeys = LocalizationToolController.Instance.GetAllKeys();
+            var allKeys = LocalizationToolAPI.Instance.GetAllKeys();
             filteredKeys = new List<string>(allKeys);
 
             if (!_filterKeyText.Equals(""))

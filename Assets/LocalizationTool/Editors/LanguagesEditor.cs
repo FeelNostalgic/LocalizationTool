@@ -230,7 +230,7 @@ namespace LocalizationTool.Editors
 
             if (GUILayout.Button(GetGUIContent(UpIcon, $"Move '{language}' Up"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                UpdateIndex(index, index - 2);
+                UpdateIndex(index, index - 1);
             }
 
             GUILayout.EndVertical();
@@ -246,7 +246,7 @@ namespace LocalizationTool.Editors
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(DownIcon, $"Move '{language}' Down"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                UpdateIndex(index, index + 2);
+                UpdateIndex(index, index + 1);
             }
 
             GUILayout.EndVertical();
@@ -397,8 +397,8 @@ namespace LocalizationTool.Editors
 
         public override void ClearAddTextField()
         {
+            if (!LocalizationManager.Configuration.LanguageClearAdd) return;
             _addLanguageValue = "";
-            EditorGUI.FocusTextInControl("LANGUAGE");
             RepaintGUI();
         }
         

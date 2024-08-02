@@ -28,6 +28,7 @@ namespace LocalizationTool.Editors
         #region EDITOR VARIABLES
 
         private bool _toggleAllDeleteConfirmation;
+        private bool _toggleAllClearAdd;
 
         private int _searchTypeIndex;
 
@@ -98,6 +99,8 @@ namespace LocalizationTool.Editors
 
             DeleteConfirmationSection();
 
+            ClearAddSection();
+
             SearchSection();
 
             LogsSection();
@@ -114,7 +117,13 @@ namespace LocalizationTool.Editors
         private void DeleteConfirmationSection()
         {
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
-            ShowSubHeader("Delete Confirmation");
+            GUILayout.Space(10);
+            
+            ShowSubHeader("Delete Confirmation", "Show confirmation window when deleting items");
+            
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            GUILayout.BeginVertical();
 
             if (LocalizationManager.Configuration.DictionaryDeleteConfirmation
                 && LocalizationManager.Configuration.LanguageDeleteConfirmation
@@ -124,41 +133,101 @@ namespace LocalizationTool.Editors
             var tempToogle = EditorGUILayout.Toggle(_toggleAllDeleteConfirmation, GUILayout.Height(28));
             UpdateAllDeleteConfirmation(_toggleAllDeleteConfirmation, tempToogle);
 
-            ToggleLeft(LocalizationManager.Configuration.DictionaryDeleteConfirmation, "Show delete confirmation in DICTIONARY",
+            ToggleLeft(LocalizationManager.Configuration.DictionaryDeleteConfirmation, " Show delete confirmation in DICTIONARY",
                 delegate(bool b) { UpdateDeleteConfirmation(b,Enums.GUIWindow.Dictionary); });
 
-            ToggleLeft(LocalizationManager.Configuration.LanguageDeleteConfirmation, "Show delete confirmation in LANGUAGES",
+            ToggleLeft(LocalizationManager.Configuration.LanguageDeleteConfirmation, " Show delete confirmation in LANGUAGES",
                 delegate(bool b) { UpdateDeleteConfirmation(b,Enums.GUIWindow.Language); });
 
-            ToggleLeft(LocalizationManager.Configuration.CategoryDeleteConfirmation, "Show delete confirmation in CATEGORIES",
+            ToggleLeft(LocalizationManager.Configuration.CategoryDeleteConfirmation, " Show delete confirmation in CATEGORIES",
                 delegate(bool b) { UpdateDeleteConfirmation(b, Enums.GUIWindow.Category); });
 
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+            
+            GUILayout.EndVertical();
+        }
+
+        private void ClearAddSection()
+        {
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
+            
+            ShowSubHeader("Clear Add Text Field", "When adding a new item, the text field will be cleared");
+            
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            GUILayout.BeginVertical();
+            
+            if (LocalizationManager.Configuration.DictionaryClearAdd
+                && LocalizationManager.Configuration.LanguageClearAdd
+                && LocalizationManager.Configuration.CategoryClearAdd) _toggleAllClearAdd = true;
+            else _toggleAllClearAdd = false;
+
+            var tempToogle = EditorGUILayout.Toggle(_toggleAllClearAdd, GUILayout.Height(28));
+            UpdateAllClearAdd(_toggleAllClearAdd, tempToogle);
+
+            ToggleLeft(LocalizationManager.Configuration.DictionaryClearAdd, " Clear key when adding in DICTIONARY",
+                delegate(bool b) { UpdateClearAdd(b,Enums.GUIWindow.Dictionary); });
+
+            ToggleLeft(LocalizationManager.Configuration.LanguageClearAdd, " Clear language when adding in LANGUAGES",
+                delegate(bool b) { UpdateClearAdd(b,Enums.GUIWindow.Language); });
+
+            ToggleLeft(LocalizationManager.Configuration.CategoryClearAdd, " Clear category when adding in CATEGORIES",
+                delegate(bool b) { UpdateClearAdd(b, Enums.GUIWindow.Category); });
+
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+            
             GUILayout.EndVertical();
         }
 
         private void SearchSection()
         {
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
-            ShowSubHeader("Search");
+            
+            ShowSubHeader("Search", "Select how to search for items");
+            
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            GUILayout.BeginVertical();
+            
             _searchTypeIndex = EditorGUILayout.Popup(LocalizationManager.Configuration.SearchTypeIndex, Enums.SEARCH_TYPE, CustomStyles.GetStyle(Enums.CustomStyleName.SearchTypePopup));
             UpdateSearchType();
-            GUILayout.Space(5);
+            
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+            
             GUILayout.EndVertical();
         }
 
-        private void LogsSection()
+        private static void LogsSection()
         {
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
+            
             ShowSubHeader("Logs");
-            ToggleLeft(LocalizationManager.Configuration.ShowLogsInConsole, "Show logs in Console", delegate(bool b) { UpdateShowLogs(b); });
+            
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            GUILayout.BeginVertical();
+            
+            ToggleLeft(LocalizationManager.Configuration.ShowLogsInConsole, "Show logs in Console", UpdateShowLogs);
+            
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+            
             GUILayout.EndVertical();
         }
 
         private void ReadmeSection()
         {
-            GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
-            ShowSubHeader("Info");
-
+            GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
+            
+            ShowSubHeader("Information", "Information about tool");
+            
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(15);
+            GUILayout.BeginVertical();
+            
             if (GUILayout.Button("Readme", CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationReadmeButton)))
             {
                 //TODO: fill readme
@@ -180,6 +249,9 @@ namespace LocalizationTool.Editors
                 InfoEditor.ShowWindow("License", GetInfoText(LICENSE_PATH));
             }
 
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+            
             GUILayout.EndVertical();
         }
 
@@ -446,6 +518,33 @@ namespace LocalizationTool.Editors
                     break;
                 case Enums.GUIWindow.Category:
                     LocalizationManager.Instance.UpdateDeleteConfirmation(newValue, window);
+                    break;
+            }
+        }
+
+        private void UpdateAllClearAdd(bool oldValue, bool newValue)
+        {
+            if (oldValue == newValue) return;
+            _toggleAllClearAdd = newValue;
+            UpdateClearAdd(newValue, Enums.GUIWindow.Dictionary);
+
+            UpdateClearAdd(newValue,Enums.GUIWindow.Language);
+            
+            UpdateClearAdd(newValue,Enums.GUIWindow.Category);
+        }
+
+        private static void UpdateClearAdd(bool newValue, Enums.GUIWindow window)
+        {
+            switch (window)
+            {
+                case Enums.GUIWindow.Dictionary:
+                    LocalizationManager.Instance.UpdateClearAdd(newValue, window);
+                    break;
+                case Enums.GUIWindow.Language:
+                    LocalizationManager.Instance.UpdateClearAdd(newValue, window);
+                    break;
+                case Enums.GUIWindow.Category:
+                    LocalizationManager.Instance.UpdateClearAdd(newValue, window);
                     break;
             }
         }

@@ -44,15 +44,35 @@ namespace LocalizationTool.Data.Binary
             tuple.Category = newName;
         }
 
-        public string ChangeIndex(int oldIndex, int newIndex)
+        public CategoryTuple ChangeIndex(int oldIndex, int newIndex)
         {
             var itemToChange = OrderedCategories.First(tuple => tuple.Index == oldIndex);
+
+            if (oldIndex < newIndex)
+            {
+                // Scroll down elements between oldIndex and newIndex
+                foreach (var item in OrderedCategories.Where(tuple => tuple.Index > oldIndex && tuple.Index <= newIndex))
+                {
+                    item.Index--;
+                }
+            }
+            else if (oldIndex > newIndex)
+            {
+                // Scroll up elements between oldIndex and newIndex
+                foreach (var item in OrderedCategories.Where(tuple => tuple.Index >= newIndex && tuple.Index < oldIndex))
+                {
+                    item.Index++;
+                }
+            }
+
+            // Update index
             itemToChange.Index = newIndex;
-            
+
+            // Reorder 
             OrderedCategories = OrderedCategories.OrderBy(tuple => tuple.Index).ToList();
-            
+
             UpdateIndexes();
-            return itemToChange.Category;
+            return itemToChange;
         }
 
         public void ChangeIndex(string category, int newIndex)

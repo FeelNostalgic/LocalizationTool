@@ -342,7 +342,7 @@ namespace LocalizationTool.Manager
 
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
 
-            Log($"Language '{language}' update to index '{newIndex}' correctly");
+            Log($"Language '{language.Language}' update to index '{language.Index}' correctly");
 
             //GUI.FocusControl(null);
         }
@@ -435,6 +435,7 @@ namespace LocalizationTool.Manager
 
         public async void ChangeCategoryIndex(int oldIndex, int newIndex)
         {
+            if(newIndex <= 1) return;
             if (oldIndex == newIndex) return; //the new index is the same
 
             //Change binary file
@@ -442,7 +443,7 @@ namespace LocalizationTool.Manager
 
             await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
 
-            Log($"Category '{category}' update to index '{newIndex}' correctly");
+            Log($"Category '{category.Category}' update to index '{category.Index}' correctly");
 
             //GUI.FocusControl(null);
         }
@@ -479,6 +480,24 @@ namespace LocalizationTool.Manager
                     break;
                 case Enums.GUIWindow.Category:
                     _configurationData.CategoryDeleteConfirmation = newValue;
+                    break;
+            }
+
+            await SaveFile(_configurationData, BINARY_CONFIGURATION_PATH, _serializerBinary);
+        }
+        
+        public async void UpdateClearAdd(bool newValue, Enums.GUIWindow window)
+        {
+            switch (window)
+            {
+                case Enums.GUIWindow.Dictionary:
+                    _configurationData.DictionaryClearAdd = newValue;
+                    break;
+                case Enums.GUIWindow.Language:
+                    _configurationData.LanguageClearAdd = newValue;
+                    break;
+                case Enums.GUIWindow.Category:
+                    _configurationData.CategoryClearAdd = newValue;
                     break;
             }
 
@@ -776,7 +795,7 @@ namespace LocalizationTool.Manager
             }
 
             CurrentLanguageInDictionarySection = _languagesData.FavouriteLanguage;
-            LocalizationToolController.Instance.ActiveLanguage = _languagesData.FavouriteLanguage;
+            LocalizationToolAPI.Instance.ActiveLanguage = _languagesData.FavouriteLanguage;
 
             //Log("Languages loaded");
         }
@@ -810,6 +829,9 @@ namespace LocalizationTool.Manager
                     DictionaryDeleteConfirmation = true,
                     CategoryDeleteConfirmation = true,
                     LanguageDeleteConfirmation = true,
+                    DictionaryClearAdd = true,
+                    LanguageClearAdd = true,
+                    CategoryClearAdd = true,
                     SearchTypeIndex = 0,
                     ShowLogsInConsole = true
                 };

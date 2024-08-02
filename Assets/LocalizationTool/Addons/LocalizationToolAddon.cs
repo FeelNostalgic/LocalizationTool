@@ -39,12 +39,12 @@ namespace LocalizationTool.Addons
         private void Awake()
         {
             _tmpText = GetComponent<TMP_Text>();
-            LocalizationToolController.Instance.OnLanguageUpdate += OnLanguageUpdate;
+            LocalizationToolAPI.Instance.OnLanguageUpdate += OnLanguageUpdate;
         }
 
         private void OnDestroy()
         {
-            LocalizationToolController.Instance.OnLanguageUpdate -= OnLanguageUpdate;
+            LocalizationToolAPI.Instance.OnLanguageUpdate -= OnLanguageUpdate;
         }
 
         public void OnKeyRemoved(string key)
@@ -68,7 +68,7 @@ namespace LocalizationTool.Addons
         
         private void OnLanguageUpdate(string newLanguage)
         {
-            var newText = LocalizationToolController.Instance.GetValueByKey(Key);
+            var newText = LocalizationToolAPI.Instance.GetValueByKey(Key);
             _tmpText.text = newText;
         }
 

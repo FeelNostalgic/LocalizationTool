@@ -229,7 +229,7 @@ namespace LocalizationTool.Editors
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(UpIcon, $"Move '{category}' Up"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index - 2);
+                if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index - 1);
             }
 
             GUILayout.EndVertical();
@@ -245,7 +245,7 @@ namespace LocalizationTool.Editors
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(DownIcon, $"Move '{category}' Down"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index + 2);
+                if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index + 1);
             }
 
             GUILayout.EndVertical();
@@ -386,8 +386,8 @@ namespace LocalizationTool.Editors
 
         public override void ClearAddTextField()
         {
+            if (!LocalizationManager.Configuration.CategoryClearAdd) return;
             _addCategoryValue = "";
-            EditorGUI.FocusTextInControl("CATEGORY");
             RepaintGUI();
         }
 

@@ -9,11 +9,11 @@ namespace LocalizationTool.Controller
     //TODO: make this persistant between scenes
     //TODO: add this to the scene
     [DefaultExecutionOrder(-888)]
-    public class LocalizationToolController : MonoBehaviour
+    public class LocalizationToolAPI : MonoBehaviour
     {
         #region PUBLIC VARIABLES
 
-        public static LocalizationToolController Instance => _instance ??= (LocalizationToolController) FindObjectOfType(typeof(LocalizationToolController));
+        public static LocalizationToolAPI Instance => _instance ??= (LocalizationToolAPI) FindObjectOfType(typeof(LocalizationToolAPI));
 
         public string ActiveLanguage { get; set; }
 
@@ -23,7 +23,7 @@ namespace LocalizationTool.Controller
 
         #region PRIVATE VARIABLES
 
-        private static LocalizationToolController _instance;
+        private static LocalizationToolAPI _instance;
 
         #endregion
 

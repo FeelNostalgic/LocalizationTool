@@ -306,14 +306,14 @@ namespace LocalizationTool.Editors
                     break;
                 case 1: // By Value
                     if (!_searchKeyValue.Equals(""))
-                        filteredDicToIterate = filteredDicToIterate.Where(pair => LocalizationToolController.Instance.GetValueByKey(pair.Key).Contains(_searchKeyValue, StringComparison.InvariantCulture))
+                        filteredDicToIterate = filteredDicToIterate.Where(pair => LocalizationToolAPI.Instance.GetValueByKey(pair.Key).Contains(_searchKeyValue, StringComparison.InvariantCulture))
                             .ToDictionary(kv => (kv.Key), kv => kv.Value);
                     break;
                 case 2: //By Both
                     if (!_searchKeyValue.Equals(""))
                         filteredDicToIterate = filteredDicToIterate.Where(pair =>
                                 pair.Key.Contains(_searchKeyValue, StringComparison.InvariantCulture)
-                                || LocalizationToolController.Instance.GetValueByKey(pair.Key).Contains(_searchKeyValue, StringComparison.InvariantCulture))
+                                || LocalizationToolAPI.Instance.GetValueByKey(pair.Key).Contains(_searchKeyValue, StringComparison.InvariantCulture))
                             .ToDictionary(kv => (kv.Key), kv => kv.Value);
                     break;
             }
@@ -456,6 +456,7 @@ namespace LocalizationTool.Editors
 
         public override void ClearAddTextField()
         {
+            if (!LocalizationManager.Configuration.DictionaryClearAdd) return;
             _addKeyValue = "";
             RepaintGUI();
         }

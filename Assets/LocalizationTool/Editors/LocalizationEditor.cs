@@ -119,9 +119,23 @@ namespace LocalizationTool.Editors
         {
             Repaint();
         }
-        
-        protected static void ControlFocus(string focus)
+
+        protected void ControlFocus(string focus)
         {
+            switch (_currentWindow)
+            {
+                case Enums.GUIWindow.Dictionary:
+                    if (!LocalizationManager.Configuration.DictionaryClearAdd) return;
+                    break;
+                case Enums.GUIWindow.Language:
+                    if (!LocalizationManager.Configuration.LanguageClearAdd) return;
+                    break;
+                case Enums.GUIWindow.Category:
+                    if (!LocalizationManager.Configuration.CategoryClearAdd) return;
+                    break;
+                case Enums.GUIWindow.Configuration: return;
+            }
+
             if (GUI.GetNameOfFocusedControl() != focus) return;
             if (Event.current is { isKey: true }) EditorGUI.FocusTextInControl(focus);
         }
@@ -244,7 +258,7 @@ namespace LocalizationTool.Editors
             if (_currentCoroutine != null) EditorCoroutineUtility.StopCoroutine(_currentCoroutine);
             _currentCoroutine = EditorCoroutineUtility.StartCoroutine(FeedbackLabelCoroutine(text, labelUpdate.Invoke, 2.5f, onComplete), this);
         }
-        
+
         private IEnumerator FeedbackLabelCoroutine(string text, Action<string> updateFeedbackLabel, float duration, Action onComplete = null)
         {
             updateFeedbackLabel?.Invoke(text);
@@ -253,13 +267,12 @@ namespace LocalizationTool.Editors
             Repaint();
             _currentCoroutine = null;
             AddActionRunning = false;
-            
+
             onComplete?.Invoke();
         }
 
         public virtual void ClearAddTextField()
         {
-            
         }
 
         #region GUI ELEMENTS
@@ -278,18 +291,12 @@ namespace LocalizationTool.Editors
             GUILayout.Space(10);
         }
 
-        protected void ShowExportImportSubHeader(string text, params GUILayoutOption[] options)
+        protected static void ShowSubHeader(string text, string tooltip = "", params GUILayoutOption[] options)
         {
             GUILayout.Space(8);
-            GUILayout.Label(text, CustomStyles.GetStyle(Enums.CustomStyleName.Header2LowerCenter14Label), options);
-            GUILayout.Space(10);
-        }
-
-        protected static void ShowSubHeader(string text, params GUILayoutOption[] options)
-        {
-            GUILayout.Space(8);
-            GUILayout.Label(text, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleLeft15Label), options);
-            GUILayout.Space(10);
+            var content = new GUIContent(text, tooltip);
+            GUILayout.Label(content, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleLeft15Label), options);
+            GUILayout.Space(6);
         }
 
         protected static void ShowSectionHeader(string text, params GUILayoutOption[] options)
