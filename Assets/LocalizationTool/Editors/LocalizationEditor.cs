@@ -6,6 +6,7 @@ using LocalizationTool.Manager;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
+using static LocalizationTool.Commons.EditorStrings;
 
 namespace LocalizationTool.Editors
 {
@@ -54,8 +55,7 @@ namespace LocalizationTool.Editors
 
         private ConfigurationEditor _configurationEditor;
         //private static bool _isWindowOpen;
-
-
+        
         private EditorCoroutine _currentCoroutine;
 
         #endregion
@@ -73,7 +73,7 @@ namespace LocalizationTool.Editors
             //Show existing window instance. If one doesn't exist, make one.
             var window = GetWindow(typeof(LocalizationEditor));
             window.minSize = WindowSize;
-            window.titleContent = new GUIContent("Localization Tool");
+            window.titleContent = new GUIContent(MAIN_WINDOW_LABEL);
             LoadData();
         }
 
@@ -200,28 +200,28 @@ namespace LocalizationTool.Editors
             GUILayout.Space(5);
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
             GUILayout.Space(10);
-            if (GUILayout.Button(new GUIContent("Dictionary"), EditorStyles.toolbarButton))
+            if (GUILayout.Button(new GUIContent(DICTIONARY_TOOLBAR_LABEL), EditorStyles.toolbarButton))
             {
                 _currentWindow = Enums.GUIWindow.Dictionary;
                 GUI.FocusControl(null);
             }
 
             GUILayout.Space(10);
-            if (GUILayout.Button(new GUIContent("Languages"), EditorStyles.toolbarButton))
+            if (GUILayout.Button(new GUIContent(LANGUAGES_TOOLBAR_LABEL), EditorStyles.toolbarButton))
             {
                 _currentWindow = Enums.GUIWindow.Language;
                 GUI.FocusControl(null);
             }
 
             GUILayout.Space(10);
-            if (GUILayout.Button(new GUIContent("Categories"), EditorStyles.toolbarButton))
+            if (GUILayout.Button(new GUIContent(CATEGORIES_TOOLBAR_LABEL), EditorStyles.toolbarButton))
             {
                 _currentWindow = Enums.GUIWindow.Category;
                 GUI.FocusControl(null);
             }
 
             GUILayout.Space(10);
-            if (GUILayout.Button(new GUIContent("Configuration"), EditorStyles.toolbarButton))
+            if (GUILayout.Button(new GUIContent(CONFIGURATION_TOOLBAR_LABEL), EditorStyles.toolbarButton))
             {
                 _currentWindow = Enums.GUIWindow.Configuration;
                 GUI.FocusControl(null);

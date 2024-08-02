@@ -4,6 +4,12 @@ namespace LocalizationTool.Commons
     {
         #region LABELS
 
+        public const string MAIN_WINDOW_LABEL = "Localization Tool";
+        public const string DICTIONARY_TOOLBAR_LABEL = "Dictionary";
+        public const string LANGUAGES_TOOLBAR_LABEL = "Languages";
+        public const string CATEGORIES_TOOLBAR_LABEL = "Categories";
+        public const string CONFIGURATION_TOOLBAR_LABEL = "Configuration";
+
         public const string KEY_LABEL_UPPER = "KEY";
         public const string CATEGORY_LABEL_UPPER = "CATEGORY";
         public const string VALUE_LABEL_UPPER = "VALUE";
