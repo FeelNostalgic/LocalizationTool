@@ -2,6 +2,14 @@ namespace LocalizationTool.Commons
 {
     public abstract class EditorStrings
     {
+        #region MAX CHARACTERS
+
+        public const int MAX_KEY_CHARACTERS = 60;
+        public const int MAX_LANGUAGE_CHARACTERS = 30;
+        public const int MAX_CATEGORY_CHARACTERS = 120;
+
+        #endregion
+        
         #region LABELS
 
         public const string MAIN_WINDOW_LABEL = "Localization Tool";
@@ -168,6 +176,8 @@ namespace LocalizationTool.Commons
 
         #region LOG
 
+        public const string DICTIONARY_KEY_CATEGORY_CHANGED_LOG = "Key '{0}' changed category to '{1}' correctly";
+        
         public const string DICTIONARY_LOADED_LOG = "Dictionary loaded";
         public const string EDITING_KEY_LOG = "Editing key '{0}'";
         public const string DELETED_KEY_LOG = "Key '{0}' deleted";
@@ -175,26 +185,42 @@ namespace LocalizationTool.Commons
         public const string CATEGORIES_LOADED_LOG = "Categories loaded";
         public const string CATEGORY_DEFAULT_LOG = "Category '{0}' is now default";
         public const string DELETED_CATEGORY_LOG = "Category '{0}' deleted";
+        public const string CATEGORY_INDEX_CHANGED_LOG = "Category '{0}' update to index '{1}' correctly";
 
         public const string LANGUAGES_LOADED_LOG = "Languages loaded";
         public const string LANGUAGE_FAVOURITE_LOG = "Language '{0}' is now favorite";
         public const string DELETED_LANGUAGE_LOG = "Language '{0}' deleted";
+        public const string LANGUAGE_INDEX_CHANGED_LOG = "Language '{0}' update to index '{1}' correctly";
 
         public const string RICH_TEXT_EDITOR_SELECT_TEXT_WARNING_LOG = "Select some text to apply a style";
+
+        public const string IMPORTED_LANGUAGE_LOG = "Language {0} imported";
+        public const string IMPORTED_KEY_LOG = "Key '{0}' - '{1}' : {2} imported";
+        public const string IMPORTED_KEY_SINGLE_LOG = "Key '{0}' - '{1}' - '{2}' : '{3}' imported";
+
+        public const string TOOL_INITIALIZED_LOG = "Localization Tool initialized";
         
         #endregion
 
         #region FEEDBACK LABEL
 
+        public const string EMPTY_KEY_FEEDBACK_LABEL = "Key cannot be an empty value";
+        public const string SPACES_KEY_FEEDBACK_LABEL = "Key cannot contain spaces";
+        public const string CHARACTERS_NUMBER_KEY_FEEDBACK_LABEL = "The maximum number of characters({0}) has been exceeded";
+        public const string KEY_EXIST_FEEDBACK_LABEL = "Key '{0}' already exists";
+        public const string KEY_ADDED_FEEDBACK_LABEL = "Key '{0}' added correctly";
+
         public const string EMPTY_CATEGORY_FEEDBACK_LABEL = "Category cannot be an empty value";
         public const string SPACES_CATEGORY_FEEDBACK_LABEL = "Category cannot contain spaces";
         public const string CHARACTERS_NUMBER_CATEGORY_FEEDBACK_LABEL = "The maximum number of characters({0}) has been exceeded";
         public const string CATEGORY_EXIST_FEEDBACK_LABEL = "Category '{0}' value already exists";
+        public const string CATEGORY_ADDED_FEEDBACK_LABEL = "Category '{0}' added correctly";
 
         public const string EMPTY_LANGUAGE_FEEDBACK_LABEL = "Language cannot be an empty value";
         public const string SPACES_LANGUAGE_FEEDBACK_LABEL = "Language cannot contain spaces";
         public const string CHARACTERS_NUMBER_LANGUAGE_FEEDBACK_LABEL = "The maximum number of characters({0}) has been exceeded";
         public const string LANGUAGE_EXIST_FEEDBACK_LABEL = "Language {0} value already exists";
+        public const string LANGUAGE_ADDED_FEEDBACK_LABEL = "Language '{0}' added correctly";
 
         #endregion
     }

@@ -21,8 +21,6 @@ namespace LocalizationTool.Editors
 
         private string _addCategoryValue;
 
-        private const int MAX_CHARACTERS = 120;
-
         private Vector2 _scrollCenter;
 
         private readonly Dictionary<string, string> _feedbackList = new();
@@ -355,9 +353,9 @@ namespace LocalizationTool.Editors
                 return;
             }
 
-            if (newCategory.Length > MAX_CHARACTERS)
+            if (newCategory.Length > MAX_CATEGORY_CHARACTERS)
             {
-                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, string.Format(CHARACTERS_NUMBER_CATEGORY_FEEDBACK_LABEL, MAX_CHARACTERS), delegate { _feedbackList.Remove(oldCategory); });
+                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, string.Format(CHARACTERS_NUMBER_CATEGORY_FEEDBACK_LABEL, MAX_CATEGORY_CHARACTERS), delegate { _feedbackList.Remove(oldCategory); });
                 return;
             }
 

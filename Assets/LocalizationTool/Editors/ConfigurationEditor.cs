@@ -682,7 +682,7 @@ namespace LocalizationTool.Editors
                 var values = new Dictionary<string, string>();
 
                 nKeys++;
-                if (!LocalizationManager.Instance.ExistCategory(category)) nCategories++;
+                if (!LocalizationManager.ExistCategory(category)) nCategories++;
 
                 Debug.Assert(lineItems != null, nameof(lineItems) + " != null");
                 for (var i = 0; i < lineItems.Length - 2; i++)
@@ -740,7 +740,7 @@ namespace LocalizationTool.Editors
             foreach (var keyCategoryLanguage in data.DictionaryKeyCategoryLanguages)
             {
                 nKeys++;
-                if (!LocalizationManager.Instance.ExistCategory(keyCategoryLanguage.Category)) nCategories++;
+                if (!LocalizationManager.ExistCategory(keyCategoryLanguage.Category)) nCategories++;
 
                 foreach (var awaiterKey in keyCategoryLanguage.LanguageValues
                              .Select(languageValue => LocalizationManager.Instance.ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, languageValue.Language, languageValue.Value))

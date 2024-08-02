@@ -21,8 +21,6 @@ namespace LocalizationTool.Editors
 
         private string _addLanguageValue;
 
-        private const int MAX_CHARACTERS = 30;
-
         private Vector2 _scrollCenter;
 
         private readonly Dictionary<string, string> _feedbackList = new();
@@ -370,9 +368,9 @@ namespace LocalizationTool.Editors
                 return;
             }
 
-            if (newLanguage.Length > MAX_CHARACTERS)
+            if (newLanguage.Length > MAX_LANGUAGE_CHARACTERS)
             {
-                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldLanguage] = s; }, string.Format(CHARACTERS_NUMBER_LANGUAGE_FEEDBACK_LABEL, MAX_CHARACTERS), delegate { _feedbackList.Remove(oldLanguage); });
+                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldLanguage] = s; }, string.Format(CHARACTERS_NUMBER_LANGUAGE_FEEDBACK_LABEL, MAX_LANGUAGE_CHARACTERS), delegate { _feedbackList.Remove(oldLanguage); });
                 return;
             }
 

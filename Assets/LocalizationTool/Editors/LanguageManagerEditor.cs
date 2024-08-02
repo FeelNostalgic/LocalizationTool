@@ -318,7 +318,7 @@ namespace LocalizationTool.Editors
                 var value = lineItems[2];
 
                 nKeys++;
-                if (!LocalizationManager.Instance.ExistCategory(category)) nCategories++;
+                if (!LocalizationManager.ExistCategory(category)) nCategories++;
                 
                 var loadKeyTask = LocalizationManager.Instance.ImportKey(key, category, _language, value);
                 var awaiterKey = loadKeyTask.GetAwaiter();
@@ -357,7 +357,7 @@ namespace LocalizationTool.Editors
             foreach (var keyCategoryLanguage in data.Data)
             {
                 nKeys++;
-                if (!LocalizationManager.Instance.ExistCategory(keyCategoryLanguage.Category)) nCategories++;
+                if (!LocalizationManager.ExistCategory(keyCategoryLanguage.Category)) nCategories++;
 
                 var task = LocalizationManager.Instance.ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, _language, keyCategoryLanguage.Value);
                 var awaiterKey = task.GetAwaiter();
