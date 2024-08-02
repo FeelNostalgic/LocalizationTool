@@ -20,6 +20,12 @@ namespace LocalizationTool.ExportSerializer
             titles.AddRange(languages);
             AddLine(titles);
         }
+
+        public void AddTitle(string language)
+        {
+            var titles = new List<string> { "Key", "Category", $"{language}" };
+            AddLine(titles);
+        }
         
         public void SetSeparator(string separator)
         {

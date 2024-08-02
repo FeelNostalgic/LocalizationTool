@@ -12,6 +12,7 @@ using LocalizationTool.Serializer;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
+using static LocalizationTool.Commons.EditorStrings;
 
 namespace LocalizationTool.Editors
 {
@@ -40,7 +41,7 @@ namespace LocalizationTool.Editors
 
         public static void ShowWindow(string language)
         {
-            var window = GetWindow<LanguageManagerEditor>($"{language} Manager Editor");
+            var window = GetWindow<LanguageManagerEditor>(string.Format(LANGUAGE_MANAGER_WINDOW_TITLE_LABEL, language));
             window.minSize = WindowSize;
             window.maxSize = WindowSize;
             window._language = language;
@@ -55,14 +56,14 @@ namespace LocalizationTool.Editors
             GUILayout.BeginVertical();
 
             GUILayout.Space(5);
-            ShowHeader1($"Manage {_language}");
+            ShowHeader1(string.Format(LANGUAGE_MANAGER_TITLE_LABEL, _language));
 
             ShowHorizontalLine(5);
 
-            ShowHeader2("EXPORT");
+            ShowHeader2(EXPORT_LABEL_UPPER);
             ShowExportSection();
 
-            ShowHeader2("IMPORT");
+            ShowHeader2(IMPORT_LABEL_UPPER);
             ShowImportSection();
             
             GUILayout.EndVertical();
@@ -84,14 +85,14 @@ namespace LocalizationTool.Editors
                         GUILayout.Width(45));
 
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(GetGUIContent(ExportIcon, "Save CSV file"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                    if (GUILayout.Button(GetGUIContent(ExportIcon, string.Format(EXPORT_BUTTON_TOOLTIP, CSV_LABEL_UPPER)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                     {
-                        var path = EditorUtility.SaveFilePanel("Save CSV File", "", $"{_language}.csv", "csv");
+                        var path = EditorUtility.SaveFilePanel(string.Format(EXPORT_BUTTON_TOOLTIP, CSV_LABEL_UPPER), "",
+                            $"{_language}{CSV_LABEL_UPPER}", CSV_LABEL_LOWER);
                         if (!string.IsNullOrEmpty(path))
                         {
                             var fileContent = BuildCSV();
-                            LocalizationManager.SaveFile(path, fileContent, "File Saved", "File has been saved successfully!", "OK");
-                            Close();
+                            SaveFile(path, fileContent);
                         }
                     }
                     GUILayout.Space(8);
@@ -102,20 +103,20 @@ namespace LocalizationTool.Editors
                     GUILayout.Space(10);
                     GUILayout.Label(WarningIcon);
                     var style = new GUIStyle(GUI.skin.label) { wordWrap = true, };
-                    GUILayout.Label("Line breaks are removed when exporting to CSV", style);
+                    GUILayout.Label(CSV_WARNING_LABEL, style);
                     GUILayout.EndHorizontal();
                     
                     break;
                 case Enums.ExportImportMethods.JSON:
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(GetGUIContent(ExportIcon, "Save JSON file"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                    if (GUILayout.Button(GetGUIContent(ExportIcon, string.Format(EXPORT_BUTTON_TOOLTIP, JSON_LABEL_UPPER)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                     {
-                        var path = EditorUtility.SaveFilePanel("Save JSON File", "", $"{_language}.json", "json");
+                        var path = EditorUtility.SaveFilePanel(string.Format(EXPORT_BUTTON_TOOLTIP, JSON_LABEL_UPPER), "",
+                            $"{_language}{CSV_LABEL_UPPER}", JSON_LABEL_LOWER);
                         if (!string.IsNullOrEmpty(path))
                         {
                             var fileContent = BuildSerializedData(_jsonSerializer);
-                            LocalizationManager.SaveFile(path, fileContent, "File Saved", "File has been saved successfully!", "OK");
-                            Close();
+                            SaveFile(path, fileContent);
                         }
                     }
                     GUILayout.Space(8);
@@ -124,15 +125,15 @@ namespace LocalizationTool.Editors
                     break;
                 case Enums.ExportImportMethods.XML:
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(GetGUIContent(ExportIcon, "Save XML file"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                    if (GUILayout.Button(GetGUIContent(ExportIcon, string.Format(EXPORT_BUTTON_TOOLTIP, XML_LABEL_UPPER)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                     {
-                        var path = EditorUtility.SaveFilePanel("Save XML File", "", $"{_language}.xml", "xml");
+                        var path = EditorUtility.SaveFilePanel(string.Format(EXPORT_BUTTON_TOOLTIP, XML_LABEL_UPPER), "",
+                            $"{_language}{CSV_LABEL_UPPER}", XML_LABEL_LOWER);
 
                         if (!string.IsNullOrEmpty(path))
                         {
                             var fileContent = BuildSerializedData(_xmlSerializer);
-                            LocalizationManager.SaveFile(path, fileContent, "File Saved", "File has been saved successfully!", "OK");
-                            Close();
+                            SaveFile(path, fileContent);
                         }
                     }
                     GUILayout.Space(8);
@@ -143,6 +144,12 @@ namespace LocalizationTool.Editors
                     throw new ArgumentOutOfRangeException();
             }
             GUILayout.EndVertical();
+        }
+
+        private void SaveFile(string path, string fileContent)
+        {
+            LocalizationManager.SaveFile(path, fileContent, FILE_SAVED_DIALOG_TITLE, FILE_SAVED_DIALOG_MESSAGE, DIALOG_OK_OPTION);
+            Close();
         }
 
         private void ShowImportSection()
@@ -161,13 +168,13 @@ namespace LocalizationTool.Editors
                         GUILayout.Width(45));
 
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(GetGUIContent(ImportIcon, "Load CSV file"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                    if (GUILayout.Button(GetGUIContent(ImportIcon, string.Format(IMPORT_BUTTON_TOOLTIP, CSV_LABEL_UPPER)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                     {
-                        var path = EditorUtility.OpenFilePanel("Load CSV File", "", "csv");
+                        var path = EditorUtility.OpenFilePanel(string.Format(IMPORT_BUTTON_TOOLTIP, CSV_LABEL_UPPER), "", CSV_LABEL_LOWER);
 
                         if (!string.IsNullOrEmpty(path))
                         {
-                            var progressWindow = ImportProgressWindow.OpenWindow($"Import {_language} CSV");
+                            var progressWindow = ImportProgressWindow.OpenWindow(string.Format(IMPORT_WINDOW_LANGUAGE_LABEL, _language, CSV_LABEL_UPPER));
                             EditorCoroutineUtility.StartCoroutine(ImportCSV(path, progressWindow), progressWindow);
                             
                             Close();
@@ -177,13 +184,13 @@ namespace LocalizationTool.Editors
                     break;
                 case Enums.ExportImportMethods.JSON:
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(GetGUIContent(ImportIcon, "Load JSON file"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                    if (GUILayout.Button(GetGUIContent(ImportIcon, string.Format(IMPORT_BUTTON_TOOLTIP, JSON_LABEL_UPPER)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                     {
-                        var path = EditorUtility.OpenFilePanel("Load JSON File", "", "json");
+                        var path = EditorUtility.OpenFilePanel(string.Format(IMPORT_BUTTON_TOOLTIP, JSON_LABEL_UPPER), "", JSON_LABEL_LOWER);
 
                         if (!string.IsNullOrEmpty(path))
                         {
-                            var progressWindow = ImportProgressWindow.OpenWindow($"Import {_language} JSON");
+                            var progressWindow = ImportProgressWindow.OpenWindow(string.Format(IMPORT_WINDOW_LANGUAGE_LABEL, _language, JSON_LABEL_UPPER));
 
                             EditorCoroutineUtility.StartCoroutine(ImportSerializedData(path, _jsonSerializer, progressWindow), progressWindow);
                            
@@ -194,13 +201,13 @@ namespace LocalizationTool.Editors
                     break;
                 case Enums.ExportImportMethods.XML:
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(GetGUIContent(ImportIcon, "Load XML file"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                    if (GUILayout.Button(GetGUIContent(ImportIcon, string.Format(IMPORT_BUTTON_TOOLTIP, XML_LABEL_UPPER)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                     {
-                        var path = EditorUtility.OpenFilePanel("Load XML File", "", "xml");
+                        var path = EditorUtility.OpenFilePanel(string.Format(IMPORT_BUTTON_TOOLTIP, XML_LABEL_UPPER), "", XML_LABEL_LOWER);
 
                         if (!string.IsNullOrEmpty(path))
                         {
-                            var progressWindow = ImportProgressWindow.OpenWindow($"Import {_language} XML");
+                            var progressWindow = ImportProgressWindow.OpenWindow(string.Format(IMPORT_WINDOW_LANGUAGE_LABEL, _language, XML_LABEL_UPPER));
 
                             EditorCoroutineUtility.StartCoroutine(ImportSerializedData(path, _xmlSerializer, progressWindow), progressWindow);
                             
@@ -224,12 +231,11 @@ namespace LocalizationTool.Editors
         {
             var serializer = new CSV_Serializer();
             serializer.SetSeparator(CsvSeparators[_selectedCsvSeparatorIndexForExport]);
+            
+            serializer.AddTitle(_language);
+            
             var data = new Dictionary<string, KeyData>(LocalizationManager.Dictionary);
-
-            var titles = new List<string> { "Key", "Category", $"{_language}" };
-
-            serializer.AddLine(titles);
-
+            
             foreach (var (key, keyData) in data)
             {
                 var items = new List<string>();
@@ -273,9 +279,6 @@ namespace LocalizationTool.Editors
 
         private IEnumerator ImportCSV(string path, ImportProgressWindow progressWindow)
         {
-            var sb = new StringBuilder();
-            sb.AppendLine("CSV has been imported successfully!");
-
             using var reader = new StreamReader(path);
             var fileInfo = new FileInfo(path);
             var totalBytes = fileInfo.Length;
@@ -322,11 +325,13 @@ namespace LocalizationTool.Editors
                 while (!awaiterKey.IsCompleted) yield return null;
                 
                 progressWindow.SetProgress( (float)bytesRead / totalBytes);
-                progressWindow.SetProgressInfo($"Key '{key}' - '{category}' imported");
+                progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_KEY_CATEGORY, key, category));
             }
             
-            sb.AppendLine($"{nCategories} new categories imported");
-            sb.AppendLine($"{nKeys} keys imported");
+            var sb = new StringBuilder();
+            sb.AppendLine(IMPORT_RESULT_SUCCESS);
+            sb.AppendLine(string.Format(IMPORT_CATEGORIES_RESULT, nCategories));
+            sb.AppendLine(string.Format(IMPORT_KEYS_RESULT, nKeys));
 
             progressWindow.Complete(sb.ToString());
         }
@@ -341,14 +346,12 @@ namespace LocalizationTool.Editors
             var totalItems = data.Data.Count;
             var itemCount = 0f;
             
-            var sb = new StringBuilder();
-            sb.AppendLine("File has been imported successfully!");
 
             var loadLanguageTask = LocalizationManager.Instance.ImportLanguage(data.Language);
             var awaiterLanguage = loadLanguageTask.GetAwaiter();
             while (!awaiterLanguage.IsCompleted) yield return null;
             
-            progressWindow.SetStatus("Importing keys...");
+            progressWindow.SetStatus(IMPORT_STATUS_KEYS);
             var nKeys = 0;
             var nCategories = 0;
             foreach (var keyCategoryLanguage in data.Data)
@@ -360,12 +363,14 @@ namespace LocalizationTool.Editors
                 var awaiterKey = task.GetAwaiter();
                 while (!awaiterKey.IsCompleted) yield return null;
                 
-                progressWindow.SetProgressInfo($"Key '{keyCategoryLanguage.Key}' - '{keyCategoryLanguage.Category}' imported");
                 progressWindow.SetProgress(itemCount++ / totalItems);
+                progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_KEY_CATEGORY, keyCategoryLanguage.Key, keyCategoryLanguage.Category));
             }
             
-            sb.AppendLine($"{nCategories} new categories imported");
-            sb.AppendLine($"{nKeys} keys imported");
+            var sb = new StringBuilder();
+            sb.AppendLine(IMPORT_RESULT_SUCCESS);
+            sb.AppendLine(string.Format(IMPORT_CATEGORIES_RESULT, nCategories));
+            sb.AppendLine(string.Format(IMPORT_KEYS_RESULT, nKeys));
 
             progressWindow.Complete(sb.ToString());
         }

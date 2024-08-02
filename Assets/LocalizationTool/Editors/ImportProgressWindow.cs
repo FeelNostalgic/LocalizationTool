@@ -1,8 +1,8 @@
-
 using LocalizationTool.Commons;
 using LocalizationTool.Data;
 using UnityEditor;
 using UnityEngine;
+using static LocalizationTool.Commons.EditorStrings;
 
 namespace LocalizationTool.Editors
 { 
@@ -43,7 +43,7 @@ namespace LocalizationTool.Editors
 				
 				GUILayout.BeginHorizontal();
 				GUILayout.FlexibleSpace();
-				if (GUILayout.Button("Close", CustomStyles.GetStyle(Enums.CustomStyleName.CloseRichTextEditorButton))) Close();
+				if (GUILayout.Button(CLOSE_BUTTON_LABEL, CustomStyles.GetStyle(Enums.CustomStyleName.CloseRichTextEditorButton))) Close();
 				GUILayout.FlexibleSpace();
 				GUILayout.EndHorizontal();
 				

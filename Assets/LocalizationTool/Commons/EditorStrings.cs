@@ -38,6 +38,7 @@ namespace LocalizationTool.Commons
         public const string DEFAULT_FILE_NAME = "LocalizationData{0}";
         public const string CSV_WARNING_LABEL = "Line breaks are removed when exporting to CSV";
         public const string IMPORT_WINDOW_LABEL = "Import {0}";
+        public const string IMPORT_WINDOW_LANGUAGE_LABEL = "Import {0} {1}";
 
         public const string IMPORT_STATUS_LANGUAGES = "Importing languages...";
         public const string IMPORT_STATUS_KEYS = "Importing keys...";
@@ -47,6 +48,11 @@ namespace LocalizationTool.Commons
         public const string IMPORT_KEYS_RESULT = "{0} keys imported";
         public const string IMPORT_PROGRESS_KEY_CATEGORY = "Key '{0}' - '{1}' imported";
         public const string IMPORT_PROGRESS_LANGUAGE = "Language '{0}' imported";
+
+        public const string CLOSE_BUTTON_LABEL = "Close";
+
+        public const string LANGUAGE_MANAGER_WINDOW_TITLE_LABEL = "{0} Manager Editor";
+        public const string LANGUAGE_MANAGER_TITLE_LABEL = "Manage {0}";
         
         #endregion
 

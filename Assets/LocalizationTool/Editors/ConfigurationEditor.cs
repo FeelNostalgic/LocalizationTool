@@ -633,8 +633,6 @@ namespace LocalizationTool.Editors
 
         private IEnumerator ImportCSVCoroutine(string path, ImportProgressWindow progressWindow)
         {
-            var sb = new StringBuilder();
-
             using var reader = new StreamReader(path);
             var fileInfo = new FileInfo(path);
             var totalBytes = fileInfo.Length;
@@ -660,10 +658,7 @@ namespace LocalizationTool.Editors
 
                 yield break;
             }
-
-            sb.AppendLine(IMPORT_RESULT_SUCCESS);
-            sb.AppendLine(string.Format(IMPORT_LANGUAGES_RESULT, languages.Length - 2));
-
+            
             var languageOrder = new List<string>();
             for (var i = 2; i < languages.Length; i++)
             {
@@ -703,6 +698,9 @@ namespace LocalizationTool.Editors
                 progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_KEY_CATEGORY, key, category));
             }
             
+            var sb = new StringBuilder();
+            sb.AppendLine(IMPORT_RESULT_SUCCESS);
+            sb.AppendLine(string.Format(IMPORT_LANGUAGES_RESULT, languages.Length - 2));
             sb.AppendLine(string.Format(IMPORT_CATEGORIES_RESULT, nCategories));
             sb.AppendLine(string.Format(IMPORT_KEYS_RESULT, nKeys));
 
@@ -719,8 +717,6 @@ namespace LocalizationTool.Editors
             var totalItems = data.DictionaryKeyCategoryLanguages[0].LanguageValues.Count + data.DictionaryKeyCategoryLanguages.Count;
             var itemCount = 0f;
 
-            var sb = new StringBuilder();
-            sb.AppendLine(IMPORT_RESULT_SUCCESS);
 
             //Languages
             progressWindow.SetStatus(IMPORT_STATUS_LANGUAGES);
@@ -760,6 +756,8 @@ namespace LocalizationTool.Editors
                 yield return null;
             }
             
+            var sb = new StringBuilder();
+            sb.AppendLine(IMPORT_RESULT_SUCCESS);
             sb.AppendLine(string.Format(IMPORT_LANGUAGES_RESULT, data.DictionaryKeyCategoryLanguages[0].LanguageValues.Count));
             sb.AppendLine(string.Format(IMPORT_CATEGORIES_RESULT, nCategories));
             sb.AppendLine(string.Format(IMPORT_KEYS_RESULT, nKeys));
