@@ -226,7 +226,7 @@ namespace LocalizationTool.Editors
             GUI.backgroundColor = Colors.DEFAULT;
 
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button(GetGUIContent(UpIcon, string.Format(MOVE_CATEGORY_UP_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(GetGUIContent(UpIcon, string.Format(MOVE_UP_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index - 1);
             }
@@ -242,7 +242,7 @@ namespace LocalizationTool.Editors
             GUI.backgroundColor = Colors.DEFAULT;
 
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button(GetGUIContent(DownIcon, string.Format(MOVE_CATEGORY_DOWN_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(GetGUIContent(DownIcon, string.Format(MOVE_DOWN_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index + 1);
             }
