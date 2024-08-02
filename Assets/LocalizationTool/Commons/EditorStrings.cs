@@ -62,6 +62,8 @@ namespace LocalizationTool.Commons
         public const string LANGUAGE_MANAGER_WINDOW_TITLE_LABEL = "{0} Manager Editor";
         public const string LANGUAGE_MANAGER_TITLE_LABEL = "Manage {0}";
 
+        public const string ADDON_SELECT_KEY_LABEL = "SELECT KEY";
+        
         #endregion
 
         #region TOOLTIPS
@@ -117,6 +119,12 @@ namespace LocalizationTool.Commons
 
         public const string EXPORT_BUTTON_TOOLTIP = "Save {0} file";
         public const string IMPORT_BUTTON_TOOLTIP = "Load {0} file";
+
+        #endregion
+
+        #region Addon
+
+        public const string ADDON_SELECTED_KEY_TOOLTIP = "Selected Key";
 
         #endregion
 

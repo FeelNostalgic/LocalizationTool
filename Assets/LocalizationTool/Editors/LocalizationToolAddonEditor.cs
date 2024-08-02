@@ -8,6 +8,7 @@ using LocalizationTool.Manager;
 using LocalizationTool.Data;
 using UnityEditor;
 using UnityEngine;
+using static LocalizationTool.Commons.EditorStrings;
 
 namespace LocalizationTool.Editors
 {
@@ -58,7 +59,7 @@ namespace LocalizationTool.Editors
 
         private static void Row1()
         {
-            GUILayout.Label("Localization Tool", CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label), GUILayout.Height(30));
+            GUILayout.Label(MAIN_WINDOW_LABEL, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label), GUILayout.Height(30));
         }
 
         private List<string> Row2()
@@ -83,7 +84,7 @@ namespace LocalizationTool.Editors
 
             GUILayout.BeginVertical("box", GUILayout.Height(30*2+5+4), GUILayout.ExpandWidth(true));
 
-            GUILayout.Label("SELECT KEY", CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel), GUILayout.Height(25));
+            GUILayout.Label(ADDON_SELECT_KEY_LABEL, CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel), GUILayout.Height(25));
             GUILayout.Space(5);
             EditorGUI.BeginChangeCheck();
             _keyIndex = EditorGUILayout.Popup(_target.KeyIndex, filteredKeys.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup));
@@ -103,8 +104,7 @@ namespace LocalizationTool.Editors
             // Selected key-value label
             GUILayout.BeginVertical("box", GUILayout.Height(30+45+5+4), GUILayout.ExpandWidth(true));
             GUILayout.Space(2);
-            var key = new GUIContent(_target.Key, "Selected Key");
-            GUILayout.Label(key, CustomStyles.GetStyle(Enums.CustomStyleName.KeySelectableLabel), GUILayout.Height(30));
+            GUILayout.Label(new GUIContent(_target.Key, ADDON_SELECTED_KEY_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.KeySelectableLabel), GUILayout.Height(30));
             GUILayout.Space(5);
             _scrollView = GUILayout.BeginScrollView(_scrollView, GUILayout.ExpandWidth(true), GUILayout.Height(45));
 
@@ -149,7 +149,7 @@ namespace LocalizationTool.Editors
         {
             if (newKey.Equals(_target.Key)) return;
 
-            Undo.RecordObject(_target, "Change Key");
+            Undo.RecordObject(_target, $"Changed Key Selected to {newKey}");
             _target.Key = newKey;
             _target.KeyIndex = _keyIndex;
             serializedObject.Update();
