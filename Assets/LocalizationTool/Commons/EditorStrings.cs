@@ -8,6 +8,8 @@ namespace LocalizationTool.Commons
         public const string CATEGORY_LABEL_UPPER = "CATEGORY";
         public const string VALUE_LABEL_UPPER = "VALUE";
 
+        public const string CATEGORIES_LABEL_UPPER = "CATEGORIES";
+
         #endregion
 
         #region TOOLTIPS
@@ -34,6 +36,14 @@ namespace LocalizationTool.Commons
 
         #region Categories
 
+        public const string ADD_CATEGORY_BUTTON_TOOLTIP = "Add new category";
+        public const string MOVE_CATEGORY_UP_BUTTON_TOOLTIP = "Move '{0}' Up";
+        public const string MOVE_CATEGORY_DOWN_BUTTON_TOOLTIP = "Move '{0}' Down";
+        public const string CATEGORY_IS_DEFAULT_BUTTON_TOOLTIP = "'{0}' is default category";
+        public const string MAKE_CATEGORY_DEFAULT_BUTTON_TOOLTIP = "Make '{0}' default";
+        public const string DELETE_CATEGORY_DEFAULT_TOOLTIP = "Default category cannot be removed";
+        public const string DELETE_CATEGORY_BUTTON_TOOLTIP = "Delete category '{0}'";
+
         #endregion
 
         #region Configuration
@@ -43,21 +53,12 @@ namespace LocalizationTool.Commons
         #endregion
 
         #region Display Dialog
-
-        #region Commons
-
+        
+        public const string DELETE_DIALOG_TITLE = "Confirm Delete";
+        public const string DELETE_DIALOG_QUESTION = "Are you sure you want to delete '{0}'?";
         public const string DIALOG_OPTION_CANCEL = "Cancel";
-
-        #endregion
-
-        #region Dictionary
-
-        public const string DELETE_KEY_DIALOG_TITLE = "Confirm Delete";
-        public const string DELETE_KEY_DIALOG_QUESTION = "Are you sure you want to delete '{0}'?";
-        public const string DELETE_KEY_DIALOG_OPTION_DELETE = "Delete";
-
-        #endregion
-
+        public const string DIALOG_OPTION_DELETE = "Delete";
+        
         #endregion
 
         #region LOG
@@ -65,6 +66,19 @@ namespace LocalizationTool.Commons
         public const string DICTIONARY_LOADED_LOG = "Dictionary loaded";
         public const string EDITING_KEY_LOG = "Editing key '{0}'";
         public const string DELETED_KEY_LOG = "Key '{0}' deleted";
+
+        public const string CATEGORIES_LOADED_LOG = "Categories loaded";
+        public const string CATEGORY_DEFAULT_LOG = "Category '{0}' is now default";
+        public const string DELETED_CATEGORY_LOG = "Category '{0}' deleted";
+
+        #endregion
+
+        #region FEEDBACK LABEL
+
+        public const string EMPTY_CATEGORY_FEEDBACK_LABEL = "Category cannot be an empty value";
+        public const string SPACES_CATEGORY_FEEDBACK_LABEL = "Category cannot contain spaces";
+        public const string CHARACTERS_NUMBER_CATEGORY_FEEDBACK_LABEL = "The maximum number of characters({0}) has been exceeded";
+        public const string CATEGORY_EXIST_FEEDBACK_LABEL = "Category '{0}' value already exists";
 
         #endregion
     }

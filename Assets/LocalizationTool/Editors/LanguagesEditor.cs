@@ -260,7 +260,7 @@ namespace LocalizationTool.Editors
             GUILayout.FlexibleSpace();
             if (LocalizationManager.IsFavouriteLanguage(language))
             {
-                if (GUILayout.Button(GetGUIContent(LocalizationManager.Instance.YellowIcon, $"'{language}' is favourite language"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                if (GUILayout.Button(GetGUIContent(LocalizationManager.YellowIcon, $"'{language}' is favourite language"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     // Nothing
                 }

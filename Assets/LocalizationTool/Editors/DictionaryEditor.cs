@@ -409,7 +409,7 @@ namespace LocalizationTool.Editors
             {
                 if (LocalizationManager.Configuration.DictionaryDeleteConfirmation)
                 {
-                    if (EditorUtility.DisplayDialog(DELETE_KEY_DIALOG_TITLE, string.Format(DELETE_KEY_DIALOG_QUESTION, key), DELETE_KEY_DIALOG_OPTION_DELETE, DIALOG_OPTION_CANCEL))
+                    if (EditorUtility.DisplayDialog(DELETE_DIALOG_TITLE, string.Format(DELETE_DIALOG_QUESTION, key), DIALOG_OPTION_DELETE, DIALOG_OPTION_CANCEL))
                         DeleteKey(key);
                 }
                 else

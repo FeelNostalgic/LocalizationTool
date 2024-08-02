@@ -36,7 +36,7 @@ namespace LocalizationTool.Manager
         public int CurrentToolbarLanguageIndex => _languagesData.Languages.IndexOf(CurrentLanguageInDictionarySection);
         public static string DefaultCategory => _categoriesData.DefaultCategory;
         public static bool IsDataLoaded { get; private set; }
-        public Texture2D YellowIcon { get; private set; }
+        public static Texture2D YellowIcon { get; private set; }
 
         #region Actions
 
