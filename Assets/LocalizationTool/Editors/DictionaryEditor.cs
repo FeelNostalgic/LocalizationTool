@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using LocalizationTool.Commons;
 using LocalizationTool.Controller;
 using LocalizationTool.Data;
 using LocalizationTool.Manager;
 using UnityEditor;
 using UnityEngine;
+using static LocalizationTool.Commons.EditorStrings;
 
 namespace LocalizationTool.Editors
 {
@@ -15,7 +15,7 @@ namespace LocalizationTool.Editors
     public class DictionaryEditor : LocalizationEditor
     {
         #region PUBLIC VARIABLES
-        
+
         #endregion
 
         #region PRIVATE VARIABLES
@@ -66,9 +66,9 @@ namespace LocalizationTool.Editors
 
         public void ShowLayout()
         {
-            ControlFocus("KEY");
-            
-            GUILayout.BeginVertical( GUILayout.ExpandHeight(true));
+            ControlFocus(KEY_LABEL_UPPER);
+
+            GUILayout.BeginVertical(GUILayout.ExpandHeight(true));
 
             ShowHorizontalLine(5);
 
@@ -107,21 +107,21 @@ namespace LocalizationTool.Editors
                 GUILayout.BeginVertical("box");
                 GUILayout.Space(5);
                 GUILayout.BeginVertical(GUILayout.Height(70));
-                ShowLabelTextFieldVertical("KEY", ref _addKeyValue);
+                ShowLabelTextFieldVertical(KEY_LABEL_UPPER, ref _addKeyValue);
                 GUILayout.EndVertical();
 
                 GUILayout.BeginVertical(GUILayout.Height(70));
-                ShowLabelPopupSelection("CATEGORY", ref _addCategoryValue);
+                ShowLabelPopupSelection(CATEGORY_LABEL_UPPER, ref _addCategoryValue);
                 GUILayout.EndVertical();
 
                 GUILayout.BeginVertical(GUILayout.Width(312), GUILayout.Height(60));
 
-                if (GUILayout.Button(new GUIContent(AddIcon, "Add new key to dictionary"), GUILayout.ExpandWidth(true), GUILayout.Height(30)))
+                if (GUILayout.Button(new GUIContent(AddIcon, ADD_KEY_BUTTON_TOOLTIP), GUILayout.ExpandWidth(true), GUILayout.Height(30)))
                 {
                     LocalizationManager.Instance.AddNewKey(_addKeyValue, _addCategoryValue, this);
                 }
 
-                if (GUI.GetNameOfFocusedControl() == "KEY")
+                if (GUI.GetNameOfFocusedControl() == KEY_LABEL_UPPER)
                 {
                     if (Event.current is { keyCode: (KeyCode.Return or KeyCode.KeypadEnter) })
                     {
@@ -204,7 +204,6 @@ namespace LocalizationTool.Editors
             catch (Exception e)
             {
                 Debug.Log(e);
-                Debug.Log(_currentLanguageToolbarIndex);
                 //Ignore
             }
         }
@@ -212,12 +211,11 @@ namespace LocalizationTool.Editors
         private static void TitleCenterSection()
         {
             GUILayout.BeginHorizontal();
-            
-            if (GUILayout.Button(new GUIContent(RefreshIcon, "Reload data"), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
+
+            if (GUILayout.Button(new GUIContent(RefreshIcon, RELOAD_BUTTON_TOOLTIP), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
             {
                 LocalizationManager.Instance.RefreshDictionaryData();
-                LocalizationManager.Log("Dictionary loaded");
-
+                LocalizationManager.Log(DICTIONARY_LOADED_LOG);
             }
 
             GUILayout.FlexibleSpace();
@@ -255,17 +253,17 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal();
             // Column 1
             GUILayout.BeginVertical("box");
-            GUILayout.Label("KEY", CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel), GUILayout.Width(275));
+            GUILayout.Label(KEY_LABEL_UPPER, CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel), GUILayout.Width(275));
             GUILayout.EndVertical();
 
             // Column 2
             GUILayout.BeginVertical("box");
-            GUILayout.Label("CATEGORY", CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel), GUILayout.Width(175));
+            GUILayout.Label(CATEGORY_LABEL_UPPER, CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel), GUILayout.Width(175));
             GUILayout.EndVertical();
 
             // Column 3
             GUILayout.BeginVertical("box", GUILayout.ExpandWidth(true));
-            GUILayout.Label("VALUE", CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel));
+            GUILayout.Label(VALUE_LABEL_UPPER, CustomStyles.GetStyle(Enums.CustomStyleName.ColumnsTitleBoldMiddleLeftLabel));
             GUILayout.EndVertical();
 
             GUILayout.EndHorizontal();
@@ -300,17 +298,17 @@ namespace LocalizationTool.Editors
             switch (LocalizationManager.Configuration.SearchTypeIndex)
             {
                 case 0: // By Key
-                    if (!_searchKeyValue.Equals(""))
+                    if (!_searchKeyValue.IsEmpty())
                         filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Key.Contains(_searchKeyValue, StringComparison.InvariantCulture))
                             .ToDictionary(kv => (kv.Key), kv => kv.Value);
                     break;
                 case 1: // By Value
-                    if (!_searchKeyValue.Equals(""))
+                    if (!_searchKeyValue.IsEmpty())
                         filteredDicToIterate = filteredDicToIterate.Where(pair => LocalizationToolAPI.Instance.GetValueByKey(pair.Key).Contains(_searchKeyValue, StringComparison.InvariantCulture))
                             .ToDictionary(kv => (kv.Key), kv => kv.Value);
                     break;
                 case 2: //By Both
-                    if (!_searchKeyValue.Equals(""))
+                    if (!_searchKeyValue.IsEmpty())
                         filteredDicToIterate = filteredDicToIterate.Where(pair =>
                                 pair.Key.Contains(_searchKeyValue, StringComparison.InvariantCulture)
                                 || LocalizationToolAPI.Instance.GetValueByKey(pair.Key).Contains(_searchKeyValue, StringComparison.InvariantCulture))
@@ -350,10 +348,10 @@ namespace LocalizationTool.Editors
             GUI.backgroundColor = Colors.DEFAULT;
             GUILayout.Space(5);
 
-            if (GUILayout.Button(new GUIContent(key, "Tooltip"), CustomStyles.GetStyle(Enums.CustomStyleName.KeySelectableLabel), GUILayout.Width(275), GUILayout.Height(30)))
+            if (GUILayout.Button(new GUIContent(key, KEY_SELECTABLE_LABEL_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.KeySelectableLabel), GUILayout.Width(275), GUILayout.Height(30)))
             {
                 EditorGUIUtility.systemCopyBuffer = key;
-                LocalizationManager.Log($"Key '{key}' copied to clipboard");
+                LocalizationManager.Log(string.Format(COPY_KEY_TOOLTIP, key));
             }
 
             GUILayout.EndVertical();
@@ -368,7 +366,7 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal(GUILayout.Width(175));
             EditorGUI.BeginChangeCheck();
 
-            if (category == "") category = LocalizationManager.DefaultCategory;
+            if (category.IsEmpty()) category = LocalizationManager.DefaultCategory;
             GUI.backgroundColor = Colors.DEFAULT;
             var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.ScrollViewCategoryPopup));
 
@@ -398,30 +396,24 @@ namespace LocalizationTool.Editors
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginHorizontal("box");
             GUI.backgroundColor = Colors.DEFAULT;
-            
-            if (GUILayout.Button(new GUIContent(GearIcon, "Open rich text editor"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+
+            if (GUILayout.Button(new GUIContent(GearIcon, OPEN_TEXT_EDITOR_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 RichTextEditor.ShowWindow(tempValue, key, delegate(string s) { UpdateValue(key, s); });
-                LocalizationManager.Log($"Editing key '{key}'");
+                LocalizationManager.Log(string.Format(EDITING_KEY_LOG, key));
             }
 
             GUILayout.Space(5);
 
-            if (GUILayout.Button(new GUIContent(DeleteIcon, "Remove key"), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(new GUIContent(DeleteIcon, string.Format(DELETE_KEY_BUTTON_TOOLTIP, key)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 if (LocalizationManager.Configuration.DictionaryDeleteConfirmation)
                 {
-                    if (EditorUtility.DisplayDialog("Confirm Delete", $"Are you sure you want to delete {key}?", "Delete", "Cancel"))
-                    {
-                        LocalizationManager.Instance.RemoveKey(key);
-                        LocalizationManager.Log($"Key '{key}' removed");
-                    }
+                    if (EditorUtility.DisplayDialog(DELETE_KEY_DIALOG_TITLE, string.Format(DELETE_KEY_DIALOG_QUESTION, key), DELETE_KEY_DIALOG_OPTION_DELETE, DIALOG_OPTION_CANCEL))
+                        DeleteKey(key);
                 }
                 else
-                {
-                    LocalizationManager.Instance.RemoveKey(key);
-                    LocalizationManager.Log($"Key '{key}' removed");
-                }
+                    DeleteKey(key);
             }
 
             GUILayout.EndHorizontal();
@@ -432,6 +424,12 @@ namespace LocalizationTool.Editors
         #endregion
 
         #region UPDATE METHODS
+
+        private static void DeleteKey(string key)
+        {
+            LocalizationManager.Instance.RemoveKey(key);
+            LocalizationManager.Log(string.Format(DELETED_KEY_LOG, key));
+        }
 
         private void UpdateCategory(string key, string tempCategory)
         {
@@ -460,9 +458,9 @@ namespace LocalizationTool.Editors
             _addKeyValue = "";
             RepaintGUI();
         }
-        
+
         #endregion
-        
+
         #endregion
     }
 #endif

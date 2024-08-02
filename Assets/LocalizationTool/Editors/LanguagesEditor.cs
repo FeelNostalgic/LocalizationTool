@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using LocalizationTool.Commons;
 using LocalizationTool.Data;
 using LocalizationTool.Manager;
