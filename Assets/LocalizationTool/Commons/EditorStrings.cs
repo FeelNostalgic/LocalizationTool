@@ -62,6 +62,10 @@ namespace LocalizationTool.Commons
         public const string LANGUAGE_MANAGER_WINDOW_TITLE_LABEL = "{0} Manager Editor";
         public const string LANGUAGE_MANAGER_TITLE_LABEL = "Manage {0}";
 
+        public const string RICH_TEXT_EDITOR_WINDOW_LABEL = "Text Editor";
+        public const string RICH_TEXT_EDITOR_TOGGLE_LABEL = "Enable rich text preview but some of the effects are only appreciate with TextMesh PRO";
+        public const string RICH_TEXT_ZOOM_LABEL = "{0} %";
+
         public const string ADDON_SELECT_KEY_LABEL = "SELECT KEY";
         
         #endregion
@@ -122,6 +126,25 @@ namespace LocalizationTool.Commons
 
         #endregion
 
+        #region Rich Text Editor
+
+        public const string RICH_TEXT_EDITOR_AUTOSAVED_TOOLTIP = "Changes are stored automatically";
+        public const string RICH_TEXT_EDITOR_UNDO_TOOLTIP = "Undo action";
+        public const string RICH_TEXT_EDITOR_REDO_TOOLTIP = "Redo action";
+        public const string RICH_TEXT_EDITOR_BOLD_BUTTON_TOOLTIP = "Toggle bold selected text";
+        public const string RICH_TEXT_EDITOR_ITALIC_BUTTON_TOOLTIP = "Toggle italic to selected text";
+        public const string RICH_TEXT_EDITOR_UNDERLINE_BUTTON_TOOLTIP = "Toggle underline to selected text";
+        public const string RICH_TEXT_EDITOR_STRIKE_OUT_BUTTON_TOOLTIP = "Toggle strike out to selected text";
+        public const string RICH_TEXT_EDITOR_FONT_SIZE_BUTTON_TOOLTIP = "Apply font size to selected text";
+        public const string RICH_TEXT_EDITOR_BIGGER_FONT_BUTTON_TOOLTIP = "Do font bigger";
+        public const string RICH_TEXT_EDITOR_SMALLER_FONT_BUTTON_TOOLTIP = "Do font smaller";
+        public const string RICH_TEXT_EDITOR_SELECTED_COLOR_TOOLTIP = "Selected Color";
+        public const string RICH_TEXT_EDITOR_COLOR_BUTTON_TOOLTIP = "Apply color to selected text";
+        public const string RICH_TEXT_EDITOR_ZOOM_IN_BUTTON_TOOLTIP = "Zoom IN";
+        public const string RICH_TEXT_EDITOR_ZOOM_OUT_BUTTON_TOOLTIP = "Zoom OUT";
+
+        #endregion
+        
         #region Addon
 
         public const string ADDON_SELECTED_KEY_TOOLTIP = "Selected Key";
@@ -157,6 +180,8 @@ namespace LocalizationTool.Commons
         public const string LANGUAGE_FAVOURITE_LOG = "Language '{0}' is now favorite";
         public const string DELETED_LANGUAGE_LOG = "Language '{0}' deleted";
 
+        public const string RICH_TEXT_EDITOR_SELECT_TEXT_WARNING_LOG = "Select some text to apply a style";
+        
         #endregion
 
         #region FEEDBACK LABEL

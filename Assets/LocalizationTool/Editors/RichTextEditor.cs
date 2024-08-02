@@ -6,6 +6,7 @@ using LocalizationTool.Manager;
 using UnityEditor;
 using UnityEngine;
 using ColorUtility = UnityEngine.ColorUtility;
+using static LocalizationTool.Commons.EditorStrings;
 
 namespace LocalizationTool.Editors
 {
@@ -33,7 +34,7 @@ namespace LocalizationTool.Editors
         private string _key;
         private bool _showRichTextTags = true;
         private int _fontSizeIndex = 2;
-        private int _currentZoom = 100;
+        private int _zoom = 100;
         private Vector2 _scrollView;
         private Color _colorSelected = Color.white;
 
@@ -43,7 +44,7 @@ namespace LocalizationTool.Editors
 
         public static void ShowWindow(string initialText, string key, Action<string> onTextChanged)
         {
-            var window = GetWindow<RichTextEditor>("Editor");
+            var window = GetWindow<RichTextEditor>(RICH_TEXT_EDITOR_WINDOW_LABEL);
             window.minSize = WindowSize;
             window.maxSize = new Vector2(WindowSize.x, 100000);
             window._key = key;
@@ -130,7 +131,7 @@ namespace LocalizationTool.Editors
             {
                 richText = _showRichTextTags,
                 wordWrap = true,
-                fontSize = FONT_SIZE_TEXT_AREA * _currentZoom / 100,
+                fontSize = FONT_SIZE_TEXT_AREA * _zoom / 100,
                 padding = { top = 5, bottom = 5, left = 5, right = 5 },
                 normal =
                 {
@@ -153,7 +154,7 @@ namespace LocalizationTool.Editors
         private void RichTextToggle()
         {
             EditorGUILayout.BeginHorizontal("box", GUILayout.Height(30));
-            _showRichTextTags = ToggleLeft(_showRichTextTags, "Enable rich text preview but some of the effects are only appreciate with TextMesh PRO");
+            _showRichTextTags = ToggleLeft(_showRichTextTags, RICH_TEXT_EDITOR_TOGGLE_LABEL);
             EditorGUILayout.EndHorizontal();
         }
         
@@ -176,11 +177,11 @@ namespace LocalizationTool.Editors
             GUILayout.BeginHorizontal("box");
             GUI.backgroundColor = Colors.DEFAULT;
             
-            if (GUILayout.Button("Close", CustomStyles.GetStyle(Enums.CustomStyleName.CloseRichTextEditorButton))) Close(); 
+            if (GUILayout.Button(CLOSE_BUTTON_LABEL, CustomStyles.GetStyle(Enums.CustomStyleName.CloseRichTextEditorButton))) Close(); 
 
             GUILayout.FlexibleSpace();
 
-            var context = GetGUIContent(ChangesSavedIcon, "Changes are stored automatically");
+            var context = GetGUIContent(ChangesSavedIcon, RICH_TEXT_EDITOR_AUTOSAVED_TOOLTIP);
             GUILayout.Label(context, GUILayout.Height(30), GUILayout.Width(25));
 
             GUILayout.EndHorizontal();
@@ -196,12 +197,12 @@ namespace LocalizationTool.Editors
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
 
-            if (GUILayout.Button(GetGUIContent(UndoIcon, "Undo action"), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
+            if (GUILayout.Button(GetGUIContent(UndoIcon, RICH_TEXT_EDITOR_UNDO_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
                 //TODO
             }
 
-            if (GUILayout.Button(GetGUIContent(RedoIcon, "Redo action"), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
+            if (GUILayout.Button(GetGUIContent(RedoIcon, RICH_TEXT_EDITOR_REDO_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
                 //TODO
             }
@@ -217,23 +218,23 @@ namespace LocalizationTool.Editors
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
 
-            if (GUILayout.Button(new GUIContent("B", "Apply bold selected text"), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
+            if (GUILayout.Button(new GUIContent("B", RICH_TEXT_EDITOR_BOLD_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
                 ApplyStyle(Enums.RichTextStyle.Bold);
             }
 
-            if (GUILayout.Button(new GUIContent("I", "Apply italic to selected text"), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
+            if (GUILayout.Button(new GUIContent("I", RICH_TEXT_EDITOR_ITALIC_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
                 ApplyStyle(Enums.RichTextStyle.Italic);
             }
 
             //Fixed this: not work with textArea
-            if (GUILayout.Button(new GUIContent("U", "Apply underline to selected text"), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
+            if (GUILayout.Button(new GUIContent("U", RICH_TEXT_EDITOR_UNDERLINE_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
                 ApplyStyle(Enums.RichTextStyle.Underline);
             }
 
-            if (GUILayout.Button(new GUIContent("S", "Apply strike out to selected text"), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
+            if (GUILayout.Button(new GUIContent("S", RICH_TEXT_EDITOR_STRIKE_OUT_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
                 ApplyStyle(Enums.RichTextStyle.StrikeOut);
             }
@@ -252,12 +253,12 @@ namespace LocalizationTool.Editors
             EditorGUI.BeginChangeCheck();
             _fontSizeIndex = EditorGUILayout.Popup(_fontSizeIndex, _fontSizes, CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextFontSizePopup), GUILayout.Width(60));
 
-            if (GUILayout.Button(GetGUIContent(ApplyStyleIcon, "Apply font size to selected text"), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
+            if (GUILayout.Button(GetGUIContent(ApplyStyleIcon, RICH_TEXT_EDITOR_FONT_SIZE_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
                 ApplyStyle(Enums.RichTextStyle.FontSize);
             }
             
-            if (GUILayout.Button(GetGUIContent(AddEmptyIcon, "Do font bigger"), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
+            if (GUILayout.Button(GetGUIContent(AddEmptyIcon, RICH_TEXT_EDITOR_BIGGER_FONT_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
                 if (_fontSizeIndex < _fontSizes.Length - 1)
                 {
@@ -266,7 +267,7 @@ namespace LocalizationTool.Editors
                 }
             }
 
-            if (GUILayout.Button(GetGUIContent(MinusEmptyIcon, "Do font smaller"), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
+            if (GUILayout.Button(GetGUIContent(MinusEmptyIcon, RICH_TEXT_EDITOR_SMALLER_FONT_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
                 if (_fontSizeIndex > 0)
                 {
@@ -286,8 +287,9 @@ namespace LocalizationTool.Editors
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
 
-            _colorSelected = EditorGUILayout.ColorField(GUIContent.none, _colorSelected, false, true, false, GUILayout.Height(28), GUILayout.Width(40));
-            if (GUILayout.Button(GetGUIContent(ApplyStyleIcon, "Apply color to selected text"), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
+            _colorSelected = EditorGUILayout.ColorField(new GUIContent("", RICH_TEXT_EDITOR_SELECTED_COLOR_TOOLTIP),
+                _colorSelected, false, true, false, GUILayout.Height(28), GUILayout.Width(40));
+            if (GUILayout.Button(GetGUIContent(ApplyStyleIcon, RICH_TEXT_EDITOR_COLOR_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
                 ApplyStyle(Enums.RichTextStyle.Color);
             }
@@ -304,18 +306,18 @@ namespace LocalizationTool.Editors
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
 
-            EditorGUILayout.LabelField($"{_currentZoom} %", CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextZoomLabel), GUILayout.Width(40));
+            EditorGUILayout.LabelField(string.Format(RICH_TEXT_ZOOM_LABEL, _zoom), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextZoomLabel), GUILayout.Width(40));
 
-            if (GUILayout.Button(GetGUIContent(AddEmptyIcon, "Zoom In"), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
+            if (GUILayout.Button(GetGUIContent(AddEmptyIcon, RICH_TEXT_EDITOR_ZOOM_IN_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
-                _currentZoom += 10;
-                _currentZoom = Math.Clamp(_currentZoom, 60, 250);
+                _zoom += 10;
+                _zoom = Math.Clamp(_zoom, 60, 250);
             }
 
-            if (GUILayout.Button(GetGUIContent(MinusEmptyIcon, "Zoom Out"), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
+            if (GUILayout.Button(GetGUIContent(MinusEmptyIcon, RICH_TEXT_EDITOR_ZOOM_OUT_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
-                _currentZoom -= 10;
-                _currentZoom = Math.Clamp(_currentZoom, 60, 250);
+                _zoom -= 10;
+                _zoom = Math.Clamp(_zoom, 60, 250);
             }
 
             GUILayout.EndHorizontal();
@@ -346,7 +348,7 @@ namespace LocalizationTool.Editors
 
             if (length == 0)
             {
-                LocalizationManager.LogWarning("Select some text to apply a style");
+                LocalizationManager.LogWarning(RICH_TEXT_EDITOR_SELECT_TEXT_WARNING_LOG);
                 return;
             }
 
