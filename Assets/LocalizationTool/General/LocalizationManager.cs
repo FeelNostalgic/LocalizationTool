@@ -18,6 +18,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static LocalizationTool.Commons.GameUtils;
 using static LocalizationTool.Commons.EditorStrings;
+using static LocalizationTool.Commons.EditorPaths;
 
 namespace LocalizationTool.Manager
 {
@@ -55,21 +56,15 @@ namespace LocalizationTool.Manager
         private ISerializerService _serializerBinary;
 
         #region JSON Data
-
-        private const string JSON_DICTIONARY_PATH = "Assets/LocalizationTool/Data/DoNotTouch/LocalizationDataLanguage.json";
+        
         private static DictionaryData _dictionaryData;
 
         #endregion
 
         #region BINARY Data
-
-        private const string BINARY_LANGUAGES_PATH = "Assets/LocalizationTool/Data/DoNotTouch/LocalizationLanguages.bin";
+        
         private static LanguagesData _languagesData;
-
-        private const string BINARY_CATEGORIES_PATH = "Assets/LocalizationTool/Data/DoNotTouch/LocalizationCategories.bin";
         private static CategoriesData _categoriesData;
-
-        private const string BINARY_CONFIGURATION_PATH = "Assets/LocalizationTool/Data/DoNotTouch/LocalizationConfiguration.bin";
         private static ConfigurationData _configurationData;
 
         #endregion

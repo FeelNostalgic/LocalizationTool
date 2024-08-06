@@ -14,6 +14,7 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 using static LocalizationTool.Commons.EditorStrings;
+using static LocalizationTool.Commons.EditorPaths;
 
 namespace LocalizationTool.Editors
 {
@@ -37,10 +38,7 @@ namespace LocalizationTool.Editors
 
         private int _selectedCsvSeparatorIndexForExport;
         private int _selectedCsvSeparatorIndexForImport;
-
-        private const string README_PATH = "Assets/LocalizationTool/Data/DoNotTouch/Info/Readme.txt";
-        private const string LICENSE_PATH = "Assets/LocalizationTool/Data/DoNotTouch/Info/License.txt";
-
+        
         #endregion
 
         #region DIMENSION VARIABLES

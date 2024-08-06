@@ -4,8 +4,8 @@ namespace LocalizationTool.Commons
     {
         #region MAX CHARACTERS
 
-        public const int MAX_KEY_CHARACTERS = 60;
-        public const int MAX_LANGUAGE_CHARACTERS = 30;
+        public const int MAX_KEY_CHARACTERS = 40;
+        public const int MAX_LANGUAGE_CHARACTERS = 35;
         public const int MAX_CATEGORY_CHARACTERS = 120;
 
         #endregion

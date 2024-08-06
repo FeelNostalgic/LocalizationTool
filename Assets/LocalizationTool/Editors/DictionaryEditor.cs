@@ -114,7 +114,7 @@ namespace LocalizationTool.Editors
                 ShowLabelPopupSelection(CATEGORY_LABEL_UPPER, ref _addCategoryValue);
                 GUILayout.EndVertical();
 
-                GUILayout.BeginVertical(GUILayout.Width(312), GUILayout.Height(60));
+                GUILayout.BeginVertical(GUILayout.Width(312), GUILayout.Height(70));
 
                 if (GUILayout.Button(new GUIContent(AddIcon, ADD_KEY_BUTTON_TOOLTIP), GUILayout.ExpandWidth(true), GUILayout.Height(30)))
                 {
@@ -130,7 +130,6 @@ namespace LocalizationTool.Editors
                 }
 
                 GUILayout.Space(5);
-
                 ShowTextAreaFeedback(FeedbackLabel);
                 GUILayout.EndVertical();
 

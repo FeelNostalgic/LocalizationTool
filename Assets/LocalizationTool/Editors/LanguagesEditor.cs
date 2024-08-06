@@ -305,7 +305,9 @@ namespace LocalizationTool.Editors
             // Delete button
             if (LocalizationManager.IsFavouriteLanguage(language))
             {
-                if (GUILayout.Button(GetGUIContent(LockIcon, DELETE_LANGUAGE_FAVOURITE_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon))) ;
+                if (GUILayout.Button(GetGUIContent(LockIcon, DELETE_LANGUAGE_FAVOURITE_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                {
+                }
             }
             else
             {

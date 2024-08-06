@@ -81,14 +81,22 @@ namespace LocalizationTool.Editors
 
         protected virtual void OnEnable()
         {
+            var wasOpened = EditorPrefs.GetBool("LocalizationToolEditorWasOpened");
+            if (wasOpened)
+            {
+                EditorPrefs.SetBool("LocalizationToolEditorWasOpened", false);
+                LoadData();
+            }
             if (hasFocus) LoadData();
         }
 
+        // Called when unity editor is closed
         protected virtual void OnDisable()
         {
-            //
+            EditorPrefs.SetBool("LocalizationToolEditorWasOpened", true);
         }
 
+        // Called when editor is closed
         protected virtual void OnDestroy()
         {
             //
@@ -341,7 +349,7 @@ namespace LocalizationTool.Editors
 
         protected static void ShowTextAreaFeedback(string label)
         {
-            EditorGUILayout.LabelField(label, CustomStyles.GetStyle(Enums.CustomStyleName.FeedbackLabel), GUILayout.Height(20));
+            EditorGUILayout.LabelField(label, CustomStyles.GetStyle(Enums.CustomStyleName.FeedbackLabel), GUILayout.Height(30));
         }
 
         protected static void ShowVerticalLine(float width)
