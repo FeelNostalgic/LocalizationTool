@@ -51,7 +51,7 @@ namespace LocalizationTool.Scripts.Commons
 		}
 		
 		public static bool IsNull(this object[] obj) {
-			return obj == null;
+			return obj is not { Length: > 0 };
 		}
 
 		public static bool IsNotNull(this object[] obj) {

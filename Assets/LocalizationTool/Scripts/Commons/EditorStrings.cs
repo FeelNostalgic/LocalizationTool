@@ -75,6 +75,8 @@ namespace LocalizationTool.Scripts.Commons
         public const string RICH_TEXT_ZOOM_LABEL = "{0} %";
 
         public const string ADDON_SELECT_KEY_LABEL = "SELECT KEY";
+        public const string ADDON_WARNING_API_NOT_INIT_1 = "Localization Tool API is not INITIALIZED.";
+        public const string ADDON_WARNING_API_NOT_INIT_2 = "Use Install in Tools / LocalizationTool";
         
         #endregion
 
@@ -203,6 +205,7 @@ namespace LocalizationTool.Scripts.Commons
         public const string API_INITIALIZED_LOG = "Localization Tool API Initialized";
         public const string API_KEY_NOT_FOUND_EXCEPTION = "Key not found in language '{0}'";
         public const string API_LANGUAGE_DOESNT_EXIST_EXCEPTION = "Language '{0}' doesnt exist";
+        public const string API_KEY_NOT_FOUND = "Key '{0}' not found";
         
         #endregion
 

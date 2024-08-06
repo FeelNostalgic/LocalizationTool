@@ -86,14 +86,13 @@ namespace LocalizationTool.Scripts.Editors
             if (EditorApplication.isPlayingOrWillChangePlaymode) return;
             
             LoadData();
-            YellowStarIcon = GetColoredIcon("d_Favorite", Color.yellow);
         }
         
         #region UNITY METHODS
 
         protected virtual void OnEnable()
         {
-            //
+            YellowStarIcon = GetColoredIcon("d_Favorite", Color.yellow);
         }
 
         // Called when unity editor is closed

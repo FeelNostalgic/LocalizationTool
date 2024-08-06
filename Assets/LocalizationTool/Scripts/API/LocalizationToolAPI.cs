@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using LocalizationTool.Scripts.General;
 using UnityEngine;
+//TODO: Quitar dependencia de la API con EditorStrings
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 
 namespace LocalizationTool.Scripts.API
 {
-    //TODO: make this persistant between scenes
-    //TODO: add this to the scene
+    [AddComponentMenu("Localization Tool/API/Auto translation", 1)]
     [DefaultExecutionOrder(-888)]
     public class LocalizationToolAPI : MonoBehaviour
     {
@@ -34,6 +34,7 @@ namespace LocalizationTool.Scripts.API
         {
             await LocalizationManager.Instance.Init(()=> OnLanguageUpdate?.Invoke(ActiveLanguage));
             LocalizationManager.Log(API_INITIALIZED_LOG);
+            DontDestroyOnLoad(this);
         }
 
         #endregion
@@ -50,7 +51,7 @@ namespace LocalizationTool.Scripts.API
         {
             return LocalizationManager.Dictionary[key].LanguagesData.ContainsKey(ActiveLanguage)
                 ? LocalizationManager.Dictionary[key].LanguagesData[ActiveLanguage]
-                : throw new Exception();
+                : throw new Exception(string.Format(API_KEY_NOT_FOUND, key));
         }
 
         /// <summary>

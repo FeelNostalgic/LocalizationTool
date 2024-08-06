@@ -10,8 +10,7 @@ namespace LocalizationTool.Scripts.Commons
 		public const string BINARY_CATEGORIES_PATH = BASE_PATH + "LocalizationCategories.bin";
 		public const string BINARY_CONFIGURATION_PATH = BASE_PATH + "LocalizationConfiguration.bin";
 		
-		public const string README_PATH = "DoNotTouch/Info/Readme.txt";
-		public const string LICENSE_PATH = "DoNotTouch/Info/License.txt";
-		
+		public const string README_PATH = BASE_PATH + "Info/Readme.txt";
+		public const string LICENSE_PATH = BASE_PATH + "Info/License.txt";
 	}
 }

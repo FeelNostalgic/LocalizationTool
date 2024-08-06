@@ -19,7 +19,7 @@ namespace LocalizationTool.Data.Json
 
         public void AddNewKeyCategoryLanguage(KeyCategoryLanguageValues item)
         {
-            if (ListDictionaryKeyCategoryLanguages.FirstOrDefault(i => i.Key == item.Key) != default)
+            if (ListDictionaryKeyCategoryLanguages.FirstOrDefault(i => i.Key.Equals(item.Key)) != default)
             {
                 LocalizationManager.Log($"When importing: Key {item.Key} is already in the dictionary");
                 return;
@@ -29,14 +29,21 @@ namespace LocalizationTool.Data.Json
         
         public void UpdateCategoryName(string key, string newCategory)
         {
-            var item = ListDictionaryKeyCategoryLanguages.First(k => k.Key == key);
+            var item = ListDictionaryKeyCategoryLanguages.First(k => k.Key.Equals(key));
             item.Category = newCategory;
         }
 
         public void UpdateLanguageValue(string key, string language, string value)
         {
-            var item = ListDictionaryKeyCategoryLanguages.First(k => k.Key == key);
+            var item = ListDictionaryKeyCategoryLanguages.First(k => k.Key.Equals(key));
             item.UpdateValue(language, value);
+        }
+
+        public void RemoveKey(string key)
+        {
+            var dataToRemove = ListDictionaryKeyCategoryLanguages.First(x => x.Key.Equals(key));
+            Debug.Log(dataToRemove.Category);
+            ListDictionaryKeyCategoryLanguages.Remove(dataToRemove);
         }
     }
 

@@ -31,30 +31,62 @@ namespace LocalizationTool.Scripts.Editors
         {
             //base.OnInspectorGUI();
 
-            _target = (LocalizationToolAddon)target;
+            if (LocalizationToolAPI.Instance.IsNull())
+            {
+                _target = (LocalizationToolAddon)target;
 
-            EditorGUILayout.BeginVertical(); 
-            Row1();
+                GUILayout.BeginVertical("box", GUILayout.Height(30+25+60+2+2)); 
+                Row1();
+                GUILayout.Space(2);
+                LocalizationEditor.ShowHorizontalLine(4);
+                GUILayout.Space(2);
+                
+                GUILayout.BeginVertical();
+                
+                //ICON
+                GUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
+                var icon = EditorGUIUtility.IconContent("d_console.warnicon.sml").image;
+                GUILayout.Label(icon, GUILayout.Height(25));
+                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
+                
+                //LABEL
+                var style = new GUIStyle(GUI.skin.label) { wordWrap = true, alignment = TextAnchor.MiddleCenter, fontSize = 13};
+                GUILayout.Label(ADDON_WARNING_API_NOT_INIT_1, style, GUILayout.Height(30), GUILayout.ExpandHeight(true));
+                GUILayout.Label(ADDON_WARNING_API_NOT_INIT_2, style, GUILayout.Height(30), GUILayout.ExpandHeight(true));
+                
+                GUILayout.EndVertical();
+                
+                GUILayout.EndVertical(); 
+            }
+            else
+            {
+                _target = (LocalizationToolAddon)target;
 
-            GUILayout.Space(2);
-            LocalizationEditor.ShowHorizontalLine(4);
-            GUILayout.Space(2);
+                GUILayout.BeginVertical(); 
+                Row1();
 
-            var allCategories = Row2();
+                GUILayout.Space(2);
+                LocalizationEditor.ShowHorizontalLine(4);
+                GUILayout.Space(2);
 
-            GUILayout.Space(2);
-            LocalizationEditor.ShowHorizontalLine(4);
-            GUILayout.Space(2);
+                var allCategories = Row2();
 
-            Row3(allCategories);
+                GUILayout.Space(2);
+                LocalizationEditor.ShowHorizontalLine(4);
+                GUILayout.Space(2);
 
-            GUILayout.Space(2);
-            LocalizationEditor.ShowHorizontalLine(4);
-            GUILayout.Space(2);
+                Row3(allCategories);
+
+                GUILayout.Space(2);
+                LocalizationEditor.ShowHorizontalLine(4);
+                GUILayout.Space(2);
             
-            Row4();
+                Row4();
 
-            EditorGUILayout.EndVertical(); 
+                GUILayout.EndVertical(); 
+            }
         }
 
         private static void Row1()

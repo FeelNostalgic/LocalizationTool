@@ -1,9 +1,12 @@
 using LocalizationTool.Scripts.API;
+using LocalizationTool.Scripts.Commons;
 using TMPro;
 using UnityEngine;
+using static LocalizationTool.Scripts.Commons.EditorStrings;
 
 namespace LocalizationTool.Scripts.Addons
 {
+    [AddComponentMenu("Localization Tool/Addon", 2)]
     [RequireComponent(typeof(TMP_Text))]
     [DefaultExecutionOrder(-999)]
     public class LocalizationToolAddon : MonoBehaviour
@@ -39,6 +42,11 @@ namespace LocalizationTool.Scripts.Addons
         private void Awake()
         {
             _tmpText = GetComponent<TMP_Text>();
+            if (LocalizationToolAPI.Instance.IsNull())
+            {
+                Debug.LogError($"{ADDON_WARNING_API_NOT_INIT_1}. {ADDON_WARNING_API_NOT_INIT_2}");
+                return;
+            }
             LocalizationToolAPI.Instance.OnLanguageUpdate += OnLanguageUpdate;
         }
 

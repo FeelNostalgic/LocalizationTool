@@ -29,6 +29,7 @@ namespace LocalizationTool.Scripts.General
 
         public static List<LanguagesData.LanguageTuple> OrderedLanguages => _languagesData.OrderedLanguages ?? new List<LanguagesData.LanguageTuple>();
         public static List<string> ActiveLanguages => _languagesData.Languages ?? new List<string>();
+        public static string DefaultLanguage => _languagesData.FavouriteLanguage;
         public static List<CategoriesData.CategoryTuple> OrderedCategories => _categoriesData?.OrderedCategories ?? new List<CategoriesData.CategoryTuple>();
         public static List<string> Categories => _categoriesData?.Categories ?? new List<string>();
         public static ConfigurationData Configuration => _configurationData ?? new ConfigurationData();
@@ -113,7 +114,7 @@ namespace LocalizationTool.Scripts.General
             _dictionaryData.ListDictionaryKeyCategoryLanguages.Add(new KeyCategoryLanguageValues(key, category, interList));
 
             ShowFeedback(string.Format(KEY_ADDED_FEEDBACK_LABEL, key), editor);
-
+            
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
         }
 
@@ -193,11 +194,9 @@ namespace LocalizationTool.Scripts.General
             _dynamicDictionary.Remove(key);
 
             //Change JSON file 
-            var data = _dictionaryData.ListDictionaryKeyCategoryLanguages.First(x => x.Key == key);
-            _dictionaryData.ListDictionaryKeyCategoryLanguages.Remove(data);
-
+            _dictionaryData.RemoveKey(key);
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
-
+            
             UpdateAddonsOnKeyRemoved(key);
         }
 
@@ -749,12 +748,7 @@ namespace LocalizationTool.Scripts.General
 
         public async Task Init(Action onComplete = null)
         {
-            if (_isInitialized)
-            {
-                onComplete?.Invoke();
-                return; // Just the first call
-            }
-
+            if (_isInitialized) return; // Just the first call
             _isInitialized = true;
 
             CreateFiles();
@@ -887,29 +881,40 @@ namespace LocalizationTool.Scripts.General
         private static async Task SaveFile<T>(T fileToSave, string path, ISerializerService serializer)
         {
             var dataToSave = serializer.Serialize(fileToSave);
+            StreamWriter writer = null;
             try
             {
-                await using var writer = new StreamWriter(path);
+                writer = new StreamWriter(path);
                 await writer.WriteAsync(dataToSave);
             }
             catch (Exception e)
             {
-                if (e is not IOException) Debug.LogError($"PATH: {path} => {e}");
+                //if (e is not IOException)
+                Debug.LogError($"PATH: {path} => {e}");
+            }
+            finally
+            {
+                writer?.Close();
             }
         }
-
+        
         public static async Task<T> LoadFile<T>(string path, ISerializerService serializer)
         {
             if (!File.Exists(path)) File.Create(path);
-
+            StreamReader reader = null;
+            
             try
             {
-                using var reader = new StreamReader(path);
+                reader = new StreamReader(path);
                 return serializer.Deserialize<T>(await reader.ReadToEndAsync());
             }
             catch (Exception e)
             {
                 Debug.LogError($"PATH: {path} => {e}");
+            }   
+            finally
+            {
+                reader?.Close();
             }
 
             return default;
