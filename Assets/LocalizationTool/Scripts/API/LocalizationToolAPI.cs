@@ -1,0 +1,114 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using LocalizationTool.Scripts.General;
+using UnityEngine;
+using static LocalizationTool.Scripts.Commons.EditorStrings;
+
+namespace LocalizationTool.Scripts.API
+{
+    //TODO: make this persistant between scenes
+    //TODO: add this to the scene
+    [DefaultExecutionOrder(-888)]
+    public class LocalizationToolAPI : MonoBehaviour
+    {
+        #region PUBLIC VARIABLES
+
+        public static LocalizationToolAPI Instance => _instance ??= (LocalizationToolAPI) FindObjectOfType(typeof(LocalizationToolAPI));
+
+        public string ActiveLanguage { get; set; }
+
+        public Action<string> OnLanguageUpdate { get; set; }
+
+        #endregion
+
+        #region PRIVATE VARIABLES
+
+        private static LocalizationToolAPI _instance;
+
+        #endregion
+
+        #region UNITY METHODS
+
+        private async void Awake()
+        {
+            await LocalizationManager.Instance.Init(()=> OnLanguageUpdate?.Invoke(ActiveLanguage));
+            LocalizationManager.Log(API_INITIALIZED_LOG);
+        }
+
+        #endregion
+
+        #region PUBLIC METHODS
+
+        /// <summary>
+        /// Return the value of a key in the current language
+        /// </summary>
+        /// <param name="key">Key to get value from</param>
+        /// <returns>Value </returns>
+        /// <exception cref="Exception">Thrown when key not found</exception>
+        public string GetValueByKey(string key)
+        {
+            return LocalizationManager.Dictionary[key].LanguagesData.ContainsKey(ActiveLanguage)
+                ? LocalizationManager.Dictionary[key].LanguagesData[ActiveLanguage]
+                : throw new Exception();
+        }
+
+        /// <summary>
+        /// Return the value of a key in the given language
+        /// </summary>
+        /// <param name="key">Key to get value from</param>
+        /// <param name="language">Language to get value from</param>
+        /// <returns>The value of the key</returns>
+        public string GetValueByKeyAndLanguage(string key, string language)
+        {
+            if (!LocalizationManager.ActiveLanguages.Contains(language)) throw new Exception(string.Format(API_LANGUAGE_DOESNT_EXIST_EXCEPTION, language));
+                
+            return LocalizationManager.Dictionary[key].LanguagesData.ContainsKey(language)
+                ? LocalizationManager.Dictionary[key].LanguagesData[ActiveLanguage]
+                : throw new Exception(string.Format(API_KEY_NOT_FOUND_EXCEPTION, language));
+        }
+
+        /// <summary>
+        /// Change active language to an available language
+        /// </summary>
+        /// <param name="newLanguage">An available language</param>
+        /// <returns>Return true if newLanguage exist, otherwise return false</returns>
+        public bool ChangeLanguage(string newLanguage)
+        {
+            if (!LocalizationManager.ActiveLanguages.Contains(newLanguage)) return false;
+            
+            ActiveLanguage = newLanguage;
+            OnLanguageUpdate.Invoke(newLanguage);
+            return true;
+        }
+
+        public List<string> GetAvailableLanguages()
+        {
+            return LocalizationManager.ActiveLanguages;
+        }
+
+        public List<string> GetAllCategories()
+        {
+#pragma warning disable CS4014
+            LocalizationManager.Instance.Init();
+#pragma warning restore CS4014
+            var categories = LocalizationManager.Categories;
+            return categories;
+        }
+
+        public List<string> GetAllKeys()
+        {
+#pragma warning disable CS4014
+            LocalizationManager.Instance.Init();
+#pragma warning restore CS4014
+            var keys = LocalizationManager.Dictionary.Keys.ToList();
+            return keys;
+        }
+        
+        #endregion
+
+        #region PRIVATE METHODS
+
+        #endregion
+    }
+}
