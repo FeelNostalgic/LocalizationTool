@@ -32,6 +32,8 @@ namespace LocalizationTool.API
 
         private async void Awake()
         {
+            Debug.Log("Localization API");
+
             await LocalizationManager.Instance.Init(()=> OnLanguageUpdate?.Invoke(ActiveLanguage));
             LocalizationManager.Log(API_INITIALIZED_LOG);
         }

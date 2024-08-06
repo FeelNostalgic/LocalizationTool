@@ -39,7 +39,6 @@ namespace LocalizationTool.Manager
         public int CurrentToolbarLanguageIndex => _languagesData.Languages.IndexOf(CurrentLanguageInDictionarySection);
         public static string DefaultCategory => _categoriesData.DefaultCategory;
         public static bool IsDataLoaded { get; private set; }
-        public static Texture2D YellowIcon { get; private set; }
 
         #region Actions
 
@@ -56,13 +55,13 @@ namespace LocalizationTool.Manager
         private ISerializerService _serializerBinary;
 
         #region JSON Data
-        
+
         private static DictionaryData _dictionaryData;
 
         #endregion
 
         #region BINARY Data
-        
+
         private static LanguagesData _languagesData;
         private static CategoriesData _categoriesData;
         private static ConfigurationData _configurationData;
@@ -72,7 +71,7 @@ namespace LocalizationTool.Manager
         private static bool _isInitialized;
 
         private static Dictionary<string, KeyData> _dynamicDictionary;
-        
+
         #endregion
 
         #region PUBLIC METHODS
@@ -104,7 +103,7 @@ namespace LocalizationTool.Manager
                 ShowFeedback(string.Format(CHARACTERS_NUMBER_KEY_FEEDBACK_LABEL, MAX_KEY_CHARACTERS), editor);
                 return;
             }
-            
+
             if (editor != null) editor.ClearAddTextField();
 
             var interDic = ActiveLanguages.ToDictionary(language => language, _ => "");
@@ -140,7 +139,7 @@ namespace LocalizationTool.Manager
                 ShowFeedback(string.Format(KEY_EXIST_FEEDBACK_LABEL, oldKey), editor);
                 return oldKey;
             }
-            
+
             if (newKey.Length > MAX_KEY_CHARACTERS)
             {
                 ShowFeedback(string.Format(CHARACTERS_NUMBER_KEY_FEEDBACK_LABEL, MAX_KEY_CHARACTERS), editor);
@@ -266,7 +265,7 @@ namespace LocalizationTool.Manager
                 ShowFeedback(string.Format(CHARACTERS_NUMBER_LANGUAGE_FEEDBACK_LABEL, MAX_LANGUAGE_CHARACTERS), editor);
                 return;
             }
-            
+
             if (editor != null) editor.ClearAddTextField();
 
             //Add language to Binary 
@@ -398,7 +397,7 @@ namespace LocalizationTool.Manager
                 ShowFeedback(string.Format(CHARACTERS_NUMBER_CATEGORY_FEEDBACK_LABEL, MAX_CATEGORY_CHARACTERS), editor);
                 return;
             }
-            
+
             if (editor != null) editor.ClearAddTextField();
 
             //Add language to Binary 
@@ -453,7 +452,7 @@ namespace LocalizationTool.Manager
 
         public async void ChangeCategoryIndex(int oldIndex, int newIndex)
         {
-            if(newIndex <= 1) return;
+            if (newIndex <= 1) return;
             if (oldIndex == newIndex) return; //the new index is the same
 
             //Change binary file
@@ -503,7 +502,7 @@ namespace LocalizationTool.Manager
 
             await SaveFile(_configurationData, BINARY_CONFIGURATION_PATH, _serializerBinary);
         }
-        
+
         public async void UpdateClearAdd(bool newValue, Enums.GUIWindow window)
         {
             switch (window)
@@ -751,8 +750,12 @@ namespace LocalizationTool.Manager
 
         public async Task Init(Action onComplete = null)
         {
-            if (_isInitialized) return; // Just the first call
-            
+            if (_isInitialized)
+            {
+                onComplete?.Invoke();
+                return; // Just the first call
+            }
+
             _isInitialized = true;
 
             CreateFiles();
@@ -764,7 +767,6 @@ namespace LocalizationTool.Manager
             await LoadDictionaryDataFromJSON();
             await LoadLanguagesDataFromBINARY();
             await LoadCategoriesDataFromBINARY();
-            YellowIcon = GetColoredIcon("d_Favorite", Color.yellow);
 
             IsDataLoaded = true;
             Log(TOOL_INITIALIZED_LOG);

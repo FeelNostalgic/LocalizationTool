@@ -258,13 +258,13 @@ namespace LocalizationTool.Editors
             GUILayout.FlexibleSpace();
             if (LocalizationManager.IsDefaultCategory(category))
             {
-                if (GUILayout.Button(GetGUIContent(LocalizationManager.YellowIcon, string.Format(CATEGORY_IS_DEFAULT_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                if (GUILayout.Button(GetGUIContent(YellowStarIcon, string.Format(CATEGORY_IS_DEFAULT_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                 }
             }
             else
             {
-                if (GUILayout.Button(GetGUIContent(FavouriteIcon, string.Format(MAKE_CATEGORY_DEFAULT_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                if (GUILayout.Button(GetGUIContent(StarIcon, string.Format(MAKE_CATEGORY_DEFAULT_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     LocalizationManager.Instance.ChangeDefaultCategory(category);
                     LocalizationManager.Log(string.Format(CATEGORY_DEFAULT_LOG, category));

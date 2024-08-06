@@ -7,6 +7,7 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 using static LocalizationTool.Commons.EditorStrings;
+using static LocalizationTool.Commons.GameUtils;
 
 namespace LocalizationTool.Editors
 {
@@ -21,7 +22,7 @@ namespace LocalizationTool.Editors
         protected static Texture DeleteIcon => EditorGUIUtility.IconContent("d_TreeEditor.Trash").image;
         protected static Texture UpIcon => EditorGUIUtility.IconContent("d_scrollup").image;
         protected static Texture DownIcon => EditorGUIUtility.IconContent("d_scrolldown").image;
-        protected static Texture FavouriteIcon => EditorGUIUtility.IconContent("d_Favorite").image;
+        protected static Texture StarIcon => EditorGUIUtility.IconContent("d_Favorite").image;
         protected static Texture ImportIcon => EditorGUIUtility.IconContent("d_FolderOpened Icon").image;
         protected static Texture ExportIcon => EditorGUIUtility.IconContent("d_SaveAs").image;
         protected static Texture LockIcon => EditorGUIUtility.IconContent("d_AssemblyLock").image;
@@ -34,6 +35,8 @@ namespace LocalizationTool.Editors
         protected static Texture ApplyStyleIcon => EditorGUIUtility.IconContent("d_Progress").image;
         protected static Texture UndoIcon => EditorGUIUtility.IconContent("d_scrollleft").image;
         protected static Texture RedoIcon => EditorGUIUtility.IconContent("d_scrollright").image;
+
+        protected static Texture2D YellowStarIcon;
 
         protected string FeedbackLabel = "";
         protected bool AddActionRunning;
@@ -55,7 +58,7 @@ namespace LocalizationTool.Editors
 
         private ConfigurationEditor _configurationEditor;
         //private static bool _isWindowOpen;
-        
+
         private EditorCoroutine _currentCoroutine;
 
         #endregion
@@ -64,7 +67,7 @@ namespace LocalizationTool.Editors
 
         private static readonly Vector2 WindowSize = new(1400, 1000);
         protected readonly GUILayoutOption Height = GUILayout.Height(40);
-
+        
         #endregion
 
         [MenuItem("Tools/LocalizationEditor")]
@@ -77,23 +80,27 @@ namespace LocalizationTool.Editors
             LoadData();
         }
 
+        [InitializeOnLoadMethod]
+        private static void OnEditorLoad()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+            
+            EditorPrefs.DeleteAll();
+            LoadData();
+            if (YellowStarIcon.IsNull()) YellowStarIcon = GetColoredIcon("d_Favorite", Color.yellow);
+        }
+        
         #region UNITY METHODS
 
         protected virtual void OnEnable()
         {
-            var wasOpened = EditorPrefs.GetBool("LocalizationToolEditorWasOpened");
-            if (wasOpened)
-            {
-                EditorPrefs.SetBool("LocalizationToolEditorWasOpened", false);
-                LoadData();
-            }
-            if (hasFocus) LoadData();
+            //
         }
 
         // Called when unity editor is closed
         protected virtual void OnDisable()
         {
-            EditorPrefs.SetBool("LocalizationToolEditorWasOpened", true);
+            //
         }
 
         // Called when editor is closed
