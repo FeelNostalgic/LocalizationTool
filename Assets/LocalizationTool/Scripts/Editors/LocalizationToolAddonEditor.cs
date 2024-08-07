@@ -98,7 +98,7 @@ namespace LocalizationTool.Scripts.Editors
         {
             GUILayout.BeginVertical("box", GUILayout.Height(35*2+5+3), GUILayout.ExpandWidth(true));
             GUILayout.Space(2);
-            var allCategories = LocalizationToolAPI.Instance.GetAllCategories();
+            var allCategories = LocalizationToolAPI.GetAllCategories();
             //Text key filter
             
             _filterKeyText = EditorGUILayout.TextField(_filterKeyText, CustomStyles.GetStyle(Enums.CustomStyleName.KeyTextField), GUILayout.Height(30));
@@ -140,15 +140,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.Space(5);
             _scrollView = GUILayout.BeginScrollView(_scrollView, GUILayout.ExpandWidth(true), GUILayout.Height(45));
 
-            var value = "";
-            try
-            {
-                value = LocalizationToolAPI.Instance.GetValueByKey(_target.Key);
-            }
-            catch (Exception)
-            {
-                // ignored
-            }
+            var value = LocalizationToolAPI.GetValueByKey(_target.Key, out _);
 
             GUILayout.Label(value, CustomStyles.GetStyle(Enums.CustomStyleName.AddonSelectableTextFieldLabel), GUILayout.ExpandHeight(true),
                 GUILayout.ExpandWidth(true));
@@ -162,7 +154,13 @@ namespace LocalizationTool.Scripts.Editors
 
         private List<string> GetFilteredKeys(IReadOnlyList<string> allCategories, out List<string> filteredKeys)
         {
-            var allKeys = LocalizationToolAPI.Instance.GetAllKeys();
+            var allKeys = LocalizationToolAPI.GetAllKeys();
+            if (allKeys.IsNull())
+            {
+                filteredKeys = new List<string>();
+                return null;
+            }
+            
             filteredKeys = new List<string>(allKeys);
 
             if (!_filterKeyText.Equals(""))

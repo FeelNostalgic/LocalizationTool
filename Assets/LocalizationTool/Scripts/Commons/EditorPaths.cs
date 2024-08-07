@@ -3,7 +3,7 @@ namespace LocalizationTool.Scripts.Commons
 { 
 	public abstract class EditorPaths
 	{
-		private const string BASE_PATH = "Assets/LocalizationTool/Scripts/Data/DoNotTouch/";
+		public const string BASE_PATH = "Assets/LocalizationTool/Scripts/Data/DoNotTouch/";
 		
 		public const string JSON_DICTIONARY_PATH = BASE_PATH + "LocalizationDataLanguage.json";
 		public const string BINARY_LANGUAGES_PATH = BASE_PATH + "LocalizationLanguages.bin";

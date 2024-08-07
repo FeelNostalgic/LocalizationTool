@@ -5,16 +5,16 @@ namespace LocalizationTool.Data.Binary
     [Serializable]
     public class ConfigurationData
     {
-        public bool DictionaryDeleteConfirmation;
-        public bool LanguageDeleteConfirmation;
-        public bool CategoryDeleteConfirmation;
+        public bool dictionaryDeleteConfirmation;
+        public bool languageDeleteConfirmation;
+        public bool categoryDeleteConfirmation;
 
-        public bool DictionaryClearAdd;
-        public bool LanguageClearAdd;
-        public bool CategoryClearAdd;
+        public bool dictionaryClearAdd;
+        public bool languageClearAdd;
+        public bool categoryClearAdd;
         
-        public int SearchTypeIndex;
+        public int searchTypeIndex;
 
-        public bool ShowLogsInConsole;
+        public bool showLogsInConsole;
     }
 }

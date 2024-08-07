@@ -10,53 +10,63 @@ namespace LocalizationTool.Data.Binary
         public string FavouriteLanguage;
 
         //This is always ordered
-        public List<LanguageTuple> OrderedLanguages = new();
-        public List<string> Languages => OrderedLanguages.Select(tuple => tuple.Language).ToList();
+        public List<LanguageTuple> orderedLanguages;
+        public List<string> Languages => orderedLanguages.Select(tuple => tuple.Language).ToList();
 
+        public LanguagesData()
+        {
+            orderedLanguages = new List<LanguageTuple>();
+        }
+        
         public void Add(string language)
         {
-            var newIndex = OrderedLanguages.Count == 0 ? 1 : OrderedLanguages.Max(item => item.Index) + 1;
-            OrderedLanguages.Add(new LanguageTuple
+            var newIndex = orderedLanguages.Count == 0 ? 1 : orderedLanguages.Max(item => item.Index) + 1;
+            orderedLanguages.Add(new LanguageTuple
             {
                 Index = newIndex,
                 Language = language
             });
 
-            OrderedLanguages = OrderedLanguages.OrderBy(tuple => tuple.Index).ToList();
+            orderedLanguages = orderedLanguages.OrderBy(tuple => tuple.Index).ToList();
         }
 
         public bool Contains(string language)
         {
-            return OrderedLanguages.FirstOrDefault(tuple => tuple.Language.Equals(language)) != default;
+            return orderedLanguages.FirstOrDefault(tuple => tuple.Language.Equals(language)) != default;
         }
 
         public int Count()
         {
-            return OrderedLanguages.Count;
+            return orderedLanguages.Count;
+        }
+
+        public void Clear()
+        {
+            orderedLanguages.Clear();
         }
 
         public void Remove(string language)
         {
-            var tuple = OrderedLanguages.First(tuple => tuple.Language.Equals(language));
-            OrderedLanguages.Remove(tuple);
+            var tuple = orderedLanguages.First(tuple => tuple.Language.Equals(language));
+            orderedLanguages.Remove(tuple);
             UpdateIndexes();
         }
 
         public void ChangeName(string oldName, string newName)
         {
-            var tuple = OrderedLanguages.First(tuple => tuple.Language.Equals(oldName));
+            var tuple = orderedLanguages.First(tuple => tuple.Language.Equals(oldName));
             tuple.Language = newName;
             if (FavouriteLanguage.Equals(oldName)) FavouriteLanguage = newName;
         }
 
         public LanguageTuple ChangeIndex(int oldIndex, int newIndex)
         {
-            var itemToChange = OrderedLanguages.First(tuple => tuple.Index == oldIndex);
+            var itemToChange = orderedLanguages.First(tuple => tuple.Index == oldIndex);
 
             if (oldIndex < newIndex)
             {
                 // Scroll down elements between oldIndex and newIndex
-                foreach (var item in OrderedLanguages.Where(tuple => tuple.Index > oldIndex && tuple.Index <= newIndex))
+                foreach (var item in orderedLanguages.Where(tuple => tuple.Index > oldIndex && tuple.Index <= newIndex))
                 {
                     item.Index--;
                 }
@@ -64,7 +74,7 @@ namespace LocalizationTool.Data.Binary
             else if (oldIndex > newIndex)
             {
                 // Scroll up elements between oldIndex and newIndex
-                foreach (var item in OrderedLanguages.Where(tuple => tuple.Index >= newIndex && tuple.Index < oldIndex))
+                foreach (var item in orderedLanguages.Where(tuple => tuple.Index >= newIndex && tuple.Index < oldIndex))
                 {
                     item.Index++;
                 }
@@ -74,17 +84,27 @@ namespace LocalizationTool.Data.Binary
             itemToChange.Index = newIndex;
 
             // Reorder 
-            OrderedLanguages = OrderedLanguages.OrderBy(tuple => tuple.Index).ToList();
+            orderedLanguages = orderedLanguages.OrderBy(tuple => tuple.Index).ToList();
 
             UpdateIndexes();
             return itemToChange;
         }
+        
+        public void ChangeIndex(string category, int newIndex)
+        {
+            var itemToChange = orderedLanguages.First(tuple => tuple.Language.Equals(category));
+            itemToChange.Index = newIndex;
+            
+            orderedLanguages = orderedLanguages.OrderBy(tuple => tuple.Index).ToList();
+            
+            UpdateIndexes();
+        }
 
         private void UpdateIndexes()
         {
-            for (var i = 0; i < OrderedLanguages.Count; i++)
+            for (var i = 0; i < orderedLanguages.Count; i++)
             {
-                OrderedLanguages[i].Index = i + 1;
+                orderedLanguages[i].Index = i + 1;
             }
         }
 

@@ -227,7 +227,7 @@ namespace LocalizationTool.Scripts.Editors
 
             if (GUILayout.Button(GetGUIContent(UpIcon, string.Format(MOVE_UP_BUTTON_TOOLTIP, language)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                UpdateIndex(index, index - 1);
+                if(!LocalizationManager.IsFavouriteLanguage(language)) UpdateIndex(index, index - 1);
             }
 
             GUILayout.EndVertical();
@@ -243,7 +243,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(DownIcon, string.Format(MOVE_DOWN_BUTTON_TOOLTIP, language)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                UpdateIndex(index, index + 1);
+                if(!LocalizationManager.IsFavouriteLanguage(language)) UpdateIndex(index, index + 1);
             }
 
             GUILayout.EndVertical();
@@ -313,7 +313,7 @@ namespace LocalizationTool.Scripts.Editors
             {
                 if (GUILayout.Button(GetGUIContent(DeleteIcon, string.Format(DELETE_LANGUAGE_TOOLTIP, language)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
-                    if (LocalizationManager.Configuration.LanguageDeleteConfirmation)
+                    if (LocalizationManager.Configuration.languageDeleteConfirmation)
                     {
                         if (EditorUtility.DisplayDialog(DELETE_DIALOG_TITLE, string.Format(DELETE_DIALOG_MESSAGE, language), DIALOG_OPTION_DELETE, DIALOG_OPTION_CANCEL))
                             DeleteLanguage(language);
@@ -394,7 +394,7 @@ namespace LocalizationTool.Scripts.Editors
 
         public override void ClearAddTextField()
         {
-            if (!LocalizationManager.Configuration.LanguageClearAdd) return;
+            if (!LocalizationManager.Configuration.languageClearAdd) return;
             _addLanguageValue = "";
             RepaintGUI();
         }

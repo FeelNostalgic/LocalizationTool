@@ -35,8 +35,7 @@ namespace LocalizationTool.Scripts.Editors
         protected static Texture ApplyStyleIcon => EditorGUIUtility.IconContent("d_Progress").image;
         protected static Texture UndoIcon => EditorGUIUtility.IconContent("d_scrollleft").image;
         protected static Texture RedoIcon => EditorGUIUtility.IconContent("d_scrollright").image;
-
-        protected static Texture2D YellowStarIcon;
+        protected static Texture YellowStarIcon => GetColoredIcon("d_Favorite", Color.yellow);
 
         protected string FeedbackLabel = "";
         protected bool AddActionRunning;
@@ -52,12 +51,11 @@ namespace LocalizationTool.Scripts.Editors
         private Vector2 _scrollRight;
 
         private Enums.GUIWindow _currentWindow;
-        private DictionaryEditor _dictionaryEditor;
-        private LanguagesEditor _languagesEditor;
-        private CategoriesEditor _categoriesEditor;
+        private static DictionaryEditor _dictionaryEditor;
+        private static LanguagesEditor _languagesEditor;
+        private static CategoriesEditor _categoriesEditor;
 
-        private ConfigurationEditor _configurationEditor;
-        //private static bool _isWindowOpen;
+        private static ConfigurationEditor _configurationEditor;
 
         private EditorCoroutine _currentCoroutine;
 
@@ -67,7 +65,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private static readonly Vector2 WindowSize = new(1400, 1000);
         protected readonly GUILayoutOption Height = GUILayout.Height(40);
-        
+
         #endregion
 
         [MenuItem("Tools/LocalizationTool/Manager", false, -30)]
@@ -84,15 +82,14 @@ namespace LocalizationTool.Scripts.Editors
         private static void OnEditorLoad()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode) return;
-            
             LoadData();
         }
-        
+
         #region UNITY METHODS
 
         protected virtual void OnEnable()
         {
-            YellowStarIcon = GetColoredIcon("d_Favorite", Color.yellow);
+            //
         }
 
         // Called when unity editor is closed
@@ -107,27 +104,6 @@ namespace LocalizationTool.Scripts.Editors
             //
         }
 
-        // private void Update()
-        // {
-        //     switch (_currentWindow)
-        //     {
-        //         case Enums.GUI_WINDOW.Dictionary:
-        //             //TODO
-        //             break;
-        //         case Enums.GUI_WINDOW.Languages:
-        //             // TODO
-        //             break;
-        //         case Enums.GUI_WINDOW.Categories:
-        //             // TODO
-        //             break;
-        //         case Enums.GUI_WINDOW.Configuration:
-        //             // TODO
-        //             break;
-        //         default:
-        //             throw new ArgumentOutOfRangeException();
-        //     }
-        // }
-
         protected void RepaintGUI()
         {
             Repaint();
@@ -138,15 +114,17 @@ namespace LocalizationTool.Scripts.Editors
             switch (_currentWindow)
             {
                 case Enums.GUIWindow.Dictionary:
-                    if (!LocalizationManager.Configuration.DictionaryClearAdd) return;
+                    if (!LocalizationManager.Configuration.dictionaryClearAdd) return;
                     break;
                 case Enums.GUIWindow.Language:
-                    if (!LocalizationManager.Configuration.LanguageClearAdd) return;
+                    if (!LocalizationManager.Configuration.languageClearAdd) return;
                     break;
                 case Enums.GUIWindow.Category:
-                    if (!LocalizationManager.Configuration.CategoryClearAdd) return;
+                    if (!LocalizationManager.Configuration.categoryClearAdd) return;
                     break;
                 case Enums.GUIWindow.Configuration: return;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             if (GUI.GetNameOfFocusedControl() != focus) return;
@@ -159,6 +137,7 @@ namespace LocalizationTool.Scripts.Editors
 
         protected void OnGUI()
         {
+            if(!hasFocus) return;
             if (!LocalizationManager.IsDataLoaded) return;
             WindowToolbar();
             switch (_currentWindow)
@@ -180,27 +159,25 @@ namespace LocalizationTool.Scripts.Editors
             }
         }
 
-        private void ShowDictionaryLayout()
+        private static void ShowDictionaryLayout()
         {
-            _dictionaryEditor ??= (DictionaryEditor)CreateInstance(typeof(DictionaryEditor));
             _dictionaryEditor.ShowLayout();
         }
 
-        private void ShowLanguagesLayout()
+        private static void ShowLanguagesLayout()
         {
-            _languagesEditor ??= (LanguagesEditor)CreateInstance((typeof(LanguagesEditor)));
             _languagesEditor.ShowLayout();
         }
 
         private void ShowCategoriesLayout()
         {
-            _categoriesEditor ??= (CategoriesEditor)CreateInstance(typeof(CategoriesEditor));
+            
             _categoriesEditor.ShowLayout();
         }
 
         private void ShowConfigurationLayout()
         {
-            _configurationEditor ??= (ConfigurationEditor)CreateInstance(typeof(ConfigurationEditor));
+           
             _configurationEditor.ShowLayout();
         }
 
@@ -252,6 +229,10 @@ namespace LocalizationTool.Scripts.Editors
         private static async void LoadData()
         {
             await LocalizationManager.Instance.Init();
+            _dictionaryEditor ??= (DictionaryEditor)CreateInstance(typeof(DictionaryEditor));
+            _languagesEditor ??= (LanguagesEditor)CreateInstance(typeof(LanguagesEditor));
+            _categoriesEditor ??= (CategoriesEditor)CreateInstance(typeof(CategoriesEditor));
+            _configurationEditor ??= (ConfigurationEditor)CreateInstance(typeof(ConfigurationEditor));
         }
 
         protected static GUIContent GetGUIContent(Texture t, string tooltip)

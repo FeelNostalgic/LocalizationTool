@@ -1,30 +1,35 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LocalizationTool.Scripts.Addons;
+using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.General;
+using TMPro;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 //TODO: Quitar dependencia de la API con EditorStrings
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 
 namespace LocalizationTool.Scripts.API
 {
     [AddComponentMenu("Localization Tool/API/Auto translation", 1)]
-    [DefaultExecutionOrder(-888)]
+    [DefaultExecutionOrder(-900)]
     public class LocalizationToolAPI : MonoBehaviour
     {
         #region PUBLIC VARIABLES
 
         public static LocalizationToolAPI Instance => _instance ??= (LocalizationToolAPI) FindObjectOfType(typeof(LocalizationToolAPI));
 
-        public string ActiveLanguage { get; set; }
-
-        public Action<string> OnLanguageUpdate { get; set; }
-
+        public static string ActiveLanguage { get; set; }
+        
         #endregion
 
         #region PRIVATE VARIABLES
 
         private static LocalizationToolAPI _instance;
+
+        private static List<LocalizationToolAddon> _addons;
 
         #endregion
 
@@ -32,9 +37,15 @@ namespace LocalizationTool.Scripts.API
 
         private async void Awake()
         {
-            await LocalizationManager.Instance.Init(()=> OnLanguageUpdate?.Invoke(ActiveLanguage));
-            LocalizationManager.Log(API_INITIALIZED_LOG);
             DontDestroyOnLoad(this);
+            
+            FindAllAddons();
+
+            await LocalizationManager.Instance.Init(()=>
+            {
+                LocalizationManager.Log(API_INITIALIZED_LOG);
+                UpdateAllAddons(ActiveLanguage);
+            });
         }
 
         #endregion
@@ -45,13 +56,19 @@ namespace LocalizationTool.Scripts.API
         /// Return the value of a key in the current language
         /// </summary>
         /// <param name="key">Key to get value from</param>
-        /// <returns>Value </returns>
-        /// <exception cref="Exception">Thrown when key not found</exception>
-        public string GetValueByKey(string key)
+        /// <param name="found">True if key was found, otherwise false</param>
+        /// <returns>Value of the key. Empty value if key was not found</returns>
+        public static string GetValueByKey(string key, out bool found)
         {
-            return LocalizationManager.Dictionary[key].LanguagesData.ContainsKey(ActiveLanguage)
+            found = false;
+            if (!LocalizationManager.IsDataLoaded) return "";
+            if (key.IsNull()) return "";
+            
+            found = LocalizationManager.Dictionary.ContainsKey(key);
+            if(found) found = LocalizationManager.Dictionary[key].LanguagesData.ContainsKey(ActiveLanguage);
+            return found
                 ? LocalizationManager.Dictionary[key].LanguagesData[ActiveLanguage]
-                : throw new Exception(string.Format(API_KEY_NOT_FOUND, key));
+                : "";
         }
 
         /// <summary>
@@ -59,36 +76,45 @@ namespace LocalizationTool.Scripts.API
         /// </summary>
         /// <param name="key">Key to get value from</param>
         /// <param name="language">Language to get value from</param>
-        /// <returns>The value of the key</returns>
-        public string GetValueByKeyAndLanguage(string key, string language)
+        /// <param name="found">True if key was found. False if language doesnt exist or key was not found</param>
+        /// <returns>The value of the key. Empty value if key was not found</returns>
+        public static string GetValueByKeyAndLanguage(string key, string language, out bool found)
         {
-            if (!LocalizationManager.ActiveLanguages.Contains(language)) throw new Exception(string.Format(API_LANGUAGE_DOESNT_EXIST_EXCEPTION, language));
-                
-            return LocalizationManager.Dictionary[key].LanguagesData.ContainsKey(language)
+            if (!LocalizationManager.ActiveLanguages.Contains(language))
+            {
+                found = false;
+                return "";
+            }
+
+            found = LocalizationManager.Dictionary[key].LanguagesData.ContainsKey(language);
+            return found
                 ? LocalizationManager.Dictionary[key].LanguagesData[ActiveLanguage]
-                : throw new Exception(string.Format(API_KEY_NOT_FOUND_EXCEPTION, language));
+                : "";
         }
 
         /// <summary>
-        /// Change active language to an available language
+        /// Change active language to an available language. All addon will be updated to the new language
         /// </summary>
         /// <param name="newLanguage">An available language</param>
         /// <returns>Return true if newLanguage exist, otherwise return false</returns>
-        public bool ChangeLanguage(string newLanguage)
+        public static bool ChangeLanguage(string newLanguage)
         {
             if (!LocalizationManager.ActiveLanguages.Contains(newLanguage)) return false;
-            
             ActiveLanguage = newLanguage;
-            OnLanguageUpdate.Invoke(newLanguage);
+            UpdateAllAddons(newLanguage);
             return true;
         }
 
-        public List<string> GetAvailableLanguages()
+        public static List<string> GetAvailableLanguages()
         {
             return LocalizationManager.ActiveLanguages;
         }
 
-        public List<string> GetAllCategories()
+        /// <summary>
+        /// Return all Categories
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetAllCategories()
         {
 #pragma warning disable CS4014
             LocalizationManager.Instance.Init();
@@ -97,18 +123,44 @@ namespace LocalizationTool.Scripts.API
             return categories;
         }
 
-        public List<string> GetAllKeys()
+        /// <summary>
+        /// Return all Keys
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetAllKeys()
         {
 #pragma warning disable CS4014
             LocalizationManager.Instance.Init();
 #pragma warning restore CS4014
-            var keys = LocalizationManager.Dictionary.Keys.ToList();
+            if (!LocalizationManager.IsDataLoaded) return null;
+            var keys = LocalizationManager.Keys;
+
             return keys;
         }
-        
+
         #endregion
 
         #region PRIVATE METHODS
+
+        private static void UpdateAllAddons(string newLanguage)
+        {
+            foreach (var addon in _addons)
+            {
+                addon.LanguageUpdate(newLanguage);
+            }
+        }
+
+        private static void FindAllAddons()
+        {
+            var tmps = Resources.FindObjectsOfTypeAll(typeof(TextMeshProUGUI));
+            _addons = new List<LocalizationToolAddon>();
+            foreach (var obj in tmps)
+            {
+                var item = (TextMeshProUGUI)obj;
+                var addon = item.GetComponent<LocalizationToolAddon>();
+                if (addon.IsNotNull()) _addons.Add(addon);
+            }
+        }
 
         #endregion
     }

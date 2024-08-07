@@ -300,7 +300,7 @@ namespace LocalizationTool.Scripts.Editors
             {
                 if (GUILayout.Button(GetGUIContent(DeleteIcon, string.Format(DELETE_CATEGORY_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
-                    if (LocalizationManager.Configuration.CategoryDeleteConfirmation)
+                    if (LocalizationManager.Configuration.categoryDeleteConfirmation)
                     {
                         if (EditorUtility.DisplayDialog(DELETE_DIALOG_TITLE, string.Format(DELETE_DIALOG_MESSAGE, category), DIALOG_OPTION_DELETE, DIALOG_OPTION_CANCEL))
                             DeleteCategory(category);
@@ -381,7 +381,7 @@ namespace LocalizationTool.Scripts.Editors
 
         public override void ClearAddTextField()
         {
-            if (!LocalizationManager.Configuration.CategoryClearAdd) return;
+            if (!LocalizationManager.Configuration.categoryClearAdd) return;
             _addCategoryValue = "";
             RepaintGUI();
         }

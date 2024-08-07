@@ -55,7 +55,6 @@ namespace LocalizationTool.Scripts.Editors
 
         protected override void OnEnable()
         {
-            base.OnEnable();
             LocalizationManager.Instance.OnDefaultCategoryUpdate += OnDefaultCategoryUpdate;
         }
 
@@ -294,7 +293,7 @@ namespace LocalizationTool.Scripts.Editors
         {
             var filteredDicToIterate = new Dictionary<string, KeyData>(LocalizationManager.Dictionary);
 
-            switch (LocalizationManager.Configuration.SearchTypeIndex)
+            switch (LocalizationManager.Configuration.searchTypeIndex)
             {
                 case 0: // By Key
                     if (!_searchKeyValue.IsEmpty())
@@ -303,14 +302,14 @@ namespace LocalizationTool.Scripts.Editors
                     break;
                 case 1: // By Value
                     if (!_searchKeyValue.IsEmpty())
-                        filteredDicToIterate = filteredDicToIterate.Where(pair => LocalizationToolAPI.Instance.GetValueByKey(pair.Key).Contains(_searchKeyValue, StringComparison.InvariantCulture))
+                        filteredDicToIterate = filteredDicToIterate.Where(pair => LocalizationToolAPI.GetValueByKey(pair.Key, out _).Contains(_searchKeyValue, StringComparison.InvariantCulture))
                             .ToDictionary(kv => (kv.Key), kv => kv.Value);
                     break;
                 case 2: //By Both
                     if (!_searchKeyValue.IsEmpty())
                         filteredDicToIterate = filteredDicToIterate.Where(pair =>
                                 pair.Key.Contains(_searchKeyValue, StringComparison.InvariantCulture)
-                                || LocalizationToolAPI.Instance.GetValueByKey(pair.Key).Contains(_searchKeyValue, StringComparison.InvariantCulture))
+                                || LocalizationToolAPI.GetValueByKey(pair.Key, out _).Contains(_searchKeyValue, StringComparison.InvariantCulture))
                             .ToDictionary(kv => (kv.Key), kv => kv.Value);
                     break;
             }
@@ -406,7 +405,7 @@ namespace LocalizationTool.Scripts.Editors
 
             if (GUILayout.Button(new GUIContent(DeleteIcon, string.Format(DELETE_KEY_BUTTON_TOOLTIP, key)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                if (LocalizationManager.Configuration.DictionaryDeleteConfirmation)
+                if (LocalizationManager.Configuration.dictionaryDeleteConfirmation)
                 {
                     if (EditorUtility.DisplayDialog(DELETE_DIALOG_TITLE, string.Format(DELETE_DIALOG_MESSAGE, key), DIALOG_OPTION_DELETE, DIALOG_OPTION_CANCEL))
                         DeleteKey(key);
@@ -453,7 +452,7 @@ namespace LocalizationTool.Scripts.Editors
 
         public override void ClearAddTextField()
         {
-            if (!LocalizationManager.Configuration.DictionaryClearAdd) return;
+            if (!LocalizationManager.Configuration.dictionaryClearAdd) return;
             _addKeyValue = "";
             RepaintGUI();
         }

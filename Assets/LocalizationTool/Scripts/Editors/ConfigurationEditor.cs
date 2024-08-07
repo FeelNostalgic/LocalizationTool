@@ -123,21 +123,21 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.Space(15);
             GUILayout.BeginVertical();
 
-            if (LocalizationManager.Configuration.DictionaryDeleteConfirmation
-                && LocalizationManager.Configuration.LanguageDeleteConfirmation
-                && LocalizationManager.Configuration.CategoryDeleteConfirmation) _toggleAllDeleteConfirmation = true;
+            if (LocalizationManager.Configuration.dictionaryDeleteConfirmation
+                && LocalizationManager.Configuration.languageDeleteConfirmation
+                && LocalizationManager.Configuration.categoryDeleteConfirmation) _toggleAllDeleteConfirmation = true;
             else _toggleAllDeleteConfirmation = false;
 
             var tempToogle = EditorGUILayout.Toggle(_toggleAllDeleteConfirmation, GUILayout.Height(28));
             UpdateAllDeleteConfirmation(_toggleAllDeleteConfirmation, tempToogle);
 
-            ToggleLeft(LocalizationManager.Configuration.DictionaryDeleteConfirmation, CONFIGURATION_DELETE_DICTIONARY_LABEL,
+            ToggleLeft(LocalizationManager.Configuration.dictionaryDeleteConfirmation, CONFIGURATION_DELETE_DICTIONARY_LABEL,
                 delegate(bool b) { UpdateDeleteConfirmation(b, Enums.GUIWindow.Dictionary); });
 
-            ToggleLeft(LocalizationManager.Configuration.LanguageDeleteConfirmation, CONFIGURATION_DELETE_LANGUAGES_LABEL,
+            ToggleLeft(LocalizationManager.Configuration.languageDeleteConfirmation, CONFIGURATION_DELETE_LANGUAGES_LABEL,
                 delegate(bool b) { UpdateDeleteConfirmation(b, Enums.GUIWindow.Language); });
 
-            ToggleLeft(LocalizationManager.Configuration.CategoryDeleteConfirmation, CONFIGURATION_DELETE_CATEGORIES_LABEL,
+            ToggleLeft(LocalizationManager.Configuration.categoryDeleteConfirmation, CONFIGURATION_DELETE_CATEGORIES_LABEL,
                 delegate(bool b) { UpdateDeleteConfirmation(b, Enums.GUIWindow.Category); });
 
             GUILayout.EndVertical();
@@ -156,21 +156,21 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.Space(15);
             GUILayout.BeginVertical();
 
-            if (LocalizationManager.Configuration.DictionaryClearAdd
-                && LocalizationManager.Configuration.LanguageClearAdd
-                && LocalizationManager.Configuration.CategoryClearAdd) _toggleAllClearAdd = true;
+            if (LocalizationManager.Configuration.dictionaryClearAdd
+                && LocalizationManager.Configuration.languageClearAdd
+                && LocalizationManager.Configuration.categoryClearAdd) _toggleAllClearAdd = true;
             else _toggleAllClearAdd = false;
 
             var tempToogle = EditorGUILayout.Toggle(_toggleAllClearAdd, GUILayout.Height(28));
             UpdateAllClearAdd(_toggleAllClearAdd, tempToogle);
 
-            ToggleLeft(LocalizationManager.Configuration.DictionaryClearAdd, CONFIGURATION_CLEAR_ADD_DICTIONARY_LABEL,
+            ToggleLeft(LocalizationManager.Configuration.dictionaryClearAdd, CONFIGURATION_CLEAR_ADD_DICTIONARY_LABEL,
                 delegate(bool b) { UpdateClearAdd(b, Enums.GUIWindow.Dictionary); });
 
-            ToggleLeft(LocalizationManager.Configuration.LanguageClearAdd, CONFIGURATION_CLEAR_ADD_LANGUAGES_LABEL,
+            ToggleLeft(LocalizationManager.Configuration.languageClearAdd, CONFIGURATION_CLEAR_ADD_LANGUAGES_LABEL,
                 delegate(bool b) { UpdateClearAdd(b, Enums.GUIWindow.Language); });
 
-            ToggleLeft(LocalizationManager.Configuration.CategoryClearAdd, CONFIGURATION_CLEAR_ADD_CATEGORIES_LABEL,
+            ToggleLeft(LocalizationManager.Configuration.categoryClearAdd, CONFIGURATION_CLEAR_ADD_CATEGORIES_LABEL,
                 delegate(bool b) { UpdateClearAdd(b, Enums.GUIWindow.Category); });
 
             GUILayout.EndVertical();
@@ -189,7 +189,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.Space(15);
             GUILayout.BeginVertical();
 
-            _searchTypeIndex = EditorGUILayout.Popup(LocalizationManager.Configuration.SearchTypeIndex, Enums.SEARCH_TYPE, CustomStyles.GetStyle(Enums.CustomStyleName.SearchTypePopup));
+            _searchTypeIndex = EditorGUILayout.Popup(LocalizationManager.Configuration.searchTypeIndex, Enums.SEARCH_TYPE, CustomStyles.GetStyle(Enums.CustomStyleName.SearchTypePopup));
             UpdateSearchType();
 
             GUILayout.EndVertical();
@@ -208,7 +208,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.Space(15);
             GUILayout.BeginVertical();
 
-            ToggleLeft(LocalizationManager.Configuration.ShowLogsInConsole, CONFIGURATION_LOGS_TOGGLE_LABEL, UpdateShowLogs);
+            ToggleLeft(LocalizationManager.Configuration.showLogsInConsole, CONFIGURATION_LOGS_TOGGLE_LABEL, UpdateShowLogs);
 
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
@@ -350,7 +350,7 @@ namespace LocalizationTool.Scripts.Editors
 
                         if (!string.IsNullOrEmpty(path))
                         {
-                            var fileContent = BuildCSV();
+                            var fileContent = LocalizationManager.BuildCSV(CsvSeparators[_selectedCsvSeparatorIndexForExport]);
                             SaveFile(path, fileContent);
                         }
                     }
@@ -376,7 +376,7 @@ namespace LocalizationTool.Scripts.Editors
 
                         if (!string.IsNullOrEmpty(path))
                         {
-                            var fileContent = BuildSerializedData(new UnityJsonSerializer());
+                            var fileContent = LocalizationManager.BuildSerializedData(new UnityJsonSerializer());
                             SaveFile(path, fileContent);
                         }
                     }
@@ -393,7 +393,7 @@ namespace LocalizationTool.Scripts.Editors
 
                         if (!string.IsNullOrEmpty(path))
                         {
-                            var fileContent = BuildSerializedData(new XmlSerializerService());
+                            var fileContent = LocalizationManager.BuildSerializedData(new XmlSerializerService());
                             SaveFile(path, fileContent);
                         }
                     }
@@ -442,7 +442,7 @@ namespace LocalizationTool.Scripts.Editors
                         {
                             var progressWindow = ImportProgressWindow.OpenWindow(string.Format(IMPORT_WINDOW_LABEL, CSV_LABEL_UPPER));
 
-                            EditorCoroutineUtility.StartCoroutine(ImportCSVCoroutine(path, progressWindow), progressWindow);
+                            EditorCoroutineUtility.StartCoroutine(LocalizationManager.ImportCSVCoroutine(path, CsvSeparators[_selectedCsvSeparatorIndexForImport],progressWindow), progressWindow);
                         }
                     }
 
@@ -461,7 +461,7 @@ namespace LocalizationTool.Scripts.Editors
                         {
                             var progressWindow = ImportProgressWindow.OpenWindow(string.Format(IMPORT_WINDOW_LABEL, JSON_LABEL_UPPER));
 
-                            EditorCoroutineUtility.StartCoroutine(ImportSerializedDataCoroutine(path, new UnityJsonSerializer(), progressWindow), progressWindow);
+                            EditorCoroutineUtility.StartCoroutine(LocalizationManager.ImportSerializedDataCoroutine(path, new UnityJsonSerializer(), progressWindow), progressWindow);
                         }
                     }
 
@@ -480,7 +480,7 @@ namespace LocalizationTool.Scripts.Editors
                         {
                             // TODO
                             var progressWindow = ImportProgressWindow.OpenWindow(string.Format(IMPORT_WINDOW_LABEL, XML_LABEL_UPPER));
-                            EditorCoroutineUtility.StartCoroutine(ImportSerializedDataCoroutine(path, new UnityJsonSerializer(), progressWindow), progressWindow);
+                            EditorCoroutineUtility.StartCoroutine(LocalizationManager.ImportSerializedDataCoroutine(path, new XmlSerializerService(), progressWindow), progressWindow);
                         }
                     }
 
@@ -564,207 +564,7 @@ namespace LocalizationTool.Scripts.Editors
         }
 
         #endregion
-
-        #region EXPORTS
-
-        private string BuildCSV()
-        {
-            var serializer = new CSV_Serializer();
-            serializer.SetSeparator(CsvSeparators[_selectedCsvSeparatorIndexForExport]);
-            
-            serializer.AddTitle(LocalizationManager.ActiveLanguages);
-            
-            var languageDictionary = new Dictionary<string, int>();
-            for (var i = 0; i < LocalizationManager.ActiveLanguages.Count; i++)
-            {
-                languageDictionary.Add(LocalizationManager.ActiveLanguages[i], i);
-            }
-            
-            var data = new Dictionary<string, KeyData>(LocalizationManager.Dictionary);
-
-            foreach (var (key, keyData) in data)
-            {
-                var items = new List<string>();
-                var category = keyData.Category;
-
-                items.Add(key);
-                items.Add(category);
-
-                var auxArray = new string[languageDictionary.Count];
-                foreach (var (language, value) in keyData.LanguagesData)
-                {
-                    auxArray[languageDictionary[language]] = value.Replace("\n", " ").Replace("\r", " ");
-                }
-
-                items.AddRange(auxArray);
-
-                serializer.AddLine(items);
-            }
-
-            return serializer.File();
-        }
-
-        private static string BuildSerializedData(ISerializerService serializer)
-        {
-            var dataToSerialize = new DictionaryTemplate();
-
-            var data = new Dictionary<string, KeyData>(LocalizationManager.Dictionary);
-
-            foreach (var (key, keyData) in data)
-            {
-                var category = keyData.Category;
-                var languageValues = keyData.LanguagesData.Select(item => new DictionaryTemplate.LanguageValue { Language = item.Key, Value = item.Value }).ToList();
-                dataToSerialize.DictionaryKeyCategoryLanguages.Add(new DictionaryTemplate.KeyCategoryLanguageValues
-                {
-                    Key = key,
-                    Category = category,
-                    LanguageValues = languageValues
-                });
-            }
-
-            return serializer.Serialize(dataToSerialize);
-        }
-
-        #endregion
-
-        #region IMPORTS
-
-        private IEnumerator ImportCSVCoroutine(string path, ImportProgressWindow progressWindow)
-        {
-            using var reader = new StreamReader(path);
-            var fileInfo = new FileInfo(path);
-            var totalBytes = fileInfo.Length;
-            long bytesRead = 0;
-
-            progressWindow.SetStatus(IMPORT_STATUS_LANGUAGES);
-
-            var header = reader.ReadLine();
-            Debug.Assert(header != null, nameof(header) + " != null");
-            bytesRead += header.Length + Environment.NewLine.Length;
-            progressWindow.SetProgress((float)bytesRead / totalBytes);
-
-            var separator = CsvSeparators[_selectedCsvSeparatorIndexForImport];
-            var languages = header?.Split(separator);
-
-            Debug.Assert(languages != null, nameof(languages) + " != null");
-            if (languages.Length < 2)
-            {
-                var sbResultError = new StringBuilder();
-                sbResultError.AppendLine("Error while importing CSV");
-                sbResultError.AppendLine($"Separator [ {separator} ] not found");
-                progressWindow.Complete(sbResultError.ToString());
-
-                yield break;
-            }
-            
-            var languageOrder = new List<string>();
-            for (var i = 2; i < languages.Length; i++)
-            {
-                languageOrder.Add(languages[i]);
-                var loadLanguageTask = LocalizationManager.Instance.ImportLanguage(languages[i]);
-                var awaiter = loadLanguageTask.GetAwaiter();
-                while (!awaiter.IsCompleted) yield return null;
-            }
-
-            progressWindow.SetStatus(IMPORT_STATUS_KEYS);
-            var nKeys = 0;
-            var nCategories = 0;
-            while (!reader.EndOfStream)
-            {
-                var nextLine = reader.ReadLine();
-                Debug.Assert(nextLine != null, nameof(nextLine) + " != null");
-                bytesRead += nextLine.Length + Environment.NewLine.Length;
-                var lineItems = nextLine?.Split(separator);
-                var key = lineItems?[0];
-                var category = lineItems?[1];
-                var values = new Dictionary<string, string>();
-
-                nKeys++;
-                if (!LocalizationManager.ExistCategory(category)) nCategories++;
-
-                Debug.Assert(lineItems != null, nameof(lineItems) + " != null");
-                for (var i = 0; i < lineItems.Length - 2; i++)
-                {
-                    values.Add(languageOrder[i], lineItems[i + 2]);
-                }
-
-                var loadKeyTask = LocalizationManager.Instance.ImportKey(key, category, values);
-                var awaiter = loadKeyTask.GetAwaiter();
-                while (!awaiter.IsCompleted) yield return null;
-
-                progressWindow.SetProgress((float)bytesRead / totalBytes);
-                progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_KEY_CATEGORY, key, category));
-            }
-            
-            var sb = new StringBuilder();
-            sb.AppendLine(IMPORT_RESULT_SUCCESS);
-            sb.AppendLine(string.Format(IMPORT_LANGUAGES_RESULT, languages.Length - 2));
-            sb.AppendLine(string.Format(IMPORT_CATEGORIES_RESULT, nCategories));
-            sb.AppendLine(string.Format(IMPORT_KEYS_RESULT, nKeys));
-
-            progressWindow.Complete(sb.ToString());
-        }
-
-        private static IEnumerator ImportSerializedDataCoroutine(string path, ISerializerService serializer, ImportProgressWindow progressWindow)
-        {
-            var loadFileTask = LocalizationManager.LoadFile<DictionaryTemplate>(path, serializer);
-            var awaiter = loadFileTask.GetAwaiter();
-            while (!awaiter.IsCompleted) yield return null;
-            var data = awaiter.GetResult();
-
-            var totalItems = data.DictionaryKeyCategoryLanguages[0].LanguageValues.Count + data.DictionaryKeyCategoryLanguages.Count;
-            var itemCount = 0f;
-
-
-            //Languages
-            progressWindow.SetStatus(IMPORT_STATUS_LANGUAGES);
-
-            foreach (var languageValue in data.DictionaryKeyCategoryLanguages[0].LanguageValues)
-            {
-                var task = LocalizationManager.Instance.ImportLanguage(languageValue.Language);
-                var awaiterLanguage = task.GetAwaiter();
-                while (!awaiterLanguage.IsCompleted) yield return null;
-                progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_LANGUAGE, languageValue.Language));
-                progressWindow.SetProgress(itemCount++ / totalItems);
-                yield return null;
-            }
-
-            var nKeys = 0;
-            var nCategories = 0;
-
-            // Keys
-            progressWindow.SetStatus(IMPORT_STATUS_KEYS);
-
-            foreach (var keyCategoryLanguage in data.DictionaryKeyCategoryLanguages)
-            {
-                nKeys++;
-                if (!LocalizationManager.ExistCategory(keyCategoryLanguage.Category)) nCategories++;
-
-                foreach (var awaiterKey in keyCategoryLanguage.LanguageValues
-                             .Select(languageValue => LocalizationManager.Instance.ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, languageValue.Language, languageValue.Value))
-                             .Select(task => task.GetAwaiter()))
-                {
-                    while (!awaiterKey.IsCompleted) yield return null;
-
-                    yield return null;
-                }
-
-                progressWindow.SetProgress(itemCount++ / totalItems);
-                progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_KEY_CATEGORY, keyCategoryLanguage.Key, keyCategoryLanguage.Category));
-                yield return null;
-            }
-            
-            var sb = new StringBuilder();
-            sb.AppendLine(IMPORT_RESULT_SUCCESS);
-            sb.AppendLine(string.Format(IMPORT_LANGUAGES_RESULT, data.DictionaryKeyCategoryLanguages[0].LanguageValues.Count));
-            sb.AppendLine(string.Format(IMPORT_CATEGORIES_RESULT, nCategories));
-            sb.AppendLine(string.Format(IMPORT_KEYS_RESULT, nKeys));
-
-            progressWindow.Complete(sb.ToString());
-        }
-
-        #endregion
-
+        
         #endregion
     }
 }

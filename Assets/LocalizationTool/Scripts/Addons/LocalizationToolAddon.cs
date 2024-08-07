@@ -15,22 +15,22 @@ namespace LocalizationTool.Scripts.Addons
 
         public string Key
         {
-            get => _key;
-            set => _key = value;
+            get => key;
+            set => key = value;
         }
 
         public int KeyIndex
         {
-            get => _keyIndex;
-            set => _keyIndex = value;
+            get => keyIndex;
+            set => keyIndex = value;
         }
 
         #endregion
 
         #region PRIVATE VARIABLES
 
-        [SerializeField] private string _key;
-        [SerializeField] private int _keyIndex;
+        [SerializeField] private string key;
+        [SerializeField] private int keyIndex;
 
         private TMP_Text _tmpText;
 
@@ -42,41 +42,46 @@ namespace LocalizationTool.Scripts.Addons
         private void Awake()
         {
             _tmpText = GetComponent<TMP_Text>();
-            if (LocalizationToolAPI.Instance.IsNull())
-            {
-                Debug.LogError($"{ADDON_WARNING_API_NOT_INIT_1}. {ADDON_WARNING_API_NOT_INIT_2}");
-                return;
-            }
-            LocalizationToolAPI.Instance.OnLanguageUpdate += OnLanguageUpdate;
+
+            if (!LocalizationToolAPI.Instance.IsNull()) return;
+            Debug.LogError($"{ADDON_WARNING_API_NOT_INIT_1}. {ADDON_WARNING_API_NOT_INIT_2}");
         }
 
-        private void OnDestroy()
-        {
-            LocalizationToolAPI.Instance.OnLanguageUpdate -= OnLanguageUpdate;
-        }
+        #endregion
 
-        public void OnKeyRemoved(string key)
+        #region PUBLIC METHODS
+
+        public void SetKey(string keyToSet)
         {
-            if (!_key.Equals(key)) return;
-            _key = "";
-            _keyIndex = -1;
+            key = keyToSet;
+            keyIndex = LocalizationToolAPI.GetAllKeys().IndexOf(key);
+            var newText = LocalizationToolAPI.GetValueByKey(key, out var found);
+            if (_tmpText.IsNull()) _tmpText = GetComponent<TMP_Text>();
+            if (found) _tmpText.text = newText;
+        }
+        
+        public void OnKeyRemoved(string keyToRemove)
+        {
+            if(key.IsNull()) return;
+            if (!key.Equals(keyToRemove)) return;
+            key = "";
+            keyIndex = -1;
         }
 
         public void OnKeyUpdate(string oldKey, string newKey)
         {
-            if (oldKey.Equals(_key))
+            if(key.IsNull()) return;
+            if (oldKey.Equals(key))
             {
-                _key = newKey;
+                key = newKey;
             }
         }
         
-        #endregion
-
-        #region PRIVATE METHODS
-        
-        private void OnLanguageUpdate(string newLanguage)
+        public void LanguageUpdate(string newLanguage)
         {
-            var newText = LocalizationToolAPI.Instance.GetValueByKey(Key);
+            var newText = LocalizationToolAPI.GetValueByKey(key, out _);
+            Debug.Log($"Key '{keyIndex}' => new language '{newLanguage}' => value {newText}");
+            if (_tmpText.IsNull()) _tmpText = GetComponent<TMP_Text>();
             _tmpText.text = newText;
         }
 

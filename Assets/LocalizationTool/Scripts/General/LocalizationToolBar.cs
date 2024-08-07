@@ -17,7 +17,7 @@ namespace LocalizationTool.Scripts.General
 			if (FindObjectsOfType<LocalizationToolAPI>().IsNull()) {
 #pragma warning restore CS0618
 				EditorUtils.MenuItemNewObject<LocalizationToolAPI>(menuCommand, "LocalizationToolAPI");
-				LocalizationToolAPI.Instance.ActiveLanguage = LocalizationManager.DefaultLanguage;
+				LocalizationToolAPI.ActiveLanguage = LocalizationManager.DefaultLanguage;
 			} else {
 				Debug.LogWarning("LocalizationToolAPI already exists");
 			}
