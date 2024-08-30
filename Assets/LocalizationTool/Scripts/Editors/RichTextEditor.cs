@@ -11,7 +11,7 @@ using static LocalizationTool.Scripts.Commons.EditorStrings;
 namespace LocalizationTool.Scripts.Editors
 {
 #if UNITY_EDITOR
-    public class RichTextEditor : LocalizationEditor
+    public class RichTextEditor : LocalizationMainEditor
     {
         #region PUBLIC VARIABLES
 

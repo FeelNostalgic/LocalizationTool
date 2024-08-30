@@ -84,7 +84,7 @@ namespace LocalizationTool.Scripts.General
 
         #region DICTIONARY
 
-        public async void AddNewKey(string key, string category, LocalizationEditor editor = null)
+        public async void AddNewKey(string key, string category, LocalizationMainEditor editor = null)
         {
             if (key.IsEmpty())
             {
@@ -124,7 +124,7 @@ namespace LocalizationTool.Scripts.General
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
         }
 
-        public async Task<string> ChangeKey(string oldKey, string newKey, LocalizationEditor editor)
+        public async Task<string> ChangeKey(string oldKey, string newKey, LocalizationMainEditor editor)
         {
             if (oldKey.Equals(newKey)) return oldKey;
 
@@ -244,7 +244,7 @@ namespace LocalizationTool.Scripts.General
 
         #region LANGUAGE
 
-        public async void AddNewLanguage(string newLanguage, LocalizationEditor editor = null)
+        public async void AddNewLanguage(string newLanguage, LocalizationMainEditor editor = null)
         {
             if (newLanguage.Equals(""))
             {
@@ -375,7 +375,7 @@ namespace LocalizationTool.Scripts.General
 
         #region CATEGORY
 
-        public async void AddNewCategory(string newCategory, LocalizationEditor editor = null, bool showEditorLogs = true)
+        public async void AddNewCategory(string newCategory, EditorWindowAbstract editor = null, bool showEditorLogs = true)
         {
             // Empty value
             if (newCategory.IsEmpty())
@@ -969,7 +969,7 @@ namespace LocalizationTool.Scripts.General
 #pragma warning restore CS4014
         }
 
-        private static void ShowFeedback(string text, LocalizationEditor editor)
+        private static void ShowFeedback(string text, EditorWindowAbstract editor)
         {
             Log(text);
             if (editor != null) editor.ControlFeedbackLabel(text);

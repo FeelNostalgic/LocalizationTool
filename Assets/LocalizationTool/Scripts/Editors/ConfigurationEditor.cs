@@ -1,13 +1,7 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using LocalizationTool.Data;
-using LocalizationTool.Data.Templates;
 using LocalizationTool.Scripts.Commons;
-using LocalizationTool.Scripts.ExportSerializer;
 using LocalizationTool.Scripts.General;
 using LocalizationTool.Scripts.Serializer;
 using Unity.EditorCoroutines.Editor;
@@ -18,7 +12,7 @@ using static LocalizationTool.Scripts.Commons.EditorPaths;
 
 namespace LocalizationTool.Scripts.Editors
 {
-    public class ConfigurationEditor : LocalizationEditor
+    public class ConfigurationEditor : EditorWindowAbstract
     {
         #region PUBLIC VARIABLES
 
@@ -89,7 +83,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private void OptionsSection()
         {
-            GUILayout.BeginHorizontal(MinWidthOption(GetWidthSize(LEFT_SECTION_WIDTH_PERCENT)));
+            GUILayout.BeginHorizontal(MinWidthOption(GetWidthSize(LEFT_SECTION_WIDTH_PERCENT, WindowSize.x)));
 
             GUILayout.FlexibleSpace();
 
@@ -161,8 +155,8 @@ namespace LocalizationTool.Scripts.Editors
                 && LocalizationManager.Configuration.categoryClearAdd) _toggleAllClearAdd = true;
             else _toggleAllClearAdd = false;
 
-            var tempToogle = EditorGUILayout.Toggle(_toggleAllClearAdd, GUILayout.Height(28));
-            UpdateAllClearAdd(_toggleAllClearAdd, tempToogle);
+            var tempToggle = EditorGUILayout.Toggle(_toggleAllClearAdd, GUILayout.Height(28));
+            UpdateAllClearAdd(_toggleAllClearAdd, tempToggle);
 
             ToggleLeft(LocalizationManager.Configuration.dictionaryClearAdd, CONFIGURATION_CLEAR_ADD_DICTIONARY_LABEL,
                 delegate(bool b) { UpdateClearAdd(b, Enums.GUIWindow.Dictionary); });

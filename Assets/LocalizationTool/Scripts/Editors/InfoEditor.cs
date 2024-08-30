@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LocalizationTool.Scripts.Editors
 { 
-	public class InfoEditor : LocalizationEditor
+	public class InfoEditor : LocalizationMainEditor
 	{
 		#region DIMENSION VARIABLES
 

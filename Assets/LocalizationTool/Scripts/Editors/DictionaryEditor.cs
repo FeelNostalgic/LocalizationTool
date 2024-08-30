@@ -12,7 +12,7 @@ using static LocalizationTool.Scripts.Commons.EditorStrings;
 namespace LocalizationTool.Scripts.Editors
 {
 #if UNITY_EDITOR
-    public class DictionaryEditor : LocalizationEditor
+    public class DictionaryEditor : EditorWindowAbstract
     {
         #region PUBLIC VARIABLES
 
@@ -41,6 +41,7 @@ namespace LocalizationTool.Scripts.Editors
         #region DIMENSION VARIABLES
 
         private const float LEFT_SECTION_WIDTH_PERCENT = 0.225f;
+        
 
         // FUTURE
         // private float _dividerPosition = 305f;
@@ -91,7 +92,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private void ShowLeftSection()
         {
-            GUILayout.BeginVertical(MinWidthOption(GetWidthSize(LEFT_SECTION_WIDTH_PERCENT)));
+            GUILayout.BeginVertical(MinWidthOption(GetWidthSize(LEFT_SECTION_WIDTH_PERCENT, WindowSize.x)));
             GUILayout.FlexibleSpace();
             ShowAddSection();
             GUILayout.FlexibleSpace();

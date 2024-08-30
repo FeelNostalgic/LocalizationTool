@@ -38,7 +38,7 @@ namespace LocalizationTool.Scripts.Editors
                 GUILayout.BeginVertical("box", GUILayout.Height(30+25+60+2+2)); 
                 Row1();
                 GUILayout.Space(2);
-                LocalizationEditor.ShowHorizontalLine(4);
+                LocalizationMainEditor.ShowHorizontalLine(4);
                 GUILayout.Space(2);
                 
                 GUILayout.BeginVertical();
@@ -68,19 +68,19 @@ namespace LocalizationTool.Scripts.Editors
                 Row1();
 
                 GUILayout.Space(2);
-                LocalizationEditor.ShowHorizontalLine(4);
+                LocalizationMainEditor.ShowHorizontalLine(4);
                 GUILayout.Space(2);
 
                 var allCategories = Row2();
 
                 GUILayout.Space(2);
-                LocalizationEditor.ShowHorizontalLine(4);
+                LocalizationMainEditor.ShowHorizontalLine(4);
                 GUILayout.Space(2);
 
                 Row3(allCategories);
 
                 GUILayout.Space(2);
-                LocalizationEditor.ShowHorizontalLine(4);
+                LocalizationMainEditor.ShowHorizontalLine(4);
                 GUILayout.Space(2);
             
                 Row4();

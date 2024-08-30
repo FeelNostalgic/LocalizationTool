@@ -16,7 +16,7 @@ using static LocalizationTool.Scripts.Commons.EditorStrings;
 
 namespace LocalizationTool.Scripts.Editors
 {
-    public class LanguageManagerEditor : LocalizationEditor
+    public class LanguageManagerEditor : LocalizationMainEditor
     {
         #region DIMENSION VARIABLES
 

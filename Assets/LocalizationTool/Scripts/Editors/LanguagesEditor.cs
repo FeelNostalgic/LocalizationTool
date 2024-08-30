@@ -9,7 +9,7 @@ using static LocalizationTool.Scripts.Commons.EditorStrings;
 namespace LocalizationTool.Scripts.Editors
 {
 #if UNITY_EDITOR
-    public class LanguagesEditor : LocalizationEditor
+    public class LanguagesEditor : EditorWindowAbstract
     {
         #region PUBLIC VARIABLES
 
@@ -72,7 +72,7 @@ namespace LocalizationTool.Scripts.Editors
         private void ShowLeftSection()
         {
             GUILayout.Space(5);
-            GUILayout.BeginVertical(MinWidthOption(GetWidthSize(LEFT_SECTION_WIDTH_PERCENT)));
+            GUILayout.BeginVertical(MinWidthOption(GetWidthSize(LEFT_SECTION_WIDTH_PERCENT, WindowSize.x)));
             GUILayout.FlexibleSpace();
             ShowAddSection();
             GUILayout.FlexibleSpace();

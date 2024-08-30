@@ -1,13 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using LocalizationTool.Scripts.Addons;
 using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.General;
 using TMPro;
-using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 //TODO: Quitar dependencia de la API con EditorStrings
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 
