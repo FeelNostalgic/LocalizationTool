@@ -7,11 +7,12 @@ using UnityEditor;
 using UnityEngine;
 using ColorUtility = UnityEngine.ColorUtility;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
+using static LocalizationTool.Scripts.Editors.EditorWindowAbstract;
 
 namespace LocalizationTool.Scripts.Editors
 {
 #if UNITY_EDITOR
-    public class RichTextEditor : LocalizationMainEditor
+    public class RichTextEditor : EditorWindow
     {
         #region PUBLIC VARIABLES
 
@@ -51,14 +52,14 @@ namespace LocalizationTool.Scripts.Editors
             window._richText = initialText;
         }
 
-        protected override void OnDestroy()
+        protected void OnDestroy()
         {
             UpdateValue(_key, _tempValue);
         }
 
         #region PRIVATE METHODS
 
-        private new void OnGUI()
+        private void OnGUI()
         {
             GUILayout.BeginVertical();
 
@@ -490,7 +491,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private async void UpdateKey(string oldKey, string newKey)
         {
-            _key = await LocalizationManager.Instance.ChangeKey(oldKey, newKey, this);
+            //TODO: _key = await LocalizationManager.Instance.ChangeKey(oldKey, newKey, this);
         }
 
         #endregion

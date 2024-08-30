@@ -9,7 +9,7 @@ using static LocalizationTool.Scripts.Commons.EditorStrings;
 namespace LocalizationTool.Scripts.Editors
 {
 #if UNITY_EDITOR
-    public class CategoriesEditor : EditorWindowAbstract
+    public class CategoriesWindow : EditorWindowAbstract
     {
         #region PUBLIC VARIABLES
 
@@ -42,9 +42,9 @@ namespace LocalizationTool.Scripts.Editors
 
         #region PUBLIC METHODS
 
-        public void ShowLayout()
+        public override void ShowLayout()
         {
-            LocalizationMainEditor.Instance.ControlFocus(CATEGORY_LABEL_UPPER);
+            ControlFocus(CATEGORY_LABEL_UPPER);
 
             GUILayout.BeginVertical(GUILayout.ExpandHeight(true));
 
@@ -61,6 +61,12 @@ namespace LocalizationTool.Scripts.Editors
 
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
+        }
+
+        protected override void ControlFocus(string focus)
+        {
+            if (!LocalizationManager.Configuration.categoryClearAdd) return;
+            base.ControlFocus(focus);
         }
 
         #endregion

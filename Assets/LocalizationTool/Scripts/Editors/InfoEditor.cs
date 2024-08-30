@@ -1,9 +1,10 @@
 using UnityEditor;
 using UnityEngine;
+using static LocalizationTool.Scripts.Editors.EditorWindowAbstract;
 
 namespace LocalizationTool.Scripts.Editors
 { 
-	public class InfoEditor : LocalizationMainEditor
+	public class InfoEditor : EditorWindow
 	{
 		#region DIMENSION VARIABLES
 
@@ -30,7 +31,7 @@ namespace LocalizationTool.Scripts.Editors
 		
 		#region PRIVATE METHODS
 
-		private new void OnGUI()
+		private void OnGUI()
 		{
 			GUILayout.BeginVertical();
 

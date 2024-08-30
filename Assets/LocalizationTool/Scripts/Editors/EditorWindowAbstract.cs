@@ -1,14 +1,14 @@
 using System;
 using System.Collections;
 using LocalizationTool.Data;
-using LocalizationTool.Scripts.Editors;
+using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.General;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 using static LocalizationTool.Scripts.Commons.GameUtils;
 
-namespace LocalizationTool.Scripts.Commons
+namespace LocalizationTool.Scripts.Editors
 { 
 	public abstract class EditorWindowAbstract 
 	{
@@ -28,27 +28,29 @@ namespace LocalizationTool.Scripts.Commons
 		protected static Texture UpIcon => EditorGUIUtility.IconContent("d_scrollup").image;
 		protected static Texture DownIcon => EditorGUIUtility.IconContent("d_scrolldown").image;
 		protected static Texture StarIcon => EditorGUIUtility.IconContent("d_Favorite").image;
-		protected static Texture ImportIcon => EditorGUIUtility.IconContent("d_FolderOpened Icon").image;
-		protected static Texture ExportIcon => EditorGUIUtility.IconContent("d_SaveAs").image;
+		public static Texture ImportIcon => EditorGUIUtility.IconContent("d_FolderOpened Icon").image;
+		public static Texture ExportIcon => EditorGUIUtility.IconContent("d_SaveAs").image;
 		protected static Texture LockIcon => EditorGUIUtility.IconContent("d_AssemblyLock").image;
 		protected static Texture GearIcon => EditorGUIUtility.IconContent("d__Popup").image;
-		protected static Texture WarningIcon => EditorGUIUtility.IconContent("d_console.warnicon.sml").image;
+		public static Texture WarningIcon => EditorGUIUtility.IconContent("d_console.warnicon.sml").image;
 		protected static Texture InfoIcon => EditorGUIUtility.IconContent("d_UnityEditor.InspectorWindow").image;
-		protected static Texture ChangesSavedIcon => EditorGUIUtility.IconContent("d_CacheServerConnected").image;
-		protected static Texture AddEmptyIcon => EditorGUIUtility.IconContent("d_ol_plus_act").image;
-        protected static Texture MinusEmptyIcon => EditorGUIUtility.IconContent("d_ol_minus_act").image;
-        protected static Texture ApplyStyleIcon => EditorGUIUtility.IconContent("d_Progress").image;
-        protected static Texture UndoIcon => EditorGUIUtility.IconContent("d_scrollleft").image;
-        protected static Texture RedoIcon => EditorGUIUtility.IconContent("d_scrollright").image;
+		public static Texture ChangesSavedIcon => EditorGUIUtility.IconContent("d_CacheServerConnected").image;
+		public static Texture AddEmptyIcon => EditorGUIUtility.IconContent("d_ol_plus_act").image;
+        public static Texture MinusEmptyIcon => EditorGUIUtility.IconContent("d_ol_minus_act").image;
+        public static Texture ApplyStyleIcon => EditorGUIUtility.IconContent("d_Progress").image;
+        public static Texture UndoIcon => EditorGUIUtility.IconContent("d_scrollleft").image;
+        public static Texture RedoIcon => EditorGUIUtility.IconContent("d_scrollright").image;
         protected static Texture YellowStarIcon => GetColoredIcon("d_Favorite", Color.yellow);
 
 		#endregion
 
         #region PROTECTED VARIABLES
 
-        protected string FeedbackLabel = "";
+        public static string FeedbackLabel = "";
         protected bool AddActionRunning;
 
+        public static readonly string[] CsvSeparators = { ";", ",", ".", ":", "|", "=" };
+        
         #endregion
 
         #region PRIVATE VARIABLES
@@ -58,6 +60,27 @@ namespace LocalizationTool.Scripts.Commons
         #endregion
 
         #region METHODS
+
+        public virtual void OnEnable()
+        {
+            
+        }
+
+        public virtual void OnDisable()
+        {
+            
+        }
+
+        public virtual void ShowLayout()
+        {
+        }
+
+        protected virtual void ControlFocus(string focus)
+        {
+            
+            if (GUI.GetNameOfFocusedControl() != focus) return;
+            if (Event.current is { isKey: true }) EditorGUI.FocusTextInControl(focus);
+        }
 
         public void ControlFeedbackLabel(string text)
         {
@@ -98,19 +121,19 @@ namespace LocalizationTool.Scripts.Commons
         
 		#region GUI ELEMENTS
 
-        protected static GUIContent GetGUIContent(Texture t, string tooltip)
+        public static GUIContent GetGUIContent(Texture t, string tooltip)
         {
             return new GUIContent(t, tooltip);
         }
 
-        protected static void ShowHeader1(string text, params GUILayoutOption[] options)
+        public static void ShowHeader1(string text, params GUILayoutOption[] options)
         {
             GUILayout.Space(5);
             GUILayout.Label(text, CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter20Label), options);
             GUILayout.Space(10);
         }
 
-        protected static void ShowHeader2(string text, params GUILayoutOption[] options)
+        public static void ShowHeader2(string text, params GUILayoutOption[] options)
         {
             GUILayout.Space(5);
             GUILayout.Label(text, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label), options);
@@ -177,7 +200,7 @@ namespace LocalizationTool.Scripts.Commons
             GUI.backgroundColor = Colors.DEFAULT;
         }
 
-        protected static void ShowHorizontalLine(float height)
+        public static void ShowHorizontalLine(float height)
         {
             GUI.backgroundColor = Colors.DEEP_GRAY;
             GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(height));

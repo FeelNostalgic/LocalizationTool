@@ -54,17 +54,17 @@ namespace LocalizationTool.Scripts.Editors
 
         #region PUBLIC METHODS
 
-        protected override void OnEnable()
+        public override void OnEnable()
         {
             LocalizationManager.Instance.OnDefaultCategoryUpdate += OnDefaultCategoryUpdate;
         }
 
-        protected override void OnDisable()
+        public override void OnDisable()
         {
             LocalizationManager.Instance.OnDefaultCategoryUpdate -= OnDefaultCategoryUpdate;
         }
 
-        public void ShowLayout()
+        public override void ShowLayout()
         {
             ControlFocus(KEY_LABEL_UPPER);
 
@@ -82,6 +82,12 @@ namespace LocalizationTool.Scripts.Editors
 
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
+        }
+        
+        protected override void ControlFocus(string focus)
+        {
+            if (!LocalizationManager.Configuration.dictionaryClearAdd) return;
+            base.ControlFocus(focus);
         }
 
         #endregion

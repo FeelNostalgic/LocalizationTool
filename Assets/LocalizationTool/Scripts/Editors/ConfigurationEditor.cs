@@ -45,7 +45,7 @@ namespace LocalizationTool.Scripts.Editors
 
         #region PUBLIC METHODS
 
-        public void ShowLayout()
+        public override void ShowLayout()
         {
             GUILayout.BeginVertical(GUILayout.ExpandHeight(true));
 
@@ -65,7 +65,7 @@ namespace LocalizationTool.Scripts.Editors
 
             GUILayout.EndVertical();
         }
-
+        
         #endregion
 
         #region PRIVATE METHODS

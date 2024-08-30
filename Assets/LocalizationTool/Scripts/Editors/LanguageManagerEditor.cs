@@ -13,10 +13,11 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
+using static LocalizationTool.Scripts.Editors.EditorWindowAbstract;
 
 namespace LocalizationTool.Scripts.Editors
 {
-    public class LanguageManagerEditor : LocalizationMainEditor
+    public class LanguageManagerEditor : EditorWindow
     {
         #region DIMENSION VARIABLES
 
@@ -51,7 +52,7 @@ namespace LocalizationTool.Scripts.Editors
 
         #region PRIVATE METHODS
 
-        private new void OnGUI()
+        private void OnGUI()
         {
             GUILayout.BeginVertical();
 

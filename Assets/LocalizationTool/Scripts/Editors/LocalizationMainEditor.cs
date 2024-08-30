@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using LocalizationTool.Data;
+using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.General;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
@@ -24,22 +25,18 @@ namespace LocalizationTool.Scripts.Editors
 
         #endregion
         
-        #region PROTECTED VARIABLES
-        protected readonly string[] CsvSeparators = { ";", ",", ".", ":", "|", "=" };
-
-        #endregion
-
         #region EDITOR VARIABLES
 
         private int _currentWindowToolbarIndex;
 
         private Vector2 _scrollRight;
 
-        private Enums.GUIWindow _currentWindow;
-        // private static DictionaryEditor _dictionaryEditor;
-        // private static LanguagesEditor _languagesEditor;
-        private static CategoriesEditor _categoriesEditor;
-        // private static ConfigurationEditor _configurationEditor;
+        //private Enums.GUIWindow _currentWindow;
+        private static EditorWindowAbstract _currentEditorWindow;
+        private static EditorWindowAbstract _dictionaryEditor;
+        private static EditorWindowAbstract _languagesEditor;
+        private static EditorWindowAbstract _categoriesEditor;
+        private static EditorWindowAbstract _configurationEditor;
         
         #endregion
 
@@ -70,14 +67,15 @@ namespace LocalizationTool.Scripts.Editors
 
         protected virtual void OnEnable()
         {
-            //
             _instance ??= this;
+            _currentEditorWindow?.OnEnable();
+            LoadWindows();
         }
 
         // Called when unity editor is closed
         protected virtual void OnDisable()
         {
-            //
+            _currentEditorWindow?.OnDisable();
         }
 
         // Called when editor is closed
@@ -100,103 +98,51 @@ namespace LocalizationTool.Scripts.Editors
             if(!hasFocus) return;
             if (!LocalizationManager.IsDataLoaded) return;
             WindowToolbar();
-            switch (_currentWindow)
-            {
-                case Enums.GUIWindow.Dictionary:
-                    ShowDictionaryLayout();
-                    break;
-                case Enums.GUIWindow.Language:
-                    ShowLanguagesLayout();
-                    break;
-                case Enums.GUIWindow.Category:
-                    ShowCategoriesLayout();
-                    break;
-                case Enums.GUIWindow.Configuration:
-                    ShowConfigurationLayout();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            _currentEditorWindow?.ShowLayout();
         }
 
-        private static void ShowDictionaryLayout()
+        private static void LoadWindows()
         {
-            // _dictionaryEditor.ShowLayout();
+            _dictionaryEditor ??= new DictionaryEditor();
+            _languagesEditor ??= new LanguagesEditor();
+            _categoriesEditor ??= new CategoriesWindow();
+            _configurationEditor ??= new ConfigurationEditor();
+            _currentEditorWindow = _dictionaryEditor;
         }
         
-        private static void ShowLanguagesLayout()
-        {
-            // _languagesEditor.ShowLayout();
-        }
-        
-        private void ShowCategoriesLayout()
-        {
-            
-            _categoriesEditor.ShowLayout();
-        }
-        
-        private void ShowConfigurationLayout()
-        {
-           
-            // _configurationEditor.ShowLayout();
-        }
-        
-        public void ControlFocus(string focus)
-        {
-            switch (_currentWindow)
-            {
-                case Enums.GUIWindow.Dictionary:
-                    if (!LocalizationManager.Configuration.dictionaryClearAdd) return;
-                    break;
-                case Enums.GUIWindow.Language:
-                    if (!LocalizationManager.Configuration.languageClearAdd) return;
-                    break;
-                case Enums.GUIWindow.Category:
-                    if (!LocalizationManager.Configuration.categoryClearAdd) return;
-                    break;
-                case Enums.GUIWindow.Configuration: return;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            if (GUI.GetNameOfFocusedControl() != focus) return;
-            if (Event.current is { isKey: true }) EditorGUI.FocusTextInControl(focus);
-        }
-
-
         #endregion
 
         #region CENTER SECTION
 
-        private void WindowToolbar()
+        private static void WindowToolbar()
         {
             GUILayout.Space(5);
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
             GUILayout.Space(10);
             if (GUILayout.Button(new GUIContent(DICTIONARY_TOOLBAR_LABEL), EditorStyles.toolbarButton))
             {
-                _currentWindow = Enums.GUIWindow.Dictionary;
+                _currentEditorWindow = _dictionaryEditor;
                 GUI.FocusControl(null);
             }
 
             GUILayout.Space(10);
             if (GUILayout.Button(new GUIContent(LANGUAGES_TOOLBAR_LABEL), EditorStyles.toolbarButton))
             {
-                _currentWindow = Enums.GUIWindow.Language;
+                _currentEditorWindow = _languagesEditor;
                 GUI.FocusControl(null);
             }
 
             GUILayout.Space(10);
             if (GUILayout.Button(new GUIContent(CATEGORIES_TOOLBAR_LABEL), EditorStyles.toolbarButton))
             {
-                _currentWindow = Enums.GUIWindow.Category;
+                _currentEditorWindow = _categoriesEditor;
                 GUI.FocusControl(null);
             }
 
             GUILayout.Space(10);
             if (GUILayout.Button(new GUIContent(CONFIGURATION_TOOLBAR_LABEL), EditorStyles.toolbarButton))
             {
-                _currentWindow = Enums.GUIWindow.Configuration;
+                _currentEditorWindow = _configurationEditor;
                 GUI.FocusControl(null);
             }
 
@@ -212,10 +158,6 @@ namespace LocalizationTool.Scripts.Editors
         private static async void LoadData()
         {
             await LocalizationManager.Instance.Init();
-            // _dictionaryEditor ??= (DictionaryEditor)CreateInstance(typeof(DictionaryEditor));
-            // _languagesEditor ??= (LanguagesEditor)CreateInstance(typeof(LanguagesEditor));
-            _categoriesEditor ??= new CategoriesEditor();
-            // _configurationEditor ??= (ConfigurationEditor)CreateInstance(typeof(ConfigurationEditor));
         }
         
         #region GUI ELEMENTS

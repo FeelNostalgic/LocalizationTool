@@ -42,7 +42,7 @@ namespace LocalizationTool.Scripts.Editors
 
         #region PUBLIC METHODS
 
-        public void ShowLayout()
+        public override void ShowLayout()
         {
             ControlFocus(LANGUAGE_LABEL_UPPER);
 
@@ -63,6 +63,12 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.EndVertical();
         }
 
+        protected override void ControlFocus(string focus)
+        {
+            if (!LocalizationManager.Configuration.languageClearAdd) return;
+            base.ControlFocus(focus);
+        }
+        
         #endregion
 
         #region PRRIVATE METHODS

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-16"?>
+<DictionaryTemplate xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <DictionaryKeyCategoryLanguages>
+    <KeyCategoryLanguageValues>
+      <Key>Play_Button</Key>
+      <Category>Main_Menu</Category>
+      <LanguageValues>
+        <LanguageValue>
+          <Language>Spanish</Language>
+          <Value>Jugar</Value>
+        </LanguageValue>
+        <LanguageValue>
+          <Language>English</Language>
+          <Value />
+        </LanguageValue>
+        <LanguageValue>
+          <Language>French</Language>
+          <Value />
+        </LanguageValue>
+      </LanguageValues>
+    </KeyCategoryLanguageValues>
+    <KeyCategoryLanguageValues>
+      <Key>Exit_Button</Key>
+      <Category>Main_Menu</Category>
+      <LanguageValues>
+        <LanguageValue>
+          <Language>Spanish</Language>
+          <Value>Salir</Value>
+        </LanguageValue>
+        <LanguageValue>
+          <Language>English</Language>
+          <Value />
+        </LanguageValue>
+        <LanguageValue>
+          <Language>French</Language>
+          <Value />
+        </LanguageValue>
+      </LanguageValues>
+    </KeyCategoryLanguageValues>
+    <KeyCategoryLanguageValues>
+      <Key>Options_Button</Key>
+      <Category>Main_Menu</Category>
+      <LanguageValues>
+        <LanguageValue>
+          <Language>Spanish</Language>
+          <Value>Opciones</Value>
+        </LanguageValue>
+        <LanguageValue>
+          <Language>English</Language>
+          <Value />
+        </LanguageValue>
+        <LanguageValue>
+          <Language>French</Language>
+          <Value />
+        </LanguageValue>
+      </LanguageValues>
+    </KeyCategoryLanguageValues>
+    <KeyCategoryLanguageValues>
+      <Key>Options_Title</Key>
+      <Category>Options</Category>
+      <LanguageValues>
+        <LanguageValue>
+          <Language>Spanish</Language>
+          <Value>Opciones</Value>
+        </LanguageValue>
+        <LanguageValue>
+          <Language>English</Language>
+          <Value />
+        </LanguageValue>
+        <LanguageValue>
+          <Language>French</Language>
+          <Value />
+        </LanguageValue>
+      </LanguageValues>
+    </KeyCategoryLanguageValues>
+    <KeyCategoryLanguageValues>
+      <Key>Volume_Label</Key>
+      <Category>Options</Category>
+      <LanguageValues>
+        <LanguageValue>
+          <Language>Spanish</Language>
+          <Value>Volumen</Value>
+        </LanguageValue>
+        <LanguageValue>
+          <Language>English</Language>
+          <Value />
+        </LanguageValue>
+        <LanguageValue>
+          <Language>French</Language>
+          <Value />
+        </LanguageValue>
+      </LanguageValues>
+    </KeyCategoryLanguageValues>
+    <KeyCategoryLanguageValues>
+      <Key>Back_Button</Key>
+      <Category>Options</Category>
+      <LanguageValues>
+        <LanguageValue>
+          <Language>Spanish</Language>
+          <Value>Volver</Value>
+        </LanguageValue>
+        <LanguageValue>
+          <Language>English</Language>
+          <Value />
+        </LanguageValue>
+        <LanguageValue>
+          <Language>French</Language>
+          <Value />
+        </LanguageValue>
+      </LanguageValues>
+    </KeyCategoryLanguageValues>
+  </DictionaryKeyCategoryLanguages>
+</DictionaryTemplate>
