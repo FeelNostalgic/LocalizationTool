@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using LocalizationTool.Scripts.Addons;
 using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.General;
@@ -115,8 +116,7 @@ namespace LocalizationTool.Scripts.API
 #pragma warning disable CS4014
             LocalizationManager.Instance.Init();
 #pragma warning restore CS4014
-            var categories = LocalizationManager.Categories;
-            return categories;
+            return LocalizationManager.Categories;
         }
 
         /// <summary>

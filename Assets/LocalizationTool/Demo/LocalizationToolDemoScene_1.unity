@@ -335,8 +335,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c9db1d309dd44f45a73b435b197c3ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  key: Exit_Button
-  keyIndex: 1
+  key: 
+  keyIndex: -1
 --- !u!1 &258309093
 GameObject:
   m_ObjectHideFlags: 0
@@ -1277,8 +1277,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c9db1d309dd44f45a73b435b197c3ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  key: Options_Button
-  keyIndex: 2
+  key: 
+  keyIndex: -1
 --- !u!1 &671525216
 GameObject:
   m_ObjectHideFlags: 0

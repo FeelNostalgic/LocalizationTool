@@ -161,7 +161,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.Label(label, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label));
             GUILayout.Space(5);
 
-            if (LocalizationManager.OrderedCategories != null) //To avoid possible errors while loading data
+            if (LocalizationManager.CategoriesCache != null) //To avoid possible errors while loading data
             {
                 if (LocalizationManager.Categories.IndexOf(categoryValue) != -1) //Category value is empty when loading
                 {
@@ -171,7 +171,7 @@ namespace LocalizationTool.Scripts.Editors
                 else
                 {
                     EditorGUILayout.Popup(0, LocalizationManager.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup));
-                    if (LocalizationManager.OrderedCategories.Count > 0) categoryValue = LocalizationManager.Categories[0];
+                    if (LocalizationManager.CategoriesCache.Count > 0) categoryValue = LocalizationManager.Categories[0];
                 }
             }
 

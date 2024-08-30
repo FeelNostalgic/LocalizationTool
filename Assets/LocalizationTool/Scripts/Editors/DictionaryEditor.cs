@@ -236,9 +236,9 @@ namespace LocalizationTool.Scripts.Editors
         {
             GUILayout.BeginHorizontal();
 
-            if (LocalizationManager.OrderedCategories != null)
+            if (LocalizationManager.CategoriesCache != null)
             {
-                if (_searchCategoryIndex >= LocalizationManager.OrderedCategories.Count) _searchCategoryIndex = 0;
+                if (_searchCategoryIndex >= LocalizationManager.CategoriesCache.Count) _searchCategoryIndex = 0;
                 GUI.SetNextControlName("Popup");
                 _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, LocalizationManager.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup), GUILayout.Width(200));
             }
@@ -371,7 +371,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.BeginHorizontal(GUILayout.Width(175));
             EditorGUI.BeginChangeCheck();
 
-            if (category.IsEmpty()) category = LocalizationManager.DefaultCategory;
+            if (category.IsEmpty()) category = LocalizationManager.GetDefaultCategory();
             GUI.backgroundColor = Colors.DEFAULT;
             var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.ScrollViewCategoryPopup));
 

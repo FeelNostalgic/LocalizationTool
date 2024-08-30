@@ -9,12 +9,8 @@ using static LocalizationTool.Scripts.Commons.EditorStrings;
 namespace LocalizationTool.Scripts.Editors
 {
 #if UNITY_EDITOR
-    public class CategoriesWindow : EditorWindowAbstract
+    public class CategoriesEditor : EditorWindowAbstract
     {
-        #region PUBLIC VARIABLES
-
-        #endregion
-
         #region PRIVATE VARIABLES
 
         #region EDITOR VARIABLES
@@ -104,14 +100,14 @@ namespace LocalizationTool.Scripts.Editors
         
             if (GUILayout.Button(GetGUIContent(AddIcon, ADD_CATEGORY_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                LocalizationManager.Instance.AddNewCategory(_addCategoryValue, this);
+                LocalizationManager.AddNewCategory(_addCategoryValue, this);
             }
         
             if (GUI.GetNameOfFocusedControl() == CATEGORY_LABEL_UPPER)
             {
                 if (Event.current is { keyCode: (KeyCode.Return or KeyCode.KeypadEnter) })
                 {
-                    if (!AddActionRunning) LocalizationManager.Instance.AddNewCategory(_addCategoryValue, this);
+                    if (!AddActionRunning) LocalizationManager.AddNewCategory(_addCategoryValue, this);
                 }
             }
         
@@ -169,7 +165,7 @@ namespace LocalizationTool.Scripts.Editors
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
             try
             {
-                foreach (var (index, category) in LocalizationManager.OrderedCategories)
+                foreach (var (index, category) in LocalizationManager.CategoriesCache)
                 {
                     UnitCenterScrollViewContent(index, category);
                 }
@@ -218,7 +214,7 @@ namespace LocalizationTool.Scripts.Editors
         
             GUILayout.FlexibleSpace();
             var tempIndex = EditorGUILayout.IntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Height(30));
-            if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, tempIndex);
+            if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(category, index, tempIndex);
             GUILayout.EndVertical();
         }
         
@@ -232,7 +228,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(UpIcon, string.Format(MOVE_UP_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index - 1);
+                if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(category, index, index - 1);
             }
         
             GUILayout.EndVertical();
@@ -248,7 +244,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(DownIcon, string.Format(MOVE_DOWN_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(index, index + 1);
+                if (!LocalizationManager.IsDefaultCategory(category) && LocalizationManager.CategoriesCache.Count >= index + 1) UpdateIndex(category, index, index + 1);
             }
         
             GUILayout.EndVertical();
@@ -369,7 +365,7 @@ namespace LocalizationTool.Scripts.Editors
                 return;
             }
         
-            if (LocalizationManager.Categories.Contains(newCategory))
+            if (LocalizationManager.ContainsCategory(newCategory))
             {
                 ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, string.Format(CATEGORY_EXIST_FEEDBACK_LABEL, newCategory), delegate { _feedbackList.Remove(oldCategory); });
                 return;
@@ -380,9 +376,9 @@ namespace LocalizationTool.Scripts.Editors
             _feedbackList.Remove(oldCategory);
         }
         
-        private static void UpdateIndex(int oldIndex, int newIndex)
+        private static void UpdateIndex(string categoryName,int oldIndex, int newIndex)
         {
-            LocalizationManager.Instance.ChangeCategoryIndex(oldIndex, newIndex);
+            LocalizationManager.ChangeCategoryIndex(categoryName, oldIndex, newIndex);
         }
         
         public override void ClearAddTextField()

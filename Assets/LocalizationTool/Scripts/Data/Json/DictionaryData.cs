@@ -113,7 +113,7 @@ namespace LocalizationTool.Data.Json
 
         public Task RemoveCategory(string categoryToRemove)
         {
-            if(category.Equals(categoryToRemove)) category = LocalizationManager.DefaultCategory;
+            if(category.Equals(categoryToRemove)) category = LocalizationManager.GetDefaultCategory();
             return Task.CompletedTask;
         }
         

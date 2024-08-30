@@ -100,7 +100,7 @@ namespace LocalizationTool.Scripts.Editors
         {
             _dictionaryEditor ??= new DictionaryEditor();
             _languagesEditor ??= new LanguagesEditor();
-            _categoriesEditor ??= new CategoriesWindow();
+            _categoriesEditor ??= new CategoriesEditor();
             _configurationEditor ??= new ConfigurationEditor();
             _currentEditorWindow = _dictionaryEditor;
         }
@@ -148,17 +148,14 @@ namespace LocalizationTool.Scripts.Editors
 
         #endregion
 
-        #region COMMONS
+        #region DATABASE
 
         private static async void LoadData()
         {
+            LocalizationManager.CreateDatabase();
             await LocalizationManager.Instance.Init();
         }
         
-        #region GUI ELEMENTS
-        
-        #endregion
-
         #endregion
     }
 #endif

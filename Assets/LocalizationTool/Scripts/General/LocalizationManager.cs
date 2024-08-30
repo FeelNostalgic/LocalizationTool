@@ -20,8 +20,11 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Data;
+using Mono.Data.Sqlite;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 using static LocalizationTool.Scripts.Commons.EditorPaths;
+using static LocalizationTool.Database.DatabaseStrings;
 
 namespace LocalizationTool.Scripts.General
 {
@@ -34,15 +37,14 @@ namespace LocalizationTool.Scripts.General
         public static List<LanguagesData.LanguageTuple> OrderedLanguages => _languagesData.orderedLanguages ?? new List<LanguagesData.LanguageTuple>();
         public static List<string> ActiveLanguages => _languagesData.Languages ?? new List<string>();
         public static string DefaultLanguage => _languagesData.FavouriteLanguage;
-        public static List<CategoriesData.CategoryTuple> OrderedCategories => _categoriesData?.orderedCategories ?? new List<CategoriesData.CategoryTuple>();
-        public static List<string> Categories => _categoriesData?.Categories ?? new List<string>();
+        public static List<CategoryTuple> CategoriesCache;
+        public static List<string> Categories => CategoriesCache.Select(x=> x.Category).ToList();
         public static ConfigurationData Configuration => _configurationData ?? new ConfigurationData();
 
         public static Dictionary<string, KeyData> Dictionary => _dynamicDictionary ?? new Dictionary<string, KeyData>();
         public static List<string> Keys => _dictionaryData.listDictionaryKeyCategoryLanguages.Select(x => x.key).ToList();
         public string CurrentLanguageInDictionarySection { get; set; }
         public int CurrentToolbarLanguageIndex => _languagesData.Languages.IndexOf(CurrentLanguageInDictionarySection);
-        public static string DefaultCategory => _categoriesData.defaultCategory;
         public static bool IsDataLoaded { get; private set; }
 
         #region Actions
@@ -60,6 +62,9 @@ namespace LocalizationTool.Scripts.General
         private ISerializerService _serializerJson;
         private ISerializerService _serializerBinary;
 
+        private static string connectionString;
+        private static IDbConnection dbConnection;
+
         #region JSON Data
 
         private static DictionaryData _dictionaryData;
@@ -69,7 +74,6 @@ namespace LocalizationTool.Scripts.General
         #region BINARY Data
 
         private static LanguagesData _languagesData;
-        private static CategoriesData _categoriesData;
         private static ConfigurationData _configurationData;
 
         #endregion
@@ -375,7 +379,7 @@ namespace LocalizationTool.Scripts.General
 
         #region CATEGORY
 
-        public async void AddNewCategory(string newCategory, EditorWindowAbstract editor = null, bool showEditorLogs = true)
+        public static void AddNewCategory(string newCategory, EditorWindowAbstract editor = null, bool showEditorLogs = true)
         {
             // Empty value
             if (newCategory.IsEmpty())
@@ -391,7 +395,7 @@ namespace LocalizationTool.Scripts.General
             }
 
             // Already in data
-            if (_categoriesData.Contains(newCategory))
+            if (ContainsCategory(newCategory))
             {
                 if (showEditorLogs) ShowFeedback(string.Format(CATEGORY_EXIST_FEEDBACK_LABEL, newCategory), editor);
                 return;
@@ -405,25 +409,28 @@ namespace LocalizationTool.Scripts.General
 
             editor?.ClearAddTextField();
 
-            //Add language to Binary 
-            _categoriesData.Add(newCategory);
+            // Add category to Database
+            InsertCategoryToDatabase(newCategory);
+
+            // Update cache 
+            CategoriesCache = GetCategoriesOrderedFromDatabase();
 
             if (showEditorLogs) ShowFeedback(string.Format(CATEGORY_ADDED_FEEDBACK_LABEL, newCategory), editor);
-
-            await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
         }
 
-        public async void RemoveCategory(string category)
+        public async void RemoveCategory(string categoryToRemove)
         {
-            //Change BINARY file 
-            _categoriesData.Remove(category);
+            // Remove from Database
+            RemoveCategoryFromDatabase(categoryToRemove);
 
-            await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
+            // Remove from cache  
+            var itemToRemove = CategoriesCache.FirstOrDefault(x => x.Category.Equals(categoryToRemove));
+            CategoriesCache.Remove(itemToRemove);
 
             //Update JSON
             foreach (var keyValue in _dictionaryData.listDictionaryKeyCategoryLanguages)
             {
-                await keyValue.RemoveCategory(category);
+                await keyValue.RemoveCategory(categoryToRemove);
             }
 
             await SaveFile(_dictionaryData, JSON_DICTIONARY_PATH, _serializerJson);
@@ -435,11 +442,12 @@ namespace LocalizationTool.Scripts.General
 
         public async void ChangeCategoryName(string oldCategoryName, string newCategoryName)
         {
-            //Change BINARY file 
-            _categoriesData.ChangeName(oldCategoryName, newCategoryName);
+            // Update database
+            UpdateCategoryNameInDatabase(oldCategoryName, newCategoryName);
 
-            await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
-
+            // Update cache 
+            CategoriesCache = GetCategoriesOrderedFromDatabase();
+            
             //Update JSON
             foreach (var keyValue in _dictionaryData.listDictionaryKeyCategoryLanguages)
             {
@@ -451,39 +459,46 @@ namespace LocalizationTool.Scripts.General
             //Update dynamic Dictionary
             _dynamicDictionary = _dictionaryData.listDictionaryKeyCategoryLanguages
                 .ToDictionary(data => data.key, data => new KeyData { Category = data.category, LanguagesData = data.DictionaryLanguageValue });
-
-            //Log($"Category '{oldCategoryName}' update to '{newCategoryName}' correctly");
         }
 
-        public async void ChangeCategoryIndex(int oldIndex, int newIndex)
+        public static void ChangeCategoryIndex(string categoryName, int oldIndex, int newIndex)
         {
             if (newIndex <= 1) return;
             if (oldIndex == newIndex) return; //the new index is the same
 
-            //Change binary file
-            var category = _categoriesData.ChangeIndex(oldIndex, newIndex);
+            // Update database
+            UpdateCategoryDisplayOrderInDatabase(categoryName, oldIndex, newIndex);
 
-            await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
+            // Update cache 
+            CategoriesCache = GetCategoriesOrderedFromDatabase();
 
-            Log(string.Format(CATEGORY_INDEX_CHANGED_LOG, category.Category, category.Index));
-
-            //GUI.FocusControl(null);
+            Log(string.Format(CATEGORY_INDEX_CHANGED_LOG, categoryName, newIndex));
         }
 
-        public async void ChangeDefaultCategory(string newCategory)
+        public void ChangeDefaultCategory(string newDefaultCategory)
         {
-            //Change BINARY file 
-            _categoriesData.defaultCategory = newCategory;
-            _categoriesData.ChangeIndex(newCategory, 0);
+            // Update database
+            UpdateDefaultCategoryInDatabase(newDefaultCategory);
 
-            await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
-
-            OnDefaultCategoryUpdate?.Invoke(newCategory);
+            // Update cache 
+            CategoriesCache = GetCategoriesOrderedFromDatabase();
+            
+            OnDefaultCategoryUpdate?.Invoke(newDefaultCategory);
         }
 
         public static bool IsDefaultCategory(string category)
         {
-            return _categoriesData.defaultCategory.Equals(category);
+            return GetDefaultCategoryFromDatabase().Equals(category);
+        }
+
+        public static string GetDefaultCategory()
+        {
+            return GetDefaultCategoryFromDatabase();
+        }
+
+        public static bool ContainsCategory(string category)
+        {
+            return CategoriesCache.FirstOrDefault(x => x.Category.Equals(category)).IsNull();
         }
 
         #endregion
@@ -657,7 +672,7 @@ namespace LocalizationTool.Scripts.General
                 var values = new Dictionary<string, string>();
 
                 nKeys++;
-                if (!ExistCategory(category)) nCategories++;
+                //TODO if (!ExistCategory(category)) nCategories++;
 
                 Debug.Assert(lineItems != null, nameof(lineItems) + " != null");
                 for (var i = 0; i < lineItems.Length - 2; i++)
@@ -716,7 +731,7 @@ namespace LocalizationTool.Scripts.General
             foreach (var keyCategoryLanguage in data.DictionaryKeyCategoryLanguages)
             {
                 nKeys++;
-                if (!ExistCategory(keyCategoryLanguage.Category)) nCategories++;
+                //TODO if (!ExistCategory(keyCategoryLanguage.Category)) nCategories++;
 
                 foreach (var awaiterKey in keyCategoryLanguage.LanguageValues
                              .Select(languageValue => Instance.ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, languageValue.Language, languageValue.Value))
@@ -782,7 +797,7 @@ namespace LocalizationTool.Scripts.General
                 if (_dynamicDictionary[key].Category != category)
                 {
                     //Change category
-                    if (!_categoriesData.Contains(category)) AddNewCategory(category.IsEmpty() ? _categoriesData.defaultCategory : category, null, false);
+                    //TODO if (!_categoriesDataCache.Contains(category)) AddNewCategory(category.IsEmpty() ? _categoriesDataCache.defaultCategory : category, null, false);
 
                     _dictionaryData.UpdateCategoryName(key, category);
                 }
@@ -797,7 +812,7 @@ namespace LocalizationTool.Scripts.General
             {
                 //Add new key
 
-                if (!_categoriesData.Contains(category)) AddNewCategory(category.IsEmpty() ? _categoriesData.defaultCategory : category, null, false);
+                //TODO if (!_categoriesDataCache.Contains(category)) AddNewCategory(category.IsEmpty() ? _categoriesDataCache.defaultCategory : category, null, false);
 
                 var interList = values.Select(languageValuePair => new LanguageValue { language = languageValuePair.Key, value = languageValuePair.Value }).ToList();
 
@@ -824,7 +839,7 @@ namespace LocalizationTool.Scripts.General
 
             if (_dynamicDictionary.ContainsKey(key))
             {
-                AddNewCategory(category.IsEmpty() ? _categoriesData.defaultCategory : category, null, false);
+                //TODO AddNewCategory(category.IsEmpty() ? _categoriesDataCache.defaultCategory : category, null, false);
 
                 if (_dynamicDictionary[key].Category != category)
                 {
@@ -838,7 +853,7 @@ namespace LocalizationTool.Scripts.General
             else
             {
                 //Add new key
-                AddNewCategory(category.IsEmpty() ? _categoriesData.defaultCategory : category, null, false);
+                //TODO AddNewCategory(category.IsEmpty() ? _categoriesDataCache.defaultCategory : category, null, false);
 
                 var interDic = ActiveLanguages.ToDictionary(l => l, _ => "");
                 interDic[language] = value;
@@ -857,15 +872,100 @@ namespace LocalizationTool.Scripts.General
             // _dynamicDictionary = _dictionaryData.listDictionaryKeyCategoryLanguages.ToDictionary(data => data.key,
             //     data => new KeyData { Category = data.category, LanguagesData = data.DictionaryLanguageValue });
         }
-
-        public static bool ExistCategory(string category)
-        {
-            return _categoriesData.Contains(category);
-        }
-
+        
         #endregion
 
-        #region RefreshData
+        #region DATABASE
+
+        private static void OpenConnection()
+        {
+            connectionString = "URI=file:" + DATABASE_PATH;
+            dbConnection = new SqliteConnection(connectionString);
+            dbConnection.Open();
+        }
+
+        private static void CloseConnection()
+        {
+            if (dbConnection == null) return;
+
+            dbConnection.Close();
+            dbConnection = null;
+        }
+
+        public static void CreateDatabase()
+        {
+            try
+            {
+                OpenConnection();
+
+                using var dbCommand = dbConnection.CreateCommand();
+                // Table category
+                string query =
+                    $"CREATE TABLE IF NOT EXISTS {CATEGORY_TABLE} (id INTEGER PRIMARY KEY AUTOINCREMENT, displayOrder INTERGER NOT NULL , category VARCHAR({MAX_CATEGORY_CHARACTERS}) NOT NULL UNIQUE, isDefault INTEGER NOT NULL)";
+                dbCommand.CommandText = query;
+                dbCommand.ExecuteNonQuery();
+                // Insert None value
+                query = $"INSERT INTO {CATEGORY_TABLE} (displayOrder, category, isDefault) VALUES (1, 'None', 1)";
+                dbCommand.CommandText = query;
+                dbCommand.ExecuteNonQuery();
+
+                // Table language
+                query =
+                    $"CREATE TABLE IF NOT EXISTS {LANGUAGE_TABLE} (id INTEGER PRIMARY KEY AUTOINCREMENT, displayOrder INTERGER NOT NULL, language VARCHAR({MAX_LANGUAGE_CHARACTERS}) NOT NULL UNIQUE, isDefault INTEGER NOT NULL)";
+                dbCommand.CommandText = query;
+                dbCommand.ExecuteNonQuery();
+                // Insert English value
+                query = $"INSERT INTO {LANGUAGE_TABLE} (displayOrder, language, isDefault) VALUES (1, 'English', 1)";
+                dbCommand.CommandText = query;
+                dbCommand.ExecuteNonQuery();
+
+                // Table translation
+                query = $"CREATE TABLE IF NOT EXISTS {TRANSLATION_TABLE} (id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        $" keyName VARCHAR({MAX_KEY_CHARACTERS}) NOT NULL UNIQUE, categoryID INTEGER references {CATEGORY_TABLE}(id), languageID INTEGER references {LANGUAGE_TABLE}(id), translationText TEXT)";
+                dbCommand.CommandText = query;
+                dbCommand.ExecuteNonQuery();
+            }
+            catch (Exception )
+            {
+                //Ignore
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
+        
+        #endregion
+
+        #region STRUCTURES
+
+        public struct CategoryTuple
+        {
+            public int DisplayOrder;
+            public string Category;
+
+            public void Deconstruct(out int displayOrder, out string category)
+            {
+                displayOrder = DisplayOrder;
+                category = Category;
+            }
+        }
+        
+        public struct LanguageTuple
+        {
+            public int DisplayOrder;
+            public string Language;
+
+            public void Deconstruct(out int displayOrder, out string language)
+            {
+                displayOrder = DisplayOrder;
+                language = Language;
+            }
+        }
+        
+        #endregion
+
+        #region REFRESH DATA
 
         // ReSharper disable Unity.PerformanceAnalysis
         public void RefreshDictionaryData()
@@ -885,7 +985,7 @@ namespace LocalizationTool.Scripts.General
         public void RefreshCategoriesData()
         {
 #pragma warning disable CS4014
-            LoadCategoriesDataFromBINARY();
+            LoadCategoriesCacheFromDatabase();
 #pragma warning restore CS4014
         }
 
@@ -945,12 +1045,7 @@ namespace LocalizationTool.Scripts.General
             };
             await SaveFile(_languagesData, BINARY_LANGUAGES_PATH, _serializerBinary);
 
-            //File.Delete(BINARY_CATEGORIES_PATH);
-            _categoriesData = new CategoriesData
-            {
-                defaultCategory = _categoriesData.defaultCategory
-            };
-            await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
+            CategoriesCache.Clear();
 
             _dynamicDictionary.Clear();
             if (_dictionaryData.IsNotNull())
@@ -959,8 +1054,217 @@ namespace LocalizationTool.Scripts.General
         }
 
         #endregion
-
+        
         #region PRIVATE METHODS
+
+        #region DATABASE UPDATES
+
+        private static void InsertCategoryToDatabase(string newCategory)
+        {
+            try
+            {
+                OpenConnection();
+                using var dbCommandGetMaxDisplayOrder = dbConnection.CreateCommand();
+                var query = $"SELECT MAX(displayOrder) AS max_display_order FROM {CATEGORY_TABLE}";
+                dbCommandGetMaxDisplayOrder.CommandText = query;
+                var reader = dbCommandGetMaxDisplayOrder.ExecuteReader();
+                var lastDisplayOrder = Convert.ToInt32(reader["max_display_order"]);
+
+                using var dbCommandInsert = dbConnection.CreateCommand();
+                query = $"INSERT INTO {CATEGORY_TABLE} (displayOrder, category, isDefault) VALUES ({lastDisplayOrder + 1}, '{newCategory}', 0)";
+                dbCommandInsert.CommandText = query;
+                dbCommandInsert.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
+
+        private static void RemoveCategoryFromDatabase(string categoryToRemove)
+        {
+            try
+            {
+                OpenConnection();
+                using var dbCommandRemove = dbConnection.CreateCommand();
+
+                var query = $"delete from {CATEGORY_TABLE} where category = '{categoryToRemove}'";
+                dbCommandRemove.CommandText = query;
+                dbCommandRemove.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
+
+        private static void UpdateCategoryNameInDatabase(string oldCategoryName, string newCategoryName)
+        {
+            try
+            {
+                OpenConnection();
+                using var dbCommandUpdate = dbConnection.CreateCommand();
+
+                var query = $"update {CATEGORY_TABLE} set category = '{newCategoryName}' where category = '{oldCategoryName}'";
+                dbCommandUpdate.CommandText = query;
+                dbCommandUpdate.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
+
+        private static void UpdateCategoryDisplayOrderInDatabase(string categoryName, int oldCategoryDisplayOrder, int newCategoryDisplayOrder)
+        {
+            try
+            {
+                OpenConnection();
+                string query;
+                if (oldCategoryDisplayOrder < newCategoryDisplayOrder)
+                {
+                    // Scroll down elements between oldIndex and newIndex
+                    using var dbCommandUpdateDown = dbConnection.CreateCommand();
+                    query = $"update {CATEGORY_TABLE} set displayOrder = displayOrder - 1 where displayOrder > {oldCategoryDisplayOrder} and displayOrder <= {newCategoryDisplayOrder}";
+                    dbCommandUpdateDown.CommandText = query;
+                    dbCommandUpdateDown.ExecuteNonQuery();
+                }
+                else if (oldCategoryDisplayOrder > newCategoryDisplayOrder)
+                {
+                    // Scroll up elements between oldIndex and newIndex
+                    using var dbCommandUpdateUp = dbConnection.CreateCommand();
+                    query = $"update {CATEGORY_TABLE} set displayOrder = displayOrder + 1 where displayOrder >= {newCategoryDisplayOrder} and displayOrder < {oldCategoryDisplayOrder}";
+                    dbCommandUpdateUp.CommandText = query;
+                    dbCommandUpdateUp.ExecuteNonQuery();
+                }
+
+                using var dbCommandUpdate = dbConnection.CreateCommand();
+                query = $"update {CATEGORY_TABLE} set displayOrder = '{newCategoryDisplayOrder}' where category = '{categoryName}'";
+                dbCommandUpdate.CommandText = query;
+                dbCommandUpdate.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
+
+        private static void UpdateDefaultCategoryInDatabase(string newDefaultCategory)
+        {
+            try
+            {
+                OpenConnection();
+                using var dbCommandOld= dbConnection.CreateCommand();
+
+                var query = $"update {CATEGORY_TABLE} set isDefault = 0 where isDefault = 1";
+                dbCommandOld.CommandText = query;
+                dbCommandOld.ExecuteNonQuery();
+                
+                using var dbCommandNew = dbConnection.CreateCommand();
+
+                query = $"update {CATEGORY_TABLE} set isDefault = 1 where category = '{newDefaultCategory}'";
+                dbCommandNew.CommandText = query;
+                dbCommandNew.ExecuteNonQuery();
+                
+                using var dbCommandGetDisplayOrder = dbConnection.CreateCommand();
+
+                query = $"select displayOrder from {CATEGORY_TABLE} where category = '{newDefaultCategory}'";
+                dbCommandGetDisplayOrder.CommandText = query;
+                var reader = dbCommandGetDisplayOrder.ExecuteReader();
+                
+                using var dbCommandUpdateUp = dbConnection.CreateCommand();
+                query = $"update {CATEGORY_TABLE} set displayOrder = displayOrder + 1 where displayOrder >= {1} and displayOrder < {Convert.ToInt32(reader["displayOrder"])}";
+                dbCommandUpdateUp.CommandText = query;
+                dbCommandUpdateUp.ExecuteNonQuery();
+                
+                using var dbCommandUpdate = dbConnection.CreateCommand();
+                query = $"update {CATEGORY_TABLE} set displayOrder = 1 where category = '{newDefaultCategory}'";
+                dbCommandUpdate.CommandText = query;
+                dbCommandUpdate.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
+
+        private static string GetDefaultCategoryFromDatabase()
+        {
+            var defaultCategory = "";
+            try
+            {
+                OpenConnection();
+                using var dbCommand = dbConnection.CreateCommand();
+                var query = $"SELECT category FROM {CATEGORY_TABLE} where isDefault = 1";
+                dbCommand.CommandText = query;
+                var reader = dbCommand.ExecuteReader();
+                defaultCategory = reader["category"].ToString();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+            finally
+            {
+                CloseConnection();
+            }
+
+            return defaultCategory;
+        }
+        
+        private static List<CategoryTuple> GetCategoriesOrderedFromDatabase()
+        {
+            var result = new List<CategoryTuple>();
+            try
+            {
+                OpenConnection();
+                using var dbCommand = dbConnection.CreateCommand();
+                var query = $"SELECT displayOrder, category FROM {CATEGORY_TABLE} order by displayOrder ASC";
+                dbCommand.CommandText = query;
+                var reader = dbCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    result.Add(new CategoryTuple
+                    {
+                        Category = reader["category"].ToString(),
+                        DisplayOrder = Convert.ToInt32(reader["displayOrder"])
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+            finally
+            {
+                CloseConnection();
+            }
+
+            return result;
+        }
+
+        #endregion
 
         private LocalizationManager()
         {
@@ -989,7 +1293,7 @@ namespace LocalizationTool.Scripts.General
 #pragma warning restore CS4014
             await LoadDictionaryDataFromJSON();
             await LoadLanguagesDataFromBINARY();
-            await LoadCategoriesDataFromBINARY();
+            LoadCategoriesCacheFromDatabase();
 
             IsDataLoaded = true;
 
@@ -1040,21 +1344,9 @@ namespace LocalizationTool.Scripts.General
             //Log("Languages loaded");
         }
 
-        private async Task LoadCategoriesDataFromBINARY()
+        private static void LoadCategoriesCacheFromDatabase()
         {
-            _categoriesData = await LoadFile<CategoriesData>(BINARY_CATEGORIES_PATH, _serializerBinary);
-
-            if (_categoriesData.IsNull())
-            {
-                _categoriesData = new CategoriesData
-                {
-                    defaultCategory = "None"
-                };
-                _categoriesData.Add("None");
-                await SaveFile(_categoriesData, BINARY_CATEGORIES_PATH, _serializerBinary);
-            }
-
-            //Log("Categories loaded");
+            CategoriesCache = GetCategoriesOrderedFromDatabase();
         }
 
         private async Task LoadConfigurationDataFromBINARY()
