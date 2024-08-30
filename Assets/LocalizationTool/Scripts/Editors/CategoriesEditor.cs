@@ -147,7 +147,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(GetGUIContent(RefreshIcon, RELOAD_BUTTON_TOOLTIP), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
             {
-                LocalizationManager.Instance.RefreshCategoriesData();
+                LocalizationManager.RefreshCategoriesData();
                 LocalizationManager.Log(CATEGORIES_LOADED_LOG);
             }
         

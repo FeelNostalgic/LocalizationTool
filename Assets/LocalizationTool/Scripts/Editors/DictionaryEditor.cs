@@ -191,13 +191,13 @@ namespace LocalizationTool.Scripts.Editors
                 GUILayout.Space(10);
                 GUILayout.BeginHorizontal();
                 _scrollToolbar = EditorGUILayout.BeginScrollView(_scrollToolbar, GUILayout.Height(40));
-                var toolbarItems = LocalizationManager.ActiveLanguages.Select(t => t).ToArray();
+                var toolbarItems = LocalizationManager.Languages.Select(t => t).ToArray();
                 if (toolbarItems.Length != 0)
                 {
-                    _currentLanguageToolbarIndex = GUILayout.Toolbar(LocalizationManager.Instance.CurrentToolbarLanguageIndex, toolbarItems);
-                    if (LocalizationManager.Instance.CurrentLanguageInDictionarySection != LocalizationManager.ActiveLanguages[_currentLanguageToolbarIndex])
+                    _currentLanguageToolbarIndex = GUILayout.Toolbar(LocalizationManager.CurrentToolbarLanguageIndex, toolbarItems);
+                    if (LocalizationManager.CurrentLanguageInDictionarySection != LocalizationManager.Languages[_currentLanguageToolbarIndex])
                     {
-                        LocalizationManager.Instance.CurrentLanguageInDictionarySection = LocalizationManager.ActiveLanguages[_currentLanguageToolbarIndex];
+                        LocalizationManager.CurrentLanguageInDictionarySection = LocalizationManager.Languages[_currentLanguageToolbarIndex];
                         GUI.FocusControl(null);
                     }
                 }
@@ -225,7 +225,7 @@ namespace LocalizationTool.Scripts.Editors
 
             GUILayout.FlexibleSpace();
 
-            GUILayout.Label(LocalizationManager.Instance.CurrentLanguageInDictionarySection, CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter20Label));
+            GUILayout.Label(LocalizationManager.CurrentLanguageInDictionarySection, CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter20Label));
 
             GUILayout.FlexibleSpace();
 
@@ -285,7 +285,7 @@ namespace LocalizationTool.Scripts.Editors
 
                 foreach (var keyData in filteredDicToIterate)
                 {
-                    UnitCenterScrollViewContent(keyData.Key, keyData.Value.Category, keyData.Value.LanguagesData[LocalizationManager.Instance.CurrentLanguageInDictionarySection]);
+                    UnitCenterScrollViewContent(keyData.Key, keyData.Value.Category, keyData.Value.LanguagesData[LocalizationManager.CurrentLanguageInDictionarySection]);
                 }
 
                 EditorGUILayout.EndScrollView();
