@@ -1,9 +1,4 @@
-using System;
-using System.Collections;
-using LocalizationTool.Data;
-using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.General;
-using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
