@@ -337,7 +337,7 @@ namespace LocalizationTool.Scripts.Editors
         
         private static void DeleteCategory(string category)
         {
-            LocalizationManager.Instance.RemoveCategory(category);
+            LocalizationManager.RemoveCategory(category);
             LocalizationManager.Log(string.Format(DELETED_CATEGORY_LOG, category));
         }
         
@@ -371,7 +371,7 @@ namespace LocalizationTool.Scripts.Editors
                 return;
             }
         
-            LocalizationManager.Instance.ChangeCategoryName(oldCategory, newCategory);
+            LocalizationManager.ChangeCategoryName(oldCategory, newCategory);
         
             _feedbackList.Remove(oldCategory);
         }

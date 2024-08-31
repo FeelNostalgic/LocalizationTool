@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Reflection;
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.General;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 using ColorUtility = UnityEngine.ColorUtility;
@@ -15,6 +17,8 @@ namespace LocalizationTool.Scripts.Editors
     public class RichTextEditor : EditorWindow
     {
         #region PUBLIC VARIABLES
+        
+        public bool AddActionRunning { get; set; }
 
         #endregion
         
@@ -40,7 +44,8 @@ namespace LocalizationTool.Scripts.Editors
         private Color _colorSelected = Color.white;
 
         private string _tempValue;
-        
+        private EditorCoroutine _currentCoroutine;
+
         #endregion
 
         public static void ShowWindow(string initialText, string key, Action<string> onTextChanged)
@@ -50,6 +55,25 @@ namespace LocalizationTool.Scripts.Editors
             window.maxSize = new Vector2(WindowSize.x, 100000);
             window._key = key;
             window._richText = initialText;
+        }
+        
+        public void ControlFeedbackLabel(string text)
+        {
+            AddActionRunning = true;
+            if (_currentCoroutine != null) EditorCoroutineUtility.StopCoroutine(_currentCoroutine);
+            _currentCoroutine = EditorCoroutineUtility.StartCoroutine(FeedbackLabelCoroutine(text, delegate(string s) { FeedbackLabel = s; }, 1.6f), this);
+        }
+        
+        private IEnumerator FeedbackLabelCoroutine(string text, Action<string> updateFeedbackLabel, float duration, Action onComplete = null)
+        {
+            updateFeedbackLabel?.Invoke(text);
+            yield return new WaitForSecondsRealtime(duration);
+            updateFeedbackLabel?.Invoke("");
+            LocalizationMainEditor.Instance.Repaint();
+            _currentCoroutine = null;
+            AddActionRunning = false;
+
+            onComplete?.Invoke();
         }
 
         protected void OnDestroy()
@@ -483,15 +507,15 @@ namespace LocalizationTool.Scripts.Editors
             };
         }
 
-        private async void UpdateValue(string key, string tempValue)
+        private void UpdateValue(string key, string tempValue)
         {
             _richText = tempValue;
-            await LocalizationManager.Instance.ChangeValue(key, tempValue);
+            LocalizationManager.ChangeValue(key, tempValue);
         }
 
-        private async void UpdateKey(string oldKey, string newKey)
+        private void UpdateKey(string oldKey, string newKey)
         {
-            //TODO: _key = await LocalizationManager.Instance.ChangeKey(oldKey, newKey, this);
+            _key = LocalizationManager.ChangeKey(oldKey, newKey, this);
         }
 
         #endregion

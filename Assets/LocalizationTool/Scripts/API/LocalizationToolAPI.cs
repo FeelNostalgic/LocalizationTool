@@ -32,13 +32,13 @@ namespace LocalizationTool.Scripts.API
 
         #region UNITY METHODS
 
-        private async void Awake()
+        private void Awake()
         {
             DontDestroyOnLoad(this);
             
             FindAllAddons();
 
-            await LocalizationManager.Instance.Init(()=>
+            LocalizationManager.Instance.Init(()=>
             {
                 LocalizationManager.Log(API_INITIALIZED_LOG);
                 UpdateAllAddons(ActiveLanguage);
@@ -61,10 +61,10 @@ namespace LocalizationTool.Scripts.API
             if (!LocalizationManager.IsDataLoaded) return "";
             if (key.IsNull()) return "";
             
-            found = LocalizationManager.Dictionary.ContainsKey(key);
-            if(found) found = LocalizationManager.Dictionary[key].LanguagesData.ContainsKey(ActiveLanguage);
+            found = LocalizationManager.DictionaryCache.ContainsKey(key);
+            if(found) found = LocalizationManager.DictionaryCache[key].TranslationData.ContainsKey(ActiveLanguage);
             return found
-                ? LocalizationManager.Dictionary[key].LanguagesData[ActiveLanguage]
+                ? LocalizationManager.DictionaryCache[key].TranslationData[ActiveLanguage]
                 : "";
         }
 
@@ -83,9 +83,9 @@ namespace LocalizationTool.Scripts.API
                 return "";
             }
 
-            found = LocalizationManager.Dictionary[key].LanguagesData.ContainsKey(language);
+            found = LocalizationManager.DictionaryCache[key].TranslationData.ContainsKey(language);
             return found
-                ? LocalizationManager.Dictionary[key].LanguagesData[ActiveLanguage]
+                ? LocalizationManager.DictionaryCache[key].TranslationData[ActiveLanguage]
                 : "";
         }
 

@@ -69,11 +69,4 @@ namespace LocalizationTool.Data
         
         public static string[] SEARCH_TYPE = {"By key", "By value", "By both"};
     }
-    
-    [Serializable]
-    public struct KeyData
-    {
-        public string Category;
-        public Dictionary<string, string> LanguagesData;
-    }
 }

@@ -235,7 +235,7 @@ namespace LocalizationTool.Scripts.Editors
             
             serializer.AddTitle(_language);
             
-            var data = new Dictionary<string, KeyData>(LocalizationManager.Dictionary);
+            var data = new Dictionary<string, LocalizationManager.KeyData>(LocalizationManager.DictionaryCache);
             
             foreach (var (key, keyData) in data)
             {
@@ -244,7 +244,7 @@ namespace LocalizationTool.Scripts.Editors
 
                 items.Add(key);
                 items.Add(category);
-                items.Add(data[key].LanguagesData[_language].Replace("\n", " ").Replace("\r", " "));
+                items.Add(data[key].TranslationData[_language].Replace("\n", " ").Replace("\r", " "));
 
                 serializer.AddLine(items);
             }
@@ -259,7 +259,7 @@ namespace LocalizationTool.Scripts.Editors
                 Language = _language
             };
 
-            var data = new Dictionary<string, KeyData>(LocalizationManager.Dictionary);
+            var data = new Dictionary<string, LocalizationManager.KeyData>(LocalizationManager.DictionaryCache);
             foreach (var (key, keyData) in data)
             {
                 var category = keyData.Category;
@@ -267,7 +267,7 @@ namespace LocalizationTool.Scripts.Editors
                 {
                     Key = key,
                     Category = category,
-                    Value = data[key].LanguagesData[_language]
+                    Value = data[key].TranslationData[_language]
                 });
             }
 

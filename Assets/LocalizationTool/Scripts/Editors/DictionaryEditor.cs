@@ -124,14 +124,14 @@ namespace LocalizationTool.Scripts.Editors
 
                 if (GUILayout.Button(new GUIContent(AddIcon, ADD_KEY_BUTTON_TOOLTIP), GUILayout.ExpandWidth(true), GUILayout.Height(30)))
                 {
-                    LocalizationManager.Instance.AddNewKey(_addKeyValue, _addCategoryValue, this);
+                    LocalizationManager.AddNewKey(_addKeyValue, _addCategoryValue, this);
                 }
 
                 if (GUI.GetNameOfFocusedControl() == KEY_LABEL_UPPER)
                 {
                     if (Event.current is { keyCode: (KeyCode.Return or KeyCode.KeypadEnter) })
                     {
-                        if (!AddActionRunning) LocalizationManager.Instance.AddNewKey(_addKeyValue, _addCategoryValue, this);
+                        if (!AddActionRunning) LocalizationManager.AddNewKey(_addKeyValue, _addCategoryValue, this);
                     }
                 }
 
@@ -219,7 +219,7 @@ namespace LocalizationTool.Scripts.Editors
 
             if (GUILayout.Button(new GUIContent(RefreshIcon, RELOAD_BUTTON_TOOLTIP), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
             {
-                LocalizationManager.Instance.RefreshDictionaryData();
+                LocalizationManager.RefreshDictionaryData();
                 LocalizationManager.Log(DICTIONARY_LOADED_LOG);
             }
 
@@ -285,7 +285,7 @@ namespace LocalizationTool.Scripts.Editors
 
                 foreach (var keyData in filteredDicToIterate)
                 {
-                    UnitCenterScrollViewContent(keyData.Key, keyData.Value.Category, keyData.Value.LanguagesData[LocalizationManager.CurrentLanguageInDictionarySection]);
+                    UnitCenterScrollViewContent(keyData.Key, keyData.Value.Category, keyData.Value.TranslationData[LocalizationManager.CurrentLanguageInDictionarySection]);
                 }
 
                 EditorGUILayout.EndScrollView();
@@ -296,9 +296,9 @@ namespace LocalizationTool.Scripts.Editors
             }
         }
 
-        private Dictionary<string, KeyData> GetFilteredDictionary()
+        private Dictionary<string, LocalizationManager.KeyData> GetFilteredDictionary()
         {
-            var filteredDicToIterate = new Dictionary<string, KeyData>(LocalizationManager.Dictionary);
+            var filteredDicToIterate = new Dictionary<string, LocalizationManager.KeyData>(LocalizationManager.DictionaryCache);
 
             switch (LocalizationManager.Configuration.searchTypeIndex)
             {
@@ -371,7 +371,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.BeginHorizontal(GUILayout.Width(175));
             EditorGUI.BeginChangeCheck();
 
-            if (category.IsEmpty()) category = LocalizationManager.GetDefaultCategory();
+            if (category.IsEmpty()) category = LocalizationManager.DefaultCategory;
             GUI.backgroundColor = Colors.DEFAULT;
             var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.ScrollViewCategoryPopup));
 
@@ -432,7 +432,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private static void DeleteKey(string key)
         {
-            LocalizationManager.Instance.RemoveKey(key);
+            LocalizationManager.RemoveKey(key);
             LocalizationManager.Log(string.Format(DELETED_KEY_LOG, key));
         }
 
@@ -441,15 +441,15 @@ namespace LocalizationTool.Scripts.Editors
             if (tempCategory.Equals(_currentKeyGroupDictionary[key])) return;
 
             _currentKeyGroupDictionary[key] = tempCategory;
-            LocalizationManager.Instance.ChangeCategory(key, _currentKeyGroupDictionary[key]);
+            LocalizationManager.ChangeCategory(key, _currentKeyGroupDictionary[key]);
         }
 
-        private async void UpdateValue(string key, string tempValue)
+        private void UpdateValue(string key, string tempValue)
         {
             if (tempValue.Equals(_currentKeyValueDictionary[key])) return;
 
             _currentKeyValueDictionary[key] = tempValue;
-            await LocalizationManager.Instance.ChangeValue(key, tempValue);
+            LocalizationManager.ChangeValue(key, tempValue);
         }
 
         private void OnDefaultCategoryUpdate(string category)

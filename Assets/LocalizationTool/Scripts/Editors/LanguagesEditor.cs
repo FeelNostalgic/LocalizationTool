@@ -336,7 +336,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private static void DeleteLanguage(string language)
         {
-            LocalizationManager.Instance.RemoveLanguage(language);
+            LocalizationManager.RemoveLanguage(language);
             LocalizationManager.Log(string.Format(DELETED_LANGUAGE_LOG, language));
         }
 
@@ -388,7 +388,7 @@ namespace LocalizationTool.Scripts.Editors
                 return;
             }
 
-            LocalizationManager.Instance.ChangeLanguageValue(oldLanguage, newLanguage);
+            LocalizationManager.ChangeLanguageValue(oldLanguage, newLanguage);
 
             _feedbackList.Remove(oldLanguage);
         }

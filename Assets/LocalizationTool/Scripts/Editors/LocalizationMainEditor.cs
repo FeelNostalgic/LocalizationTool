@@ -150,10 +150,11 @@ namespace LocalizationTool.Scripts.Editors
 
         #region DATABASE
 
-        private static async void LoadData()
+        private static void LoadData()
         {
             LocalizationManager.CreateDatabase();
-            await LocalizationManager.Instance.Init();
+            LocalizationManager.LoadCache();
+            LocalizationManager.Instance.Init();
         }
         
         #endregion
