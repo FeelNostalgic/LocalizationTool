@@ -113,7 +113,7 @@ namespace LocalizationTool.Scripts.Editors
                     if (GUILayout.Button(GetGUIContent(ExportIcon, string.Format(EXPORT_BUTTON_TOOLTIP, JSON_LABEL_UPPER)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                     {
                         var path = EditorUtility.SaveFilePanel(string.Format(EXPORT_BUTTON_TOOLTIP, JSON_LABEL_UPPER), "",
-                            $"{_language}{CSV_LABEL_UPPER}", JSON_LABEL_LOWER);
+                            $"{_language}{JSON_LABEL_UPPER}", JSON_LABEL_LOWER);
                         if (!string.IsNullOrEmpty(path))
                         {
                             var fileContent = BuildSerializedData(_jsonSerializer);
@@ -129,7 +129,7 @@ namespace LocalizationTool.Scripts.Editors
                     if (GUILayout.Button(GetGUIContent(ExportIcon, string.Format(EXPORT_BUTTON_TOOLTIP, XML_LABEL_UPPER)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                     {
                         var path = EditorUtility.SaveFilePanel(string.Format(EXPORT_BUTTON_TOOLTIP, XML_LABEL_UPPER), "",
-                            $"{_language}{CSV_LABEL_UPPER}", XML_LABEL_LOWER);
+                            $"{_language}{XML_LABEL_UPPER}", XML_LABEL_LOWER);
 
                         if (!string.IsNullOrEmpty(path))
                         {
@@ -302,9 +302,7 @@ namespace LocalizationTool.Scripts.Editors
                 yield break;
             }
 
-            var loadLanguageTask = LocalizationManager.Instance.ImportLanguage(headerItems[2]);
-            var awaiter = loadLanguageTask.GetAwaiter();
-            while (!awaiter.IsCompleted) yield return null;
+            LocalizationManager.ImportLanguage(headerItems[2]);
 
             var nKeys = 0;
             var nCategories = 0;
@@ -319,12 +317,10 @@ namespace LocalizationTool.Scripts.Editors
                 var value = lineItems[2];
 
                 nKeys++;
-                //TODO: if (!LocalizationManager.ExistCategory(category)) nCategories++;
+                if (!LocalizationManager.ContainsCategory(category)) nCategories++;
                 
-                var loadKeyTask = LocalizationManager.Instance.ImportKey(key, category, _language, value);
-                var awaiterKey = loadKeyTask.GetAwaiter();
-                while (!awaiterKey.IsCompleted) yield return null;
-                
+                LocalizationManager.ImportKey(key, category, _language, value);
+
                 progressWindow.SetProgress( (float)bytesRead / totalBytes);
                 progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_KEY_CATEGORY, key, category));
             }
@@ -348,21 +344,17 @@ namespace LocalizationTool.Scripts.Editors
             var itemCount = 0f;
             
 
-            var loadLanguageTask = LocalizationManager.Instance.ImportLanguage(data.Language);
-            var awaiterLanguage = loadLanguageTask.GetAwaiter();
-            while (!awaiterLanguage.IsCompleted) yield return null;
-            
+            LocalizationManager.ImportLanguage(data.Language);
+
             progressWindow.SetStatus(IMPORT_STATUS_KEYS);
             var nKeys = 0;
             var nCategories = 0;
             foreach (var keyCategoryLanguage in data.Data)
             {
                 nKeys++;
-                //TODO: if (!LocalizationManager.ExistCategory(keyCategoryLanguage.Category)) nCategories++;
+                if (!LocalizationManager.ContainsCategory(keyCategoryLanguage.Category)) nCategories++;
 
-                var task = LocalizationManager.Instance.ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, _language, keyCategoryLanguage.Value);
-                var awaiterKey = task.GetAwaiter();
-                while (!awaiterKey.IsCompleted) yield return null;
+                LocalizationManager.ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, _language, keyCategoryLanguage.Value);
                 
                 progressWindow.SetProgress(itemCount++ / totalItems);
                 progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_KEY_CATEGORY, keyCategoryLanguage.Key, keyCategoryLanguage.Category));

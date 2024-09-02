@@ -2,357 +2,43 @@
 <DictionaryTemplate xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <DictionaryKeyCategoryLanguages>
     <KeyCategoryLanguageValues>
-      <Key>1</Key>
+      <Key>Test</Key>
+      <Category>MainMenu</Category>
+      <LanguageValues>
+        <LanguageValue>
+          <Language>English</Language>
+          <Value />
+        </LanguageValue>
+        <LanguageValue>
+          <Language>Spanish</Language>
+          <Value />
+        </LanguageValue>
+      </LanguageValues>
+    </KeyCategoryLanguageValues>
+    <KeyCategoryLanguageValues>
+      <Key>mainMenu</Key>
       <Category>None</Category>
       <LanguageValues>
         <LanguageValue>
-          <Language>Spanish</Language>
-          <Value>nnnvbnmvbn</Value>
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value>a</Value>
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
           <Language>English</Language>
-          <Value />
+          <Value>HELLO</Value>
+        </LanguageValue>
+        <LanguageValue>
+          <Language>Spanish</Language>
+          <Value>HOLA</Value>
         </LanguageValue>
       </LanguageValues>
     </KeyCategoryLanguageValues>
     <KeyCategoryLanguageValues>
-      <Key>2</Key>
-      <Category>Table</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value>dfgdfg</Value>
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value>dfgdfgdf</Value>
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value />
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>4</Key>
+      <Key>Options_title</Key>
       <Category>None</Category>
       <LanguageValues>
         <LanguageValue>
-          <Language>Italian</Language>
-          <Value>kjhhhhhhhhhhhjk</Value>
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
           <Language>English</Language>
           <Value />
         </LanguageValue>
         <LanguageValue>
           <Language>Spanish</Language>
-          <Value>&lt;size=18&gt;&lt;color=#00E093FF&gt;sdfsdfsdfsdfsdf&lt;/color&gt;&lt;/size&gt; &lt;size=9&gt;gdsfgdfgdfgdfg&lt;/size&gt;
-&lt;size=19&gt;gggggggggggggggggggggggg  &lt;/size&gt;              &lt;color=#026F5FFF&gt; &lt;size=24&gt;fghfgh&lt;/size&gt;&lt;/color&gt;</Value>
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>3</Key>
-      <Category>Main_Menu_Options_Localization</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value>d</Value>
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value>Hello5</Value>
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value>&lt;size=13&gt;&lt;i&gt;Holaaaaaaaaaaaaaaaaa&lt;/i&gt;
- &lt;u&gt;Tal&lt;/u&gt;&lt;/size&gt;
-
-</Value>
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>0</Key>
-      <Category>Testing</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value>dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd</Value>
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>6</Key>
-      <Category>None</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>666</Key>
-      <Category>None</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>6667</Key>
-      <Category>None</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>66678</Key>
-      <Category>Inventory</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>7</Key>
-      <Category>Testing</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>8</Key>
-      <Category>Testing</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>9</Key>
-      <Category>Testing</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>76</Key>
-      <Category>Testing</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>ghjghj</Key>
-      <Category>Testing</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>hfnvbntgyg</Key>
-      <Category>Testing</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
-          <Value />
-        </LanguageValue>
-      </LanguageValues>
-    </KeyCategoryLanguageValues>
-    <KeyCategoryLanguageValues>
-      <Key>nghjkgjkghj</Key>
-      <Category>Testing</Category>
-      <LanguageValues>
-        <LanguageValue>
-          <Language>Spanish</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>Italian</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>English</Language>
-          <Value />
-        </LanguageValue>
-        <LanguageValue>
-          <Language>French</Language>
           <Value />
         </LanguageValue>
       </LanguageValues>

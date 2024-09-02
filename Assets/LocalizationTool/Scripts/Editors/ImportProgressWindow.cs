@@ -92,8 +92,7 @@ namespace LocalizationTool.Scripts.Editors
 		}
 
 		#endregion
-
-
+		
 		#region PRIVATE METHODS
 
 		

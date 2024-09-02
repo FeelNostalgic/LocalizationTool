@@ -21,6 +21,12 @@ namespace LocalizationTool.Data.Templates
         {
             public string Language;
             public string Value;
+
+            public void Deconstruct(out string language, out string value)
+            {
+                language = Language;
+                value = Value;
+            }
         }
     }
 }

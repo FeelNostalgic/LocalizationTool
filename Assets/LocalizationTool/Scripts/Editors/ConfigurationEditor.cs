@@ -210,7 +210,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.EndVertical();
         }
 
-        private void ReadmeSection()
+        private static void ReadmeSection()
         {
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
 
@@ -472,7 +472,6 @@ namespace LocalizationTool.Scripts.Editors
 
                         if (!string.IsNullOrEmpty(path))
                         {
-                            // TODO
                             var progressWindow = ImportProgressWindow.OpenWindow(string.Format(IMPORT_WINDOW_LABEL, XML_LABEL_UPPER));
                             EditorCoroutineUtility.StartCoroutine(LocalizationManager.ImportSerializedDataCoroutine(path, new XmlSerializerService(), progressWindow), progressWindow);
                         }

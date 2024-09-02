@@ -83,7 +83,7 @@ namespace UIManager
 			LocalizationManager.SaveFile(BACKUP_PATH, LocalizationManager.BuildSerializedData(new UnityJsonSerializer()), "", "", "");
 			Debug.Log("Data saved to backup");
 			
-			LocalizationManager.Instance.ClearData();
+			LocalizationManager.ClearData();
 			LoadDemoData();
 		}
 
@@ -125,7 +125,7 @@ namespace UIManager
 		
 		private static void LoadBackupData()
 		{
-			LocalizationManager.Instance.ClearData();
+			LocalizationManager.ClearData();
 			var currentLogValue = LocalizationManager.Configuration.showLogsInConsole;
 			LocalizationManager.Configuration.showLogsInConsole = false;
 			EditorCoroutineUtility.StartCoroutineOwnerless(LocalizationManager.ImportSerializedDataCoroutine(BACKUP_PATH, new UnityJsonSerializer(), null,

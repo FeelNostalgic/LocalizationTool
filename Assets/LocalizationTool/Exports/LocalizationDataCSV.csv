@@ -1,17 +1,4 @@
-Key;Category;Spanish;Italian;English;French
-1;None;nnnvbnmvbn;a;;
-2;Table;dfgdfg;dfgdfgdf;;
-4;None;<size=18><color=#00E093FF>sdfsdfsdfsdfsdf</color></size> <size=9>gdsfgdfgdfgdfg</size> <size=19>gggggggggggggggggggggggg  </size>              <color=#026F5FFF> <size=24>fghfgh</size></color>;kjhhhhhhhhhhhjk;;
-3;Main_Menu_Options_Localization;<size=13><i>Holaaaaaaaaaaaaaaaaa</i>  <u>Tal</u></size>  ;d;Hello5;
-0;Testing;dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd;;;
-6;None;;;;
-666;None;;;;
-6667;None;;;;
-66678;Inventory;;;;
-7;Testing;;;;
-8;Testing;;;;
-9;Testing;;;;
-76;Testing;;;;
-ghjghj;Testing;;;;
-hfnvbntgyg;Testing;;;;
-nghjkgjkghj;Testing;;;;
+Key,Category,English,Spanish
+Test,MainMenu,,
+mainMenu,None,HOLA,
+Options_title,None,,
