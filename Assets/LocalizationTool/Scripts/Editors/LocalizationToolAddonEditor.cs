@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +15,6 @@ using static LocalizationTool.Scripts.Editors.EditorWindowAbstract;
 
 namespace LocalizationTool.Scripts.Editors
 {
-#if UNITY_EDITOR
     [CustomEditor(typeof(LocalizationToolAddon))]
     public class LocalizationToolAddonEditor : Editor
     {
@@ -193,5 +194,5 @@ namespace LocalizationTool.Scripts.Editors
 
         #endregion
     }
-#endif
 }
+#endif

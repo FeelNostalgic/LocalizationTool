@@ -25,6 +25,8 @@ using static LocalizationTool.Scripts.Commons.EditorStrings;
 using static LocalizationTool.Scripts.Commons.EditorPaths;
 using static LocalizationTool.Database.DatabaseStrings;
 
+//TODO: add #if UNITY_EDITOR where is necessary or created another class to store cache
+
 namespace LocalizationTool.Scripts.General
 {
     public class LocalizationManager
@@ -231,6 +233,11 @@ namespace LocalizationTool.Scripts.General
             //Save scene
             EditorSceneManager.SaveScene(SceneManager.GetActiveScene());
         }
+        
+        public static void RefreshDictionaryData()
+        {
+            LoadDictionaryCacheFromDatabase();
+        }
 
         #endregion
 
@@ -331,6 +338,11 @@ namespace LocalizationTool.Scripts.General
         {
             return LanguagesCache.FirstOrDefault(x => x.Language.Equals(language)).Language.IsNotNull();
         }
+        
+        public static void RefreshLanguagesData()
+        {
+            LoadLanguagesCacheFromDatabase();
+        }
 
         #endregion
 
@@ -428,6 +440,11 @@ namespace LocalizationTool.Scripts.General
         public static bool ContainsCategory(string category)
         {
             return CategoriesCache.FirstOrDefault(x => x.Category.Equals(category)).Category.IsNotNull();
+        }
+        
+        public static void RefreshCategoriesData()
+        {
+            LoadCategoriesCacheFromDatabase();
         }
 
         #endregion
@@ -899,25 +916,6 @@ namespace LocalizationTool.Scripts.General
                 displayOrder = DisplayOrder;
                 language = Language;
             }
-        }
-
-        #endregion
-
-        #region REFRESH DATA
-
-        public static void RefreshDictionaryData()
-        {
-            LoadDictionaryCacheFromDatabase();
-        }
-
-        public static void RefreshLanguagesData()
-        {
-            LoadLanguagesCacheFromDatabase();
-        }
-
-        public static void RefreshCategoriesData()
-        {
-            LoadCategoriesCacheFromDatabase();
         }
 
         #endregion
@@ -1622,7 +1620,6 @@ namespace LocalizationTool.Scripts.General
         private static void LoadDictionaryCacheFromDatabase()
         {
             DictionaryCache = GetKeysTranslationFromDatabase();
-            //Debug.Log("Dictionary loaded");
         }
 
         private static void LoadLanguagesCacheFromDatabase()
@@ -1632,15 +1629,12 @@ namespace LocalizationTool.Scripts.General
             DefaultLanguage = GetDefaultLanguageFromDatabase();
             CurrentLanguageInDictionarySection = DefaultLanguage;
             if (LocalizationToolAPI.Instance.IsNotNull()) LocalizationToolAPI.ActiveLanguage = DefaultLanguage;
-
-            //Debug.Log("Languages loaded");
         }
 
         private static void LoadCategoriesCacheFromDatabase()
         {
             CategoriesCache = GetCategoriesOrderedFromDatabase();
             DefaultCategory = GetDefaultCategoryFromDatabase();
-            //Debug.Log("Categories loaded");
         }
 
         private async Task LoadConfigurationDataFromBINARY()
@@ -1662,8 +1656,6 @@ namespace LocalizationTool.Scripts.General
                 };
                 await SaveFile(_configurationData, BINARY_CONFIGURATION_PATH, _serializerBinary);
             }
-
-            //Debug.Log("Configuration loaded");
         }
 
         #endregion

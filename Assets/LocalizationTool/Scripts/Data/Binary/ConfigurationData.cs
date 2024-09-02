@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 
 namespace LocalizationTool.Data.Binary
 {
@@ -18,3 +19,4 @@ namespace LocalizationTool.Data.Binary
         public bool showLogsInConsole;
     }
 }
+#endif

@@ -4,8 +4,6 @@ using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.General;
 using TMPro;
 using UnityEngine;
-//TODO: Quitar dependencia de la API con EditorStrings
-using static LocalizationTool.Scripts.Commons.EditorStrings;
 
 namespace LocalizationTool.Scripts.API
 {
@@ -39,7 +37,7 @@ namespace LocalizationTool.Scripts.API
 
             LocalizationManager.Instance.Init(()=>
             {
-                LocalizationManager.Log(API_INITIALIZED_LOG);
+                LocalizationManager.Log("Localization Tool API Initialized");
                 UpdateAllAddons(ActiveLanguage);
             });
         }

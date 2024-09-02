@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System.Collections.Generic;
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.Commons;
@@ -8,7 +10,6 @@ using static LocalizationTool.Scripts.Commons.EditorStrings;
 
 namespace LocalizationTool.Scripts.Editors
 {
-#if UNITY_EDITOR
     public class LanguagesEditor : EditorWindowAbstract
     {
         #region PUBLIC VARIABLES
@@ -409,5 +410,5 @@ namespace LocalizationTool.Scripts.Editors
 
         #endregion
     }
-#endif
 }
+#endif

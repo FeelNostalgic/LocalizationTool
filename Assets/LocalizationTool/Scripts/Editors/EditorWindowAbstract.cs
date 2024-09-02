@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using System.Collections;
 using LocalizationTool.Data;
@@ -260,3 +262,4 @@ namespace LocalizationTool.Scripts.Editors
 		#endregion
 	}
 }
+#endif

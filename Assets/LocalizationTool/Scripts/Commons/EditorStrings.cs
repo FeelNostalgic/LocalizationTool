@@ -1,5 +1,6 @@
 namespace LocalizationTool.Scripts.Commons
 {
+    #if UNITY_EDITOR
     public abstract class EditorStrings
     {
         #region MAX CHARACTERS
@@ -201,11 +202,6 @@ namespace LocalizationTool.Scripts.Commons
         public const string IMPORTED_KEY_SINGLE_LOG = "Key '{0}' - '{1}' - '{2}' : '{3}' imported";
 
         public const string TOOL_INITIALIZED_LOG = "Localization Tool Initialized";
-
-        public const string API_INITIALIZED_LOG = "Localization Tool API Initialized";
-        public const string API_KEY_NOT_FOUND_EXCEPTION = "Key not found in language '{0}'";
-        public const string API_LANGUAGE_DOESNT_EXIST_EXCEPTION = "Language '{0}' doesnt exist";
-        public const string API_KEY_NOT_FOUND = "Key '{0}' not found";
         
         #endregion
 
@@ -231,4 +227,5 @@ namespace LocalizationTool.Scripts.Commons
 
         #endregion
     }
+    #endif
 }

@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using UnityEditor;
 using UnityEngine;
 using static LocalizationTool.Scripts.Editors.EditorWindowAbstract;
@@ -53,3 +55,4 @@ namespace LocalizationTool.Scripts.Editors
 		#endregion
 	}
 }
+#endif

@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.Commons;
 using UnityEditor;
@@ -100,3 +101,4 @@ namespace LocalizationTool.Scripts.Editors
 		#endregion
 	}
 }
+#endif

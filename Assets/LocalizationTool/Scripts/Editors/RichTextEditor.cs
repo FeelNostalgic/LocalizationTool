@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using System.Collections;
 using System.Reflection;
@@ -13,7 +15,6 @@ using static LocalizationTool.Scripts.Editors.EditorWindowAbstract;
 
 namespace LocalizationTool.Scripts.Editors
 {
-#if UNITY_EDITOR
     public class RichTextEditor : EditorWindow
     {
         #region PUBLIC VARIABLES
@@ -520,5 +521,5 @@ namespace LocalizationTool.Scripts.Editors
 
         #endregion
     }
-#endif
 }
+#endif

@@ -1,14 +1,16 @@
+#if UNITY_EDITOR
+
 using System;
 using System.IO;
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.General;
 using LocalizationTool.Scripts.Serializer;
-using Unity.EditorCoroutines.Editor;
-using UnityEditor;
 using UnityEngine;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 using static LocalizationTool.Scripts.Commons.EditorPaths;
+using UnityEditor;
+using Unity.EditorCoroutines.Editor;
 
 namespace LocalizationTool.Scripts.Editors
 {
@@ -87,7 +89,7 @@ namespace LocalizationTool.Scripts.Editors
 
             GUILayout.FlexibleSpace();
 
-            GUILayout.BeginVertical(MinWidthOption(300));
+            GUILayout.BeginVertical(MinWidthOption(325));
 
             DeleteConfirmationSection();
 
@@ -122,8 +124,8 @@ namespace LocalizationTool.Scripts.Editors
                 && LocalizationManager.Configuration.categoryDeleteConfirmation) _toggleAllDeleteConfirmation = true;
             else _toggleAllDeleteConfirmation = false;
 
-            var tempToogle = EditorGUILayout.Toggle(_toggleAllDeleteConfirmation, GUILayout.Height(28));
-            UpdateAllDeleteConfirmation(_toggleAllDeleteConfirmation, tempToogle);
+            var tempToggle = EditorGUILayout.Toggle(_toggleAllDeleteConfirmation, GUILayout.Height(28));
+            UpdateAllDeleteConfirmation(_toggleAllDeleteConfirmation, tempToggle);
 
             ToggleLeft(LocalizationManager.Configuration.dictionaryDeleteConfirmation, CONFIGURATION_DELETE_DICTIONARY_LABEL,
                 delegate(bool b) { UpdateDeleteConfirmation(b, Enums.GUIWindow.Dictionary); });
@@ -561,3 +563,4 @@ namespace LocalizationTool.Scripts.Editors
         #endregion
     }
 }
+#endif

@@ -1,3 +1,7 @@
+#if UNITY_EDITOR
+
+using System;
+using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.General;
 using UnityEditor;
 using UnityEngine;
@@ -5,7 +9,6 @@ using static LocalizationTool.Scripts.Commons.EditorStrings;
 
 namespace LocalizationTool.Scripts.Editors
 {
-#if UNITY_EDITOR
     public class LocalizationMainEditor : EditorWindow
     {
         #region PUBLIC VARIABLES
@@ -19,7 +22,7 @@ namespace LocalizationTool.Scripts.Editors
         private static LocalizationMainEditor _instance;
 
         #endregion
-        
+
         #region EDITOR VARIABLES
 
         private int _currentWindowToolbarIndex;
@@ -32,7 +35,7 @@ namespace LocalizationTool.Scripts.Editors
         private static EditorWindowAbstract _languagesEditor;
         private static EditorWindowAbstract _categoriesEditor;
         private static EditorWindowAbstract _configurationEditor;
-        
+
         #endregion
 
         #region DIMENSION VARIABLES
@@ -60,7 +63,7 @@ namespace LocalizationTool.Scripts.Editors
 
         #region UNITY METHODS
 
-        protected virtual void OnEnable()
+        protected void OnEnable()
         {
             _instance ??= this;
             _currentEditorWindow?.OnEnable();
@@ -68,13 +71,13 @@ namespace LocalizationTool.Scripts.Editors
         }
 
         // Called when unity editor is closed
-        protected virtual void OnDisable()
+        protected void OnDisable()
         {
             _currentEditorWindow?.OnDisable();
         }
 
         // Called when editor is closed
-        protected virtual void OnDestroy()
+        protected void OnDestroy()
         {
             //
         }
@@ -90,7 +93,7 @@ namespace LocalizationTool.Scripts.Editors
 
         protected void OnGUI()
         {
-            if(!hasFocus) return;
+            if (!hasFocus) return;
             if (!LocalizationManager.IsDataLoaded) return;
             WindowToolbar();
             _currentEditorWindow?.ShowLayout();
@@ -102,9 +105,9 @@ namespace LocalizationTool.Scripts.Editors
             _languagesEditor ??= new LanguagesEditor();
             _categoriesEditor ??= new CategoriesEditor();
             _configurationEditor ??= new ConfigurationEditor();
-            _currentEditorWindow = _dictionaryEditor;
+            if (_currentEditorWindow.IsNull()) _currentEditorWindow = _dictionaryEditor;
         }
-        
+
         #endregion
 
         #region CENTER SECTION
@@ -156,8 +159,8 @@ namespace LocalizationTool.Scripts.Editors
             LocalizationManager.LoadCache();
             LocalizationManager.Instance.Init();
         }
-        
+
         #endregion
     }
-#endif
 }
+#endif
