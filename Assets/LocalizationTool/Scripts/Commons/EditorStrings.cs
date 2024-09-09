@@ -44,6 +44,7 @@ namespace LocalizationTool.Scripts.Commons
         public const string CONFIGURATION_INFO_README_BUTTON_LABEL = "Readme";
         public const string CONFIGURATION_INFO_DOCUMENTATION_BUTTON_LABEL = "Documentation";
         public const string CONFIGURATION_INFO_LICENSE_BUTTON_LABEL = "License";
+        public const string CONFIGURATION_EMPTY_OR_DELETE_LANGUAGE_LABEL = "Delete or Empty language";
 
         public const string EXPORT_LABEL_UPPER = "EXPORT";
         public const string IMPORT_LABEL_UPPER = "IMPORT";
@@ -108,8 +109,9 @@ namespace LocalizationTool.Scripts.Commons
         public const string LANGUAGE_IS_FAVOURITE_BUTTON_TOOLTIP = "'{0}' is favourite language";
         public const string MAKE_LANGUAGE_FAVOURITE_BUTTON_TOOLTIP = "Make '{0}' favourite";
         public const string OPEN_MANAGE_MENU_BUTTON_TOOLTIP = "Open Manage Menu";
-        public const string DELETE_LANGUAGE_FAVOURITE_TOOLTIP = "Favourite language cannot be deleted";
+        public const string DELETE_LANGUAGE_FAVOURITE_TOOLTIP = "Favourite language cannot be deleted or emptied";
         public const string DELETE_LANGUAGE_TOOLTIP = "Delete language '{0}'";
+        public const string EMPTY_LANGUAGE_TOOLTIP = "Empty language '{0}'";
 
         #endregion
 
@@ -132,6 +134,8 @@ namespace LocalizationTool.Scripts.Commons
         public const string CONFIGURATION_INFO_README_BUTTON_TOOLTIP = "Open Readme";
         public const string CONFIGURATION_INFO_DOCUMENTATION_BUTTON_TOOLTIP = "Open Documentation";
         public const string CONFIGURATION_INFO_LICENSE_BUTTON_TOOLTIP = "Open License";
+
+        public const string CONFIGURATION_EMPTY_OR_DELETE_LANGUAGE_TOOLTIP = "Choose if a language is deleted or emptied. Delete remove all, empty remove only translations";
 
         public const string EXPORT_BUTTON_TOOLTIP = "Save {0} file";
         public const string IMPORT_BUTTON_TOOLTIP = "Load {0} file";
@@ -169,8 +173,12 @@ namespace LocalizationTool.Scripts.Commons
 
         public const string DELETE_DIALOG_TITLE = "Confirm Delete";
         public const string DELETE_DIALOG_MESSAGE = "Are you sure you want to delete '{0}'?";
+        public const string EMPTY_DIALOG_TITLE = "Confirm Empty";
+        public const string EMPTY_DIALOG_MESSAGE = "Are you sure you want to empty '{0}'?";
+
         public const string DIALOG_OPTION_CANCEL = "Cancel";
         public const string DIALOG_OPTION_DELETE = "Delete";
+        public const string DIALOG_OPTION_EMPTY = "Empty";
 
         public const string FILE_SAVED_DIALOG_TITLE = "File Saved";
         public const string FILE_SAVED_DIALOG_MESSAGE = "File has been saved successfully!";
@@ -194,6 +202,7 @@ namespace LocalizationTool.Scripts.Commons
         public const string LANGUAGES_LOADED_LOG = "Languages loaded";
         public const string LANGUAGE_FAVOURITE_LOG = "Language '{0}' is now favorite";
         public const string DELETED_LANGUAGE_LOG = "Language '{0}' deleted";
+        public const string EMPTIED_LANGUAGE_LOG = "Language '{0}' Emptied";
         public const string LANGUAGE_INDEX_CHANGED_LOG = "Language '{0}' update to index '{1}' correctly";
 
         public const string RICH_TEXT_EDITOR_SELECT_TEXT_WARNING_LOG = "Select some text to apply a style";

@@ -42,6 +42,7 @@ namespace LocalizationTool.Scripts.Editors
         public static Texture ApplyStyleIcon => EditorGUIUtility.IconContent("d_Progress").image;
         public static Texture UndoIcon => EditorGUIUtility.IconContent("d_scrollleft").image;
         public static Texture RedoIcon => EditorGUIUtility.IconContent("d_scrollright").image;
+        public static Texture EmptyIcon => EditorGUIUtility.IconContent("d_UndoHistory").image;
         protected static Texture YellowStarIcon => GetColoredIcon("d_Favorite", Color.yellow);
 
 		#endregion

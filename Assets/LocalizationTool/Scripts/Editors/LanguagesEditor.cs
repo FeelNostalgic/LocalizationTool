@@ -70,7 +70,7 @@ namespace LocalizationTool.Scripts.Editors
             if (!LocalizationManager.Configuration.languageClearAdd) return;
             base.ControlFocus(focus);
         }
-        
+
         #endregion
 
         #region PRRIVATE METHODS
@@ -235,7 +235,7 @@ namespace LocalizationTool.Scripts.Editors
 
             if (GUILayout.Button(GetGUIContent(UpIcon, string.Format(MOVE_UP_BUTTON_TOOLTIP, language)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                if(!LocalizationManager.IsDefaultLanguage(language)) UpdateIndex(language, index, index - 1);
+                if (!LocalizationManager.IsDefaultLanguage(language)) UpdateIndex(language, index, index - 1);
             }
 
             GUILayout.EndVertical();
@@ -251,7 +251,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(DownIcon, string.Format(MOVE_DOWN_BUTTON_TOOLTIP, language)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                if(!LocalizationManager.IsDefaultLanguage(language) && CacheData.LanguageCache.Count >= index + 1) UpdateIndex(language, index, index + 1);
+                if (!LocalizationManager.IsDefaultLanguage(language) && CacheData.LanguageCache.Count >= index + 1) UpdateIndex(language, index, index + 1);
             }
 
             GUILayout.EndVertical();
@@ -319,15 +319,32 @@ namespace LocalizationTool.Scripts.Editors
             }
             else
             {
-                if (GUILayout.Button(GetGUIContent(DeleteIcon, string.Format(DELETE_LANGUAGE_TOOLTIP, language)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                var content = LocalizationManager.Configuration.deleteOrEmptyLanguageIndex == 0
+                    ? GetGUIContent(DeleteIcon, string.Format(DELETE_LANGUAGE_TOOLTIP, language)) //Delete
+                    : GetGUIContent(EmptyIcon, string.Format(EMPTY_LANGUAGE_TOOLTIP, language)); //Empty
+
+                if (GUILayout.Button(content, CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     if (LocalizationManager.Configuration.languageDeleteConfirmation)
                     {
-                        if (EditorUtility.DisplayDialog(DELETE_DIALOG_TITLE, string.Format(DELETE_DIALOG_MESSAGE, language), DIALOG_OPTION_DELETE, DIALOG_OPTION_CANCEL))
-                            DeleteLanguage(language);
+                        if (LocalizationManager.Configuration.deleteOrEmptyLanguageIndex == 0)
+                        {
+                            if (EditorUtility.DisplayDialog(DELETE_DIALOG_TITLE, string.Format(DELETE_DIALOG_MESSAGE, language), DIALOG_OPTION_DELETE, DIALOG_OPTION_CANCEL))
+                                DeleteLanguage(language);
+                        }
+                        else
+                        {
+                            if (EditorUtility.DisplayDialog(EMPTY_DIALOG_TITLE, string.Format(EMPTY_DIALOG_MESSAGE, language), DIALOG_OPTION_EMPTY, DIALOG_OPTION_CANCEL))
+                                EmptyLanguage(language);
+                        }
                     }
                     else
-                        DeleteLanguage(language);
+                    {
+                        if (LocalizationManager.Configuration.deleteOrEmptyLanguageIndex == 0)
+                            DeleteLanguage(language);
+                        else
+                            EmptyLanguage(language);
+                    }
                 }
             }
 
@@ -342,6 +359,12 @@ namespace LocalizationTool.Scripts.Editors
             LocalizationManager.Log(string.Format(DELETED_LANGUAGE_LOG, language));
         }
 
+        private static void EmptyLanguage(string language)
+        {
+            LocalizationManager.EmptyLanguage(language);
+            LocalizationManager.Log(string.Format(EMPTIED_LANGUAGE_LOG, language));
+        }
+        
         private void Feedback(string language)
         {
             //Feedback
@@ -371,10 +394,11 @@ namespace LocalizationTool.Scripts.Editors
                 ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldLanguage] = s; }, EMPTY_LANGUAGE_FEEDBACK_LABEL, delegate { _feedbackList.Remove(oldLanguage); });
                 return;
             }
-            
+
             if (newLanguage.Length > MAX_LANGUAGE_CHARACTERS)
             {
-                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldLanguage] = s; }, string.Format(CHARACTERS_NUMBER_LANGUAGE_FEEDBACK_LABEL, MAX_LANGUAGE_CHARACTERS), delegate { _feedbackList.Remove(oldLanguage); });
+                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldLanguage] = s; }, string.Format(CHARACTERS_NUMBER_LANGUAGE_FEEDBACK_LABEL, MAX_LANGUAGE_CHARACTERS),
+                    delegate { _feedbackList.Remove(oldLanguage); });
                 return;
             }
 
@@ -389,7 +413,7 @@ namespace LocalizationTool.Scripts.Editors
             _feedbackList.Remove(oldLanguage);
         }
 
-        private static void UpdateIndex(string languageName,int oldIndex, int newIndex)
+        private static void UpdateIndex(string languageName, int oldIndex, int newIndex)
         {
             LocalizationManager.ChangeLanguageIndex(languageName, oldIndex, newIndex);
         }

@@ -435,6 +435,28 @@ namespace LocalizationTool.Scripts.Data
             }
         }
 
+        public static void EmptyLanguageFromDatabase(string languageToEmpty)
+        {
+            try
+            {
+                OpenConnection();
+                var query = $"select id from {LANGUAGE_TABLE} where language = '{languageToEmpty}'";
+                var reader = ExecuteReaderCommand(query);
+                var languageToEmptyID = Convert.ToInt32(reader["id"]);
+
+                query = $"update {TRANSLATION_TABLE} set translationText = '' where languageID = '{languageToEmptyID}'";
+                ExecuteNonQueryCommand(query);
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+            finally
+            {
+                CloseConnection();
+            }
+        }
+        
         public static void UpdateLanguageNameInDatabase(string oldLanguageName, string newLanguageName)
         {
             try

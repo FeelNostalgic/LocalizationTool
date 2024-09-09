@@ -299,6 +299,15 @@ namespace LocalizationTool.Scripts.General
             CacheData.UpdateDictionaryCache();
         }
 
+        public static void EmptyLanguage(string language)
+        {
+            // Empty language in database
+            CacheData.EmptyLanguageFromDatabase(language);
+            
+            // Update cache 
+            CacheData.UpdateDictionaryCache();
+        }
+        
         public static void ChangeLanguageValue(string oldLanguageName, string newLanguageName)
         {
             if (CurrentLanguageInDictionarySection.Equals(oldLanguageName)) CurrentLanguageInDictionarySection = newLanguageName;
@@ -497,6 +506,14 @@ namespace LocalizationTool.Scripts.General
             if (_configurationData.searchTypeIndex.Equals(searchTypeIndex)) return;
 
             _configurationData.searchTypeIndex = searchTypeIndex;
+            await SaveLoadFileManager.SaveFile(_configurationData, CONFIGURATION_PATH, _serializerBinary);
+        }
+
+        public async void UpdateDeleteOrEmptyLanguage(int index)
+        {
+            if (_configurationData.deleteOrEmptyLanguageIndex.Equals(index)) return;
+
+            _configurationData.deleteOrEmptyLanguageIndex = index;
             await SaveLoadFileManager.SaveFile(_configurationData, CONFIGURATION_PATH, _serializerBinary);
         }
 
@@ -923,6 +940,7 @@ namespace LocalizationTool.Scripts.General
                 languageClearAdd = true,
                 categoryClearAdd = true,
                 searchTypeIndex = 0,
+                deleteOrEmptyLanguageIndex = 0,
                 showLogsInConsole = true
             };
             await SaveLoadFileManager.SaveFile(_configurationData, CONFIGURATION_PATH, _serializerBinary);

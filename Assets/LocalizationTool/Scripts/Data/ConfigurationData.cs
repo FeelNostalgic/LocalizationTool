@@ -17,6 +17,8 @@ namespace LocalizationTool.Scripts.Data
         public int searchTypeIndex;
 
         public bool showLogsInConsole;
+
+        public int deleteOrEmptyLanguageIndex;
     }
 }
 #endif

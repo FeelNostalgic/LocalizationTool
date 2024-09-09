@@ -65,5 +65,7 @@
         }
         
         public static string[] SEARCH_TYPE = {"By key", "By value", "By both"};
+
+        public static string[] DELETE_OR_EMPTY_TYPE = { "Delete language", "Empty language" };
     }
 }
