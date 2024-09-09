@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.Commons;
+using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.General;
 using LocalizationTool.Scripts.Serializer;
 using UnityEngine;
@@ -407,7 +408,7 @@ namespace LocalizationTool.Scripts.Editors
         private static void SaveFile(string path, string fileContent)
         {
             // Create and save the file
-            LocalizationManager.SaveFile(path, fileContent, FILE_SAVED_DIALOG_TITLE, FILE_SAVED_DIALOG_MESSAGE, DIALOG_OK_OPTION);
+            SaveLoadFileManager.SaveFile(path, fileContent, FILE_SAVED_DIALOG_TITLE, FILE_SAVED_DIALOG_MESSAGE, DIALOG_OK_OPTION);
         }
 
         #endregion

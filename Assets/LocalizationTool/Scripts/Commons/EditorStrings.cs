@@ -1,6 +1,7 @@
+#if UNITY_EDITOR
+
 namespace LocalizationTool.Scripts.Commons
 {
-    #if UNITY_EDITOR
     public abstract class EditorStrings
     {
         #region MAX CHARACTERS
@@ -78,7 +79,7 @@ namespace LocalizationTool.Scripts.Commons
         public const string ADDON_SELECT_KEY_LABEL = "SELECT KEY";
         public const string ADDON_WARNING_API_NOT_INIT_1 = "Localization Tool API is not INITIALIZED.";
         public const string ADDON_WARNING_API_NOT_INIT_2 = "Use Install in Tools / LocalizationTool";
-        
+
         #endregion
 
         #region TOOLTIPS
@@ -103,7 +104,7 @@ namespace LocalizationTool.Scripts.Commons
 
         #region Languages
 
-        public const string ADD_LANGUAGE_BUTTON_TOOLTIP = "Add new language";  
+        public const string ADD_LANGUAGE_BUTTON_TOOLTIP = "Add new language";
         public const string LANGUAGE_IS_FAVOURITE_BUTTON_TOOLTIP = "'{0}' is favourite language";
         public const string MAKE_LANGUAGE_FAVOURITE_BUTTON_TOOLTIP = "Make '{0}' favourite";
         public const string OPEN_MANAGE_MENU_BUTTON_TOOLTIP = "Open Manage Menu";
@@ -155,7 +156,7 @@ namespace LocalizationTool.Scripts.Commons
         public const string RICH_TEXT_EDITOR_ZOOM_OUT_BUTTON_TOOLTIP = "Zoom OUT";
 
         #endregion
-        
+
         #region Addon
 
         public const string ADDON_SELECTED_KEY_TOOLTIP = "Selected Key";
@@ -180,7 +181,7 @@ namespace LocalizationTool.Scripts.Commons
         #region LOG
 
         public const string DICTIONARY_KEY_CATEGORY_CHANGED_LOG = "Key '{0}' changed category to '{1}' correctly";
-        
+
         public const string DICTIONARY_LOADED_LOG = "Dictionary loaded";
         public const string EDITING_KEY_LOG = "Editing key '{0}'";
         public const string DELETED_KEY_LOG = "Key '{0}' deleted";
@@ -202,7 +203,7 @@ namespace LocalizationTool.Scripts.Commons
         public const string IMPORTED_KEY_SINGLE_LOG = "Key '{0}' - '{1}' - '{2}' : '{3}' imported";
 
         public const string TOOL_INITIALIZED_LOG = "Localization Tool Initialized";
-        
+
         #endregion
 
         #region FEEDBACK LABEL
@@ -227,5 +228,5 @@ namespace LocalizationTool.Scripts.Commons
 
         #endregion
     }
-    #endif
 }
+#endif

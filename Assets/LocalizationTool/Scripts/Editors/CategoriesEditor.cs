@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.Commons;
+using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.General;
 using UnityEditor;
 using UnityEngine;
@@ -166,7 +167,7 @@ namespace LocalizationTool.Scripts.Editors
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
             try
             {
-                foreach (var (index, category) in LocalizationManager.CategoriesCache)
+                foreach (var (index, category) in CacheData.CategoryCache)
                 {
                     UnitCenterScrollViewContent(index, category);
                 }
@@ -245,7 +246,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(DownIcon, string.Format(MOVE_DOWN_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                if (!LocalizationManager.IsDefaultCategory(category) && LocalizationManager.CategoriesCache.Count >= index + 1) UpdateIndex(category, index, index + 1);
+                if (!LocalizationManager.IsDefaultCategory(category) && CacheData.CategoryCache.Count >= index + 1) UpdateIndex(category, index, index + 1);
             }
         
             GUILayout.EndVertical();

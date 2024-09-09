@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using LocalizationTool.Scripts.Addons;
 using LocalizationTool.Scripts.Commons;
+using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.General;
 using TMPro;
 using UnityEngine;
@@ -35,9 +36,11 @@ namespace LocalizationTool.Scripts.API
             
             FindAllAddons();
 
-            LocalizationManager.Instance.Init(()=>
+            CacheData.Instance.Init(() =>
             {
+                #if UNITY_EDITOR
                 LocalizationManager.Log("Localization Tool API Initialized");
+                #endif
                 UpdateAllAddons(ActiveLanguage);
             });
         }
@@ -55,13 +58,13 @@ namespace LocalizationTool.Scripts.API
         public static string GetValueByKey(string key, out bool found)
         {
             found = false;
-            if (!LocalizationManager.IsDataLoaded) return "";
+            if (!CacheData.IsDataLoaded) return "";
             if (key.IsNull()) return "";
             
-            found = LocalizationManager.DictionaryCache.ContainsKey(key);
-            if(found) found = LocalizationManager.DictionaryCache[key].TranslationData.ContainsKey(ActiveLanguage);
+            found = CacheData.DictionaryCache.ContainsKey(key);
+            if(found) found = CacheData.DictionaryCache[key].TranslationData.ContainsKey(ActiveLanguage);
             return found
-                ? LocalizationManager.DictionaryCache[key].TranslationData[ActiveLanguage]
+                ? CacheData.DictionaryCache[key].TranslationData[ActiveLanguage]
                 : "";
         }
 
@@ -74,15 +77,15 @@ namespace LocalizationTool.Scripts.API
         /// <returns>The value of the key. Empty value if key was not found</returns>
         public static string GetValueByKeyAndLanguage(string key, string language, out bool found)
         {
-            if (!LocalizationManager.Languages.Contains(language))
+            if (!CacheData.Languages.Contains(language))
             {
                 found = false;
                 return "";
             }
 
-            found = LocalizationManager.DictionaryCache[key].TranslationData.ContainsKey(language);
+            found = CacheData.DictionaryCache[key].TranslationData.ContainsKey(language);
             return found
-                ? LocalizationManager.DictionaryCache[key].TranslationData[ActiveLanguage]
+                ? CacheData.DictionaryCache[key].TranslationData[ActiveLanguage]
                 : "";
         }
 
@@ -93,7 +96,7 @@ namespace LocalizationTool.Scripts.API
         /// <returns>Return true if newLanguage exist, otherwise return false</returns>
         public static bool ChangeLanguage(string newLanguage)
         {
-            if (!LocalizationManager.Languages.Contains(newLanguage)) return false;
+            if (!CacheData.Languages.Contains(newLanguage)) return false;
             ActiveLanguage = newLanguage;
             UpdateAllAddons(newLanguage);
             return true;
@@ -101,7 +104,7 @@ namespace LocalizationTool.Scripts.API
 
         public static List<string> GetAvailableLanguages()
         {
-            return LocalizationManager.Languages;
+            return CacheData.Languages;
         }
 
         /// <summary>
@@ -110,10 +113,8 @@ namespace LocalizationTool.Scripts.API
         /// <returns></returns>
         public static List<string> GetAllCategories()
         {
-#pragma warning disable CS4014
-            LocalizationManager.Instance.Init();
-#pragma warning restore CS4014
-            return LocalizationManager.Categories;
+            //CacheData.LoadCacheData();
+            return CacheData.Categories;
         }
 
         /// <summary>
@@ -122,11 +123,9 @@ namespace LocalizationTool.Scripts.API
         /// <returns></returns>
         public static List<string> GetAllKeys()
         {
-#pragma warning disable CS4014
-            LocalizationManager.Instance.Init();
-#pragma warning restore CS4014
-            if (!LocalizationManager.IsDataLoaded) return null;
-            var keys = LocalizationManager.Keys;
+            //CacheData.LoadCacheData();
+            if (!CacheData.IsDataLoaded) return null;
+            var keys = CacheData.Keys;
 
             return keys;
         }

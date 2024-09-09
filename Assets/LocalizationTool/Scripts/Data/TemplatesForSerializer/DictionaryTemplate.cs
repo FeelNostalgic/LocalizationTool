@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LocalizationTool.Data.Templates
+namespace LocalizationTool.Scripts.Data.TemplatesForSerializer
 {
     [Serializable]
     public class DictionaryTemplate

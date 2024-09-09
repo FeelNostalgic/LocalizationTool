@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System;
 
-namespace LocalizationTool.Data.Binary
+namespace LocalizationTool.Scripts.Data
 {
     [Serializable]
     public class ConfigurationData

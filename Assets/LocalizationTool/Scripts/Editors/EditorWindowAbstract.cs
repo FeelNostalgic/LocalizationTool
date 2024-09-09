@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.Commons;
-using LocalizationTool.Scripts.General;
+using LocalizationTool.Scripts.Data;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -157,23 +157,23 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.Space(10);
         }
 
-        protected static void ShowLabelPopupSelection(string label, ref string categoryValue)
+        protected static void ShowLabelPopupSelectionCategory(string label, ref string categoryValue)
         {
             GUILayout.BeginVertical();
             GUILayout.Label(label, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label));
             GUILayout.Space(5);
 
-            if (LocalizationManager.CategoriesCache != null) //To avoid possible errors while loading data
+            if (CacheData.CategoryCache != null) //To avoid possible errors while loading data
             {
-                if (LocalizationManager.Categories.IndexOf(categoryValue) != -1) //Category value is empty when loading
+                if (CacheData.Categories.IndexOf(categoryValue) != -1) //Category value is empty when loading
                 {
-                    var index = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(categoryValue), LocalizationManager.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup));
-                    categoryValue = LocalizationManager.Categories[index];
+                    var index = EditorGUILayout.Popup(CacheData.Categories.IndexOf(categoryValue), CacheData.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup));
+                    categoryValue = CacheData.Categories[index];
                 }
                 else
                 {
-                    EditorGUILayout.Popup(0, LocalizationManager.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup));
-                    if (LocalizationManager.CategoriesCache.Count > 0) categoryValue = LocalizationManager.Categories[0];
+                    EditorGUILayout.Popup(0, CacheData.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup));
+                    if (CacheData.CategoryCache.Count > 0) categoryValue = CacheData.Categories[0];
                 }
             }
 

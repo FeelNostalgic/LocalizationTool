@@ -6,6 +6,7 @@ using System.Linq;
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.API;
 using LocalizationTool.Scripts.Commons;
+using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.General;
 using UnityEditor;
 using UnityEngine;
@@ -118,7 +119,7 @@ namespace LocalizationTool.Scripts.Editors
                 GUILayout.EndVertical();
 
                 GUILayout.BeginVertical(GUILayout.Height(70));
-                ShowLabelPopupSelection(CATEGORY_LABEL_UPPER, ref _addCategoryValue);
+                ShowLabelPopupSelectionCategory(CATEGORY_LABEL_UPPER, ref _addCategoryValue);
                 GUILayout.EndVertical();
 
                 GUILayout.BeginVertical(GUILayout.Width(312), GUILayout.Height(70));
@@ -192,13 +193,13 @@ namespace LocalizationTool.Scripts.Editors
                 GUILayout.Space(10);
                 GUILayout.BeginHorizontal();
                 _scrollToolbar = EditorGUILayout.BeginScrollView(_scrollToolbar, GUILayout.Height(40));
-                var toolbarItems = LocalizationManager.Languages.Select(t => t).ToArray();
+                var toolbarItems = CacheData.Languages.Select(t => t).ToArray();
                 if (toolbarItems.Length != 0)
                 {
                     _currentLanguageToolbarIndex = GUILayout.Toolbar(LocalizationManager.CurrentToolbarLanguageIndex, toolbarItems);
-                    if (LocalizationManager.CurrentLanguageInDictionarySection != LocalizationManager.Languages[_currentLanguageToolbarIndex])
+                    if (LocalizationManager.CurrentLanguageInDictionarySection != CacheData.Languages[_currentLanguageToolbarIndex])
                     {
-                        LocalizationManager.CurrentLanguageInDictionarySection = LocalizationManager.Languages[_currentLanguageToolbarIndex];
+                        LocalizationManager.CurrentLanguageInDictionarySection = CacheData.Languages[_currentLanguageToolbarIndex];
                         GUI.FocusControl(null);
                     }
                 }
@@ -237,11 +238,11 @@ namespace LocalizationTool.Scripts.Editors
         {
             GUILayout.BeginHorizontal();
 
-            if (LocalizationManager.CategoriesCache != null)
+            if (CacheData.CategoryCache != null)
             {
-                if (_searchCategoryIndex >= LocalizationManager.CategoriesCache.Count) _searchCategoryIndex = 0;
+                if (_searchCategoryIndex >= CacheData.CategoryCache.Count) _searchCategoryIndex = 0;
                 GUI.SetNextControlName("Popup");
-                _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, LocalizationManager.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup), GUILayout.Width(200));
+                _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, CacheData.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup), GUILayout.Width(200));
             }
 
             GUILayout.Space(5);
@@ -297,9 +298,9 @@ namespace LocalizationTool.Scripts.Editors
             }
         }
 
-        private Dictionary<string, LocalizationManager.KeyData> GetFilteredDictionary()
+        private Dictionary<string, CacheData.KeyData> GetFilteredDictionary()
         {
-            var filteredDicToIterate = new Dictionary<string, LocalizationManager.KeyData>(LocalizationManager.DictionaryCache);
+            var filteredDicToIterate = new Dictionary<string, CacheData.KeyData>(CacheData.DictionaryCache);
 
             switch (LocalizationManager.Configuration.searchTypeIndex)
             {
@@ -323,7 +324,7 @@ namespace LocalizationTool.Scripts.Editors
             }
 
             if (_searchCategoryIndex != 0)
-                filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Value.Category == LocalizationManager.Categories[_searchCategoryIndex])
+                filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Value.Category == CacheData.Categories[_searchCategoryIndex])
                     .ToDictionary(kv => (kv.Key), kv => kv.Value);
 
             return filteredDicToIterate;
@@ -372,12 +373,12 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.BeginHorizontal(GUILayout.Width(175));
             EditorGUI.BeginChangeCheck();
 
-            if (category.IsEmpty()) category = LocalizationManager.DefaultCategory;
+            if (category.IsEmpty()) category = CacheData.DefaultCategory;
             GUI.backgroundColor = Colors.DEFAULT;
-            var tempCategory = EditorGUILayout.Popup(LocalizationManager.Categories.IndexOf(category), LocalizationManager.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.ScrollViewCategoryPopup));
+            var tempCategory = EditorGUILayout.Popup(CacheData.Categories.IndexOf(category), CacheData.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.ScrollViewCategoryPopup));
 
             if (EditorGUI.EndChangeCheck())
-                UpdateCategory(key, LocalizationManager.Categories[tempCategory]);
+                UpdateCategory(key, CacheData.Categories[tempCategory]);
 
             GUILayout.EndHorizontal();
 

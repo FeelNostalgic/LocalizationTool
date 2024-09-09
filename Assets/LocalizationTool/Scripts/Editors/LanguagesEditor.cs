@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.Commons;
+using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.General;
 using UnityEditor;
 using UnityEngine;
@@ -171,7 +172,7 @@ namespace LocalizationTool.Scripts.Editors
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
             try
             {
-                foreach (var (index, language) in LocalizationManager.LanguagesCache)
+                foreach (var (index, language) in CacheData.LanguageCache)
                 {
                     UnitCenterScrollViewContent(index, language);
                 }
@@ -250,7 +251,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(DownIcon, string.Format(MOVE_DOWN_BUTTON_TOOLTIP, language)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                if(!LocalizationManager.IsDefaultLanguage(language) && LocalizationManager.LanguagesCache.Count >= index + 1) UpdateIndex(language, index, index + 1);
+                if(!LocalizationManager.IsDefaultLanguage(language) && CacheData.LanguageCache.Count >= index + 1) UpdateIndex(language, index, index + 1);
             }
 
             GUILayout.EndVertical();
@@ -383,7 +384,7 @@ namespace LocalizationTool.Scripts.Editors
                 return;
             }
 
-            if (LocalizationManager.Languages.Contains(newLanguage))
+            if (CacheData.Languages.Contains(newLanguage))
             {
                 ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldLanguage] = s; }, string.Format(LANGUAGE_EXIST_FEEDBACK_LABEL, newLanguage), delegate { _feedbackList.Remove(oldLanguage); });
                 return;

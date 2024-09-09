@@ -1,7 +1,7 @@
 #if UNITY_EDITOR
 
-using System;
 using LocalizationTool.Scripts.Commons;
+using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.General;
 using UnityEditor;
 using UnityEngine;
@@ -94,7 +94,7 @@ namespace LocalizationTool.Scripts.Editors
         protected void OnGUI()
         {
             if (!hasFocus) return;
-            if (!LocalizationManager.IsDataLoaded) return;
+            if (!CacheData.IsDataLoaded) return;
             WindowToolbar();
             _currentEditorWindow?.ShowLayout();
         }
@@ -156,8 +156,9 @@ namespace LocalizationTool.Scripts.Editors
         private static void LoadData()
         {
             LocalizationManager.CreateDatabase();
-            LocalizationManager.LoadCache();
+            CacheData.Instance.Init();
             LocalizationManager.Instance.Init();
+            
         }
 
         #endregion

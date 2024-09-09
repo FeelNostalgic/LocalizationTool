@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace LocalizationTool.Data
+﻿namespace LocalizationTool.Data
 {
     public class Enums
     {

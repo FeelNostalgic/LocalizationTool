@@ -7,7 +7,7 @@ using LocalizationTool.Data;
 using LocalizationTool.Scripts.Addons;
 using LocalizationTool.Scripts.API;
 using LocalizationTool.Scripts.Commons;
-using LocalizationTool.Scripts.General;
+using LocalizationTool.Scripts.Data;
 using UnityEditor;
 using UnityEngine;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
@@ -169,7 +169,7 @@ namespace LocalizationTool.Scripts.Editors
                 filteredKeys = filteredKeys.Where(key => key.Contains(_filterKeyText, StringComparison.InvariantCulture)).ToList();
             
             if (_filterCategoryIndex != 0)
-                filteredKeys = filteredKeys.Where(key => LocalizationManager.DictionaryCache[key].Category == allCategories[_filterCategoryIndex]).ToList();
+                filteredKeys = filteredKeys.Where(key => CacheData.DictionaryCache[key].Category == allCategories[_filterCategoryIndex]).ToList();
             return filteredKeys;
         }
 

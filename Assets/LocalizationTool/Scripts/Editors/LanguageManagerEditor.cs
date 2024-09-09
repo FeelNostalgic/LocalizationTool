@@ -5,8 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using LocalizationTool.Data;
-using LocalizationTool.Data.Templates;
 using LocalizationTool.Scripts.Commons;
+using LocalizationTool.Scripts.Data;
+using LocalizationTool.Scripts.Data.TemplatesForSerializer;
 using LocalizationTool.Scripts.ExportSerializer;
 using LocalizationTool.Scripts.General;
 using LocalizationTool.Scripts.Serializer;
@@ -150,7 +151,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private void SaveFile(string path, string fileContent)
         {
-            LocalizationManager.SaveFile(path, fileContent, FILE_SAVED_DIALOG_TITLE, FILE_SAVED_DIALOG_MESSAGE, DIALOG_OK_OPTION);
+            SaveLoadFileManager.SaveFile(path, fileContent, FILE_SAVED_DIALOG_TITLE, FILE_SAVED_DIALOG_MESSAGE, DIALOG_OK_OPTION);
             Close();
         }
 
@@ -236,7 +237,7 @@ namespace LocalizationTool.Scripts.Editors
             
             serializer.AddTitle(_language);
             
-            var data = new Dictionary<string, LocalizationManager.KeyData>(LocalizationManager.DictionaryCache);
+            var data = new Dictionary<string, CacheData.KeyData>(CacheData.DictionaryCache);
             
             foreach (var (key, keyData) in data)
             {
@@ -260,7 +261,7 @@ namespace LocalizationTool.Scripts.Editors
                 Language = _language
             };
 
-            var data = new Dictionary<string, LocalizationManager.KeyData>(LocalizationManager.DictionaryCache);
+            var data = new Dictionary<string, CacheData.KeyData>(CacheData.DictionaryCache);
             foreach (var (key, keyData) in data)
             {
                 var category = keyData.Category;
@@ -336,7 +337,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private IEnumerator ImportSerializedData(string path, ISerializerService serializer, ImportProgressWindow progressWindow)
         {
-            var loadFileTask =  LocalizationManager.LoadFile<LanguageTemplate>(path, serializer);
+            var loadFileTask =  SaveLoadFileManager.LoadFile<LanguageTemplate>(path, serializer);
             var awaiter = loadFileTask.GetAwaiter();
             while (!awaiter.IsCompleted) yield return null;
             var data = awaiter.GetResult();

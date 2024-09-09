@@ -1,6 +1,7 @@
 using System.Linq;
 using LocalizationTool.Scripts.Addons;
 using LocalizationTool.Scripts.API;
+using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.General;
 using LocalizationTool.Scripts.Serializer;
 using TMPro;
@@ -47,12 +48,12 @@ namespace UIManager
 		{
 			mainMenuGroup.SetActive(true);
 			optionsGroup.SetActive(false);
-			LocalizationManager.Instance.OnLocalizationToolInitialized += ToolInitialized;
+			CacheData.Instance.OnLocalizationToolDataInitialized += ToolInitialized;
 		}
 		
 		private void OnDisable()
 		{
-			LocalizationManager.Instance.OnLocalizationToolInitialized -= ToolInitialized;
+			CacheData.Instance.OnLocalizationToolDataInitialized -= ToolInitialized;
 		
 			LoadBackupData();
 		}
@@ -80,10 +81,10 @@ namespace UIManager
 
 		private void ToolInitialized()
 		{
-			LocalizationManager.SaveFile(BACKUP_PATH, LocalizationManager.BuildSerializedData(new UnityJsonSerializer()), "", "", "");
+			SaveLoadFileManager.SaveFile(BACKUP_PATH, LocalizationManager.BuildSerializedData(new UnityJsonSerializer()), "", "", "");
 			Debug.Log("Data saved to backup");
 			
-			LocalizationManager.ClearData();
+			CacheData.ClearData();
 			LoadDemoData();
 		}
 
@@ -125,7 +126,7 @@ namespace UIManager
 		
 		private static void LoadBackupData()
 		{
-			LocalizationManager.ClearData();
+			CacheData.ClearData();
 			var currentLogValue = LocalizationManager.Configuration.showLogsInConsole;
 			LocalizationManager.Configuration.showLogsInConsole = false;
 			EditorCoroutineUtility.StartCoroutineOwnerless(LocalizationManager.ImportSerializedDataCoroutine(BACKUP_PATH, new UnityJsonSerializer(), null,

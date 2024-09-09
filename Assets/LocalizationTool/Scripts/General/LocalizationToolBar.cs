@@ -3,6 +3,7 @@
 using LocalizationTool.Scripts.Addons;
 using LocalizationTool.Scripts.API;
 using LocalizationTool.Scripts.Commons;
+using LocalizationTool.Scripts.Data;
 using UnityEditor;
 using UnityEngine;
 using static UnityEngine.Object;
@@ -18,7 +19,7 @@ namespace LocalizationTool.Scripts.General
 			if (FindObjectsOfType<LocalizationToolAPI>().IsNull()) {
 #pragma warning restore CS0618
 				EditorUtils.MenuItemNewObject<LocalizationToolAPI>(menuCommand, "LocalizationToolAPI");
-				LocalizationToolAPI.ActiveLanguage = LocalizationManager.DefaultLanguage;
+				LocalizationToolAPI.ActiveLanguage = CacheData.DefaultLanguage;
 			} else {
 				Debug.LogWarning("LocalizationToolAPI already exists");
 			}
