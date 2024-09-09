@@ -117,13 +117,7 @@ namespace LocalizationTool.Scripts.General
                 ShowFeedback(EMPTY_KEY_FEEDBACK_LABEL, editor);
                 return;
             }
-
-            if (key.Contains(" "))
-            {
-                ShowFeedback(SPACES_KEY_FEEDBACK_LABEL, editor);
-                return;
-            }
-
+            
             if (ContainsKey(key))
             {
                 ShowFeedback(string.Format(KEY_EXIST_FEEDBACK_LABEL, key), editor);
@@ -156,13 +150,7 @@ namespace LocalizationTool.Scripts.General
                 ShowFeedback(EMPTY_KEY_FEEDBACK_LABEL, editor);
                 return oldKeyName;
             }
-
-            if (newKeyName.Contains(" "))
-            {
-                ShowFeedback(SPACES_KEY_FEEDBACK_LABEL, editor);
-                return oldKeyName;
-            }
-
+            
             if (ContainsKey(newKeyName))
             {
                 ShowFeedback(string.Format(KEY_EXIST_FEEDBACK_LABEL, oldKeyName), editor);
@@ -277,13 +265,7 @@ namespace LocalizationTool.Scripts.General
                 ShowFeedback(EMPTY_LANGUAGE_FEEDBACK_LABEL, editor);
                 return;
             }
-
-            if (newLanguage.Contains(" "))
-            {
-                ShowFeedback(SPACES_LANGUAGE_FEEDBACK_LABEL, editor);
-                return;
-            }
-
+            
             if (ContainsLanguage(newLanguage))
             {
                 ShowFeedback(string.Format(LANGUAGE_EXIST_FEEDBACK_LABEL, newLanguage), editor);
@@ -383,13 +365,7 @@ namespace LocalizationTool.Scripts.General
                 if (showEditorLogs) ShowFeedback(EMPTY_CATEGORY_FEEDBACK_LABEL, editor);
                 return;
             }
-
-            if (newCategory.Contains(" "))
-            {
-                if (showEditorLogs) ShowFeedback(SPACES_CATEGORY_FEEDBACK_LABEL, editor);
-                return;
-            }
-
+            
             // Already in data
             if (ContainsCategory(newCategory))
             {

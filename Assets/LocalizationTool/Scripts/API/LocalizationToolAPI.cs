@@ -107,6 +107,10 @@ namespace LocalizationTool.Scripts.API
             return true;
         }
 
+        /// <summary>
+        /// Return all available languages, useful for making a language selector
+        /// </summary>
+        /// <returns>List of all languages</returns>
         public static List<string> GetAvailableLanguages()
         {
             return CacheData.Languages;

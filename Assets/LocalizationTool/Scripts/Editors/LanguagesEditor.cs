@@ -371,13 +371,7 @@ namespace LocalizationTool.Scripts.Editors
                 ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldLanguage] = s; }, EMPTY_LANGUAGE_FEEDBACK_LABEL, delegate { _feedbackList.Remove(oldLanguage); });
                 return;
             }
-
-            if (newLanguage.Contains(" "))
-            {
-                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldLanguage] = s; }, SPACES_LANGUAGE_FEEDBACK_LABEL, delegate { _feedbackList.Remove(oldLanguage); });
-                return;
-            }
-
+            
             if (newLanguage.Length > MAX_LANGUAGE_CHARACTERS)
             {
                 ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldLanguage] = s; }, string.Format(CHARACTERS_NUMBER_LANGUAGE_FEEDBACK_LABEL, MAX_LANGUAGE_CHARACTERS), delegate { _feedbackList.Remove(oldLanguage); });

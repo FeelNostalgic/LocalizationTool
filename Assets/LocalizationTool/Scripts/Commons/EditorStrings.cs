@@ -209,19 +209,19 @@ namespace LocalizationTool.Scripts.Commons
         #region FEEDBACK LABEL
 
         public const string EMPTY_KEY_FEEDBACK_LABEL = "Key cannot be an empty value";
-        public const string SPACES_KEY_FEEDBACK_LABEL = "Key cannot contain spaces";
+        // public const string SPACES_KEY_FEEDBACK_LABEL = "Key cannot contain spaces";
         public const string CHARACTERS_NUMBER_KEY_FEEDBACK_LABEL = "The maximum number of characters({0}) has been exceeded";
         public const string KEY_EXIST_FEEDBACK_LABEL = "Key '{0}' already exists";
         public const string KEY_ADDED_FEEDBACK_LABEL = "Key '{0}' added correctly";
 
         public const string EMPTY_CATEGORY_FEEDBACK_LABEL = "Category cannot be an empty value";
-        public const string SPACES_CATEGORY_FEEDBACK_LABEL = "Category cannot contain spaces";
+        // public const string SPACES_CATEGORY_FEEDBACK_LABEL = "Category cannot contain spaces";
         public const string CHARACTERS_NUMBER_CATEGORY_FEEDBACK_LABEL = "The maximum number of characters({0}) has been exceeded";
         public const string CATEGORY_EXIST_FEEDBACK_LABEL = "Category '{0}' value already exists";
         public const string CATEGORY_ADDED_FEEDBACK_LABEL = "Category '{0}' added correctly";
 
         public const string EMPTY_LANGUAGE_FEEDBACK_LABEL = "Language cannot be an empty value";
-        public const string SPACES_LANGUAGE_FEEDBACK_LABEL = "Language cannot contain spaces";
+        // public const string SPACES_LANGUAGE_FEEDBACK_LABEL = "Language cannot contain spaces";
         public const string CHARACTERS_NUMBER_LANGUAGE_FEEDBACK_LABEL = "The maximum number of characters({0}) has been exceeded";
         public const string LANGUAGE_EXIST_FEEDBACK_LABEL = "Language {0} value already exists";
         public const string LANGUAGE_ADDED_FEEDBACK_LABEL = "Language '{0}' added correctly";

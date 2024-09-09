@@ -100,6 +100,7 @@ namespace LocalizationTool.Scripts.Commons
                     Enums.CustomStyleName.SearchTypePopup, new GUIStyle(EditorStyles.popup)
                     {
                         alignment = TextAnchor.MiddleLeft,
+                        padding = {top = 0, bottom = 0, left = 6, right = 0},
                         fixedHeight = 32,
                         fixedWidth = 150,
                         fontSize = 13,

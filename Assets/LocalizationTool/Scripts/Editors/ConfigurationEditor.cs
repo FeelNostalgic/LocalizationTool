@@ -35,7 +35,9 @@ namespace LocalizationTool.Scripts.Editors
 
         private int _selectedCsvSeparatorIndexForExport;
         private int _selectedCsvSeparatorIndexForImport;
-        
+
+        private Vector2 _configurationScroll;
+
         #endregion
 
         #region DIMENSION VARIABLES
@@ -68,7 +70,7 @@ namespace LocalizationTool.Scripts.Editors
 
             GUILayout.EndVertical();
         }
-        
+
         #endregion
 
         #region PRIVATE METHODS
@@ -86,27 +88,40 @@ namespace LocalizationTool.Scripts.Editors
 
         private void OptionsSection()
         {
-            GUILayout.BeginHorizontal(MinWidthOption(GetWidthSize(LEFT_SECTION_WIDTH_PERCENT, WindowSize.x)));
+            _configurationScroll = EditorGUILayout.BeginScrollView(_configurationScroll, GUILayout.Width(GetWidthSize(LEFT_SECTION_WIDTH_PERCENT, LocalizationMainEditor.Instance.position.width)));
+
+            GUILayout.BeginHorizontal();
 
             GUILayout.FlexibleSpace();
 
-            GUILayout.BeginVertical(MinWidthOption(325));
+            GUILayout.BeginVertical(GUILayout.Width(315));
 
             DeleteConfirmationSection();
 
+            GUILayout.Space(10);
+            
             ClearAddSection();
 
+            GUILayout.Space(10);
+            
             SearchSection();
 
+            GUILayout.Space(10);
+            
             LogsSection();
 
             ReadmeSection();
-
+            ReadmeSection();
+            ReadmeSection();
+            ReadmeSection();
+            
             GUILayout.EndVertical();
 
             GUILayout.FlexibleSpace();
 
             GUILayout.EndHorizontal();
+
+            EditorGUILayout.EndScrollView();
         }
 
         private void DeleteConfirmationSection()
@@ -114,10 +129,10 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
             GUILayout.Space(10);
 
-            ShowSubHeader(CONFIGURATION_DELETE_SECTION_LABEL, CONFIGURATION_DELETE_SECTION_TOOLTIP);
+            CenteredTitle(CONFIGURATION_DELETE_SECTION_LABEL, CONFIGURATION_DELETE_SECTION_TOOLTIP);
 
             GUILayout.BeginHorizontal();
-            GUILayout.Space(15);
+            //GUILayout.Space(15); //line bleed 
             GUILayout.BeginVertical();
 
             if (LocalizationManager.Configuration.dictionaryDeleteConfirmation
@@ -146,11 +161,11 @@ namespace LocalizationTool.Scripts.Editors
         private void ClearAddSection()
         {
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
-
-            ShowSubHeader(CONFIGURATION_CLEAR_ADD_SECTION_LABEL, CONFIGURATION_CLEAR_ADD_SECTION_TOOLTIP);
-
+            
+            CenteredTitle(CONFIGURATION_CLEAR_ADD_SECTION_LABEL, CONFIGURATION_CLEAR_ADD_SECTION_TOOLTIP);
+            
             GUILayout.BeginHorizontal();
-            GUILayout.Space(15);
+            //GUILayout.Space(15); //line bleed 
             GUILayout.BeginVertical();
 
             if (LocalizationManager.Configuration.dictionaryClearAdd
@@ -179,18 +194,22 @@ namespace LocalizationTool.Scripts.Editors
         private void SearchSection()
         {
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
-
-            ShowSubHeader(CONFIGURATION_SEARCH_SECTION_LABEL, CONFIGURATION_SEARCH_SECTION_TOOLTIP);
-
+            
+            CenteredTitle(CONFIGURATION_SEARCH_SECTION_LABEL, CONFIGURATION_SEARCH_SECTION_TOOLTIP);
+            
             GUILayout.BeginHorizontal();
-            GUILayout.Space(15);
-            GUILayout.BeginVertical();
+            //GUILayout.Space(15); //line bleed 
+            GUILayout.FlexibleSpace();
+            
+            GUILayout.BeginVertical(GUILayout.Width(150));
 
             EditorGUI.BeginChangeCheck();
             _searchTypeIndex = EditorGUILayout.Popup(LocalizationManager.Configuration.searchTypeIndex, Enums.SEARCH_TYPE, CustomStyles.GetStyle(Enums.CustomStyleName.SearchTypePopup));
-            if(EditorGUI.EndChangeCheck()) UpdateSearchType();
+            if (EditorGUI.EndChangeCheck()) UpdateSearchType();
 
             GUILayout.EndVertical();
+            
+            GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -199,16 +218,20 @@ namespace LocalizationTool.Scripts.Editors
         private static void LogsSection()
         {
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
-
-            ShowSubHeader(CONFIGURATION_LOGS_SECTION_LABEL);
-
+            
+            CenteredTitle(CONFIGURATION_LOGS_SECTION_LABEL, "");
+            
             GUILayout.BeginHorizontal();
-            GUILayout.Space(15);
-            GUILayout.BeginVertical();
+            //GUILayout.Space(15); //line bleed 
+            GUILayout.FlexibleSpace();
+
+            GUILayout.BeginVertical(GUILayout.Width(10));
 
             ToggleLeft(LocalizationManager.Configuration.showLogsInConsole, CONFIGURATION_LOGS_TOGGLE_LABEL, UpdateShowLogs);
 
             GUILayout.EndVertical();
+            
+            GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -217,11 +240,13 @@ namespace LocalizationTool.Scripts.Editors
         private static void ReadmeSection()
         {
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.Height(75));
-
-            ShowSubHeader(CONFIGURATION_INFO_SECTION_LABEL, CONFIGURATION_INFO_SECTION_TOOLTIP);
+            
+            CenteredTitle(CONFIGURATION_INFO_SECTION_LABEL, CONFIGURATION_INFO_SECTION_TOOLTIP);
 
             GUILayout.BeginHorizontal();
-            GUILayout.Space(15);
+            //GUILayout.Space(15); //line bleed 
+            GUILayout.FlexibleSpace();
+
             GUILayout.BeginVertical();
 
             if (GUILayout.Button(new GUIContent(CONFIGURATION_INFO_README_BUTTON_LABEL, CONFIGURATION_INFO_README_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.ConfigurationReadmeButton)))
@@ -246,6 +271,8 @@ namespace LocalizationTool.Scripts.Editors
             }
 
             GUILayout.EndVertical();
+            
+            GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -270,6 +297,15 @@ namespace LocalizationTool.Scripts.Editors
         {
             using var reader = new StreamReader(path);
             return reader.ReadToEnd();
+        }
+
+        private static void CenteredTitle(string title, string tooltip)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            ShowSubHeader(title, tooltip);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
         }
 
         #endregion
@@ -440,7 +476,7 @@ namespace LocalizationTool.Scripts.Editors
                         {
                             var progressWindow = ImportProgressWindow.OpenWindow(string.Format(IMPORT_WINDOW_LABEL, CSV_LABEL_UPPER));
 
-                            EditorCoroutineUtility.StartCoroutine(LocalizationManager.ImportCSVCoroutine(path, CsvSeparators[_selectedCsvSeparatorIndexForImport],progressWindow), progressWindow);
+                            EditorCoroutineUtility.StartCoroutine(LocalizationManager.ImportCSVCoroutine(path, CsvSeparators[_selectedCsvSeparatorIndexForImport], progressWindow), progressWindow);
                         }
                     }
 
@@ -561,7 +597,7 @@ namespace LocalizationTool.Scripts.Editors
         }
 
         #endregion
-        
+
         #endregion
     }
 }

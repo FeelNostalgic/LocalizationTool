@@ -41,6 +41,7 @@ namespace LocalizationTool.Scripts.Editors
         #region DIMENSION VARIABLES
 
         private static readonly Vector2 WindowSize = new(1400, 1000);
+        public Rect Position => position;
 
         #endregion
 
@@ -106,7 +107,8 @@ namespace LocalizationTool.Scripts.Editors
             _languagesEditor ??= new LanguagesEditor();
             _categoriesEditor ??= new CategoriesEditor();
             _configurationEditor ??= new ConfigurationEditor();
-            if (_currentEditorWindow.IsNull()) _currentEditorWindow = _dictionaryEditor;
+            // TODO: change to _dictionaryEditor
+            if (_currentEditorWindow.IsNull()) _currentEditorWindow = _configurationEditor;
             
             LocalizationManager.Instance.InitForEditor();
         }

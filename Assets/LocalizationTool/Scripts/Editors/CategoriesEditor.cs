@@ -354,13 +354,7 @@ namespace LocalizationTool.Scripts.Editors
                 ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, EMPTY_CATEGORY_FEEDBACK_LABEL, delegate { _feedbackList.Remove(oldCategory); });
                 return;
             }
-        
-            if (newCategory.Contains(" "))
-            {
-                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, SPACES_CATEGORY_FEEDBACK_LABEL, delegate { _feedbackList.Remove(oldCategory); });
-                return;
-            }
-        
+            
             if (newCategory.Length > MAX_CATEGORY_CHARACTERS)
             {
                 ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, string.Format(CHARACTERS_NUMBER_CATEGORY_FEEDBACK_LABEL, MAX_CATEGORY_CHARACTERS), delegate { _feedbackList.Remove(oldCategory); });
