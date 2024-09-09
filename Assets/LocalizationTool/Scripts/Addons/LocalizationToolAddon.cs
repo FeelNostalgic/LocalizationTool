@@ -80,7 +80,7 @@ namespace LocalizationTool.Scripts.Addons
         public void LanguageUpdate(string newLanguage)
         {
             var newText = LocalizationToolAPI.GetValueByKey(key, out _);
-            Debug.Log($"Key: '{key}' => new language: '{newLanguage}' => value: {newText}");
+            //Debug.Log($"Key: '{key}' => new language: '{newLanguage}' => value: {newText}");
             if (_tmpText.IsNull()) _tmpText = GetComponent<TMP_Text>();
             _tmpText.text = newText;
         }

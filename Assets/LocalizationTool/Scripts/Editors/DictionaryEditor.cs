@@ -211,7 +211,6 @@ namespace LocalizationTool.Scripts.Editors
             catch (Exception e)
             {
                 Debug.Log(e);
-                //Ignore
             }
         }
 

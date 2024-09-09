@@ -3,7 +3,6 @@ using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.Serializer;
 using UnityEditor;
 using UnityEngine;
@@ -40,7 +39,7 @@ namespace LocalizationTool.Scripts.Data
         {
             await File.WriteAllTextAsync(path, fileContent);
 
-            if (title.IsNotEmpty()) EditorUtility.DisplayDialog(title, message, okMessage);
+            EditorUtility.DisplayDialog(title, message, okMessage);
         }
 
         public static async Task<T> LoadFile<T>(string path, ISerializerService serializer)

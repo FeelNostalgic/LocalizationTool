@@ -12,7 +12,6 @@ using LocalizationTool.Scripts.Editors;
 using LocalizationTool.Scripts.ExportSerializer;
 using LocalizationTool.Scripts.Serializer;
 using TMPro;
-using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -296,12 +295,12 @@ namespace LocalizationTool.Scripts.General
                 ShowFeedback(string.Format(CHARACTERS_NUMBER_LANGUAGE_FEEDBACK_LABEL, MAX_LANGUAGE_CHARACTERS), editor);
                 return;
             }
-
+            
             editor?.ClearAddTextField();
 
             // Add category to Database
             CacheData.InsertLanguageToDatabase(newLanguage);
-
+            
             // Update cache 
             CacheData.UpdateLanguageCache();
 
@@ -408,10 +407,12 @@ namespace LocalizationTool.Scripts.General
 
             // Add category to Database
             CacheData.InsertCategoryToDatabase(newCategory);
-
+            
             // Update cache 
             CacheData.UpdateCategoryCache();
 
+            if (CacheData.CategoryCache.Count() == 1) Instance.ChangeDefaultCategory(newCategory);
+            
             if (showEditorLogs) ShowFeedback(string.Format(CATEGORY_ADDED_FEEDBACK_LABEL, newCategory), editor);
         }
 
@@ -517,7 +518,7 @@ namespace LocalizationTool.Scripts.General
 
         public async void UpdateSearchType(int searchTypeIndex)
         {
-            if (_configurationData.searchTypeIndex == searchTypeIndex) return;
+            if (_configurationData.searchTypeIndex.Equals(searchTypeIndex)) return;
 
             _configurationData.searchTypeIndex = searchTypeIndex;
             await SaveLoadFileManager.SaveFile(_configurationData, CONFIGURATION_PATH, _serializerBinary);
@@ -667,8 +668,10 @@ namespace LocalizationTool.Scripts.General
             progressWindow.Complete(sb.ToString());
         }
 
-        public static IEnumerator ImportSerializedDataCoroutine(string path, ISerializerService serializer, ImportProgressWindow progressWindow, Action onComplete = null)
+        public static IEnumerator ImportSerializedDataCoroutine(string path, ISerializerService serializer, ImportProgressWindow progressWindow)
         {
+            //CacheData.ClearData();
+            
             // Load data
             var loadFileTask = SaveLoadFileManager.LoadFile<DictionaryTemplate>(path, serializer);
             var awaiter = loadFileTask.GetAwaiter();
@@ -724,11 +727,45 @@ namespace LocalizationTool.Scripts.General
             sb.AppendLine(string.Format(IMPORT_KEYS_RESULT, nKeys));
 
             if (progressWindow.IsNotNull()) progressWindow.Complete(sb.ToString());
+        }
+
+        public static IEnumerator ImportSerializedDataCoroutineForGameMode(string path, Action onComplete)
+        {
+            //CacheData.ClearData();
+            
+            // Load data
+            var loadFileTask = SaveLoadFileManager.LoadFile<DictionaryTemplate>(path, new UnityJsonSerializer());
+            var awaiter = loadFileTask.GetAwaiter();
+            while (!awaiter.IsCompleted) yield return null;
+            var data = awaiter.GetResult();
+
+            if (data.DictionaryKeyCategoryLanguages.IsEmpty())
+            {
+                yield break;
+            }
+            
+            //Languages
+            foreach (var languageValue in data.DictionaryKeyCategoryLanguages[0].LanguageValues)
+            {
+                ImportLanguage(languageValue.Language, false);
+                yield return null;
+            }
+            
+            // Keys
+            foreach (var keyCategoryLanguage in data.DictionaryKeyCategoryLanguages)
+            {
+                foreach (var (language, translation) in keyCategoryLanguage.LanguageValues)
+                {
+                    ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, language, translation, false);
+                }
+                
+                yield return null;
+            }
 
             onComplete?.Invoke();
         }
-
-        public static void ImportLanguage(string languageToImport)
+        
+        public static void ImportLanguage(string languageToImport, bool showLog = true)
         {
             if (ContainsLanguage(languageToImport)) return;
 
@@ -740,13 +777,13 @@ namespace LocalizationTool.Scripts.General
 
             if (CacheData.LanguageCache.Count() == 1)
             {
-                CacheData.DefaultLanguage = languageToImport;
+                ChangeDefaultLanguage(languageToImport);
                 CurrentLanguageInDictionarySection = languageToImport;
             }
 
-            Log(string.Format(IMPORTED_LANGUAGE_LOG, languageToImport));
+            if(showLog) Log(string.Format(IMPORTED_LANGUAGE_LOG, languageToImport));
         }
-
+        
         private static void ImportKey(string keyToImport, string category, Dictionary<string, string> values)
         {
             if (keyToImport.IsEmpty()) return;
@@ -783,12 +820,12 @@ namespace LocalizationTool.Scripts.General
             CacheData.UpdateDictionaryCache();
         }
 
-        public static void ImportKey(string keyToImport, string category, string language, string translation)
+        public static void ImportKey(string keyToImport, string category, string language, string translation, bool showLog = true)
         {
             if (keyToImport.Equals("")) return;
-            Log(string.Format(IMPORTED_KEY_SINGLE_LOG, keyToImport, category, language, translation));
+            if(showLog) Log(string.Format(IMPORTED_KEY_SINGLE_LOG, keyToImport, category, language, translation));
 
-            ImportLanguage(language);
+            ImportLanguage(language, showLog);
 
             if (ContainsKey(keyToImport))
             {
@@ -823,37 +860,43 @@ namespace LocalizationTool.Scripts.General
 
         public static void Log(string log)
         {
+            if(_configurationData.IsNull()) return;
+            
             try
             {
                 if (_configurationData.showLogsInConsole) Debug.Log(log);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Debug.Log(log);
+                Debug.Log(e);
             }
         }
 
         public static void LogWarning(string log)
         {
+            if(_configurationData.IsNull()) return;
+            
             try
             {
                 if (_configurationData.showLogsInConsole) Debug.LogWarning(log);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Debug.LogWarning(log);
+                Debug.Log(e);
             }
         }
 
         public static void LogError(string log)
         {
+            if(_configurationData.IsNull()) return;
+            
             try
             {
                 if (_configurationData.showLogsInConsole) Debug.LogError(log);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Debug.LogError(log);
+                Debug.Log(e);
             }
         }
 
@@ -877,12 +920,12 @@ namespace LocalizationTool.Scripts.General
 
         #region LOAD FROM MEMORY
 
-        public void Init()
+        public void InitForEditor()
         {
             if (_isInitialized) return; // Just the first call
             _isInitialized = true;
 
-            _serializerBinary = new BinarySerializer();
+            _serializerBinary ??= new BinarySerializer();
             LoadConfigurationDataFromMemory();
 
             Log(TOOL_INITIALIZED_LOG);
@@ -890,6 +933,7 @@ namespace LocalizationTool.Scripts.General
         
         private async void LoadConfigurationDataFromMemory()
         {
+            _configurationData = null;
             _configurationData = await SaveLoadFileManager.LoadFile<ConfigurationData>(CONFIGURATION_PATH, _serializerBinary);
 
             if (_configurationData.IsNotNull()) return;

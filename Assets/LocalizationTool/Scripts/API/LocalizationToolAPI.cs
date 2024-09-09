@@ -35,14 +35,19 @@ namespace LocalizationTool.Scripts.API
             DontDestroyOnLoad(this);
             
             FindAllAddons();
-
-            CacheData.Instance.Init(() =>
+            
+            CacheData.Instance.OnLocalizationToolDataInitialized += delegate
             {
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 LocalizationManager.Log("Localization Tool API Initialized");
-                #endif
+#endif
                 UpdateAllAddons(ActiveLanguage);
-            });
+            };
+        }
+
+        private void Start()
+        {
+            CacheData.LoadCacheData();
         }
 
         #endregion
@@ -144,11 +149,11 @@ namespace LocalizationTool.Scripts.API
 
         private static void FindAllAddons()
         {
-            var tmps = Resources.FindObjectsOfTypeAll(typeof(TextMeshProUGUI));
+            var TextMeshPros = Resources.FindObjectsOfTypeAll(typeof(TextMeshProUGUI));
             _addons = new List<LocalizationToolAddon>();
-            foreach (var obj in tmps)
+            foreach (var tmp in TextMeshPros)
             {
-                var item = (TextMeshProUGUI)obj;
+                var item = (TextMeshProUGUI)tmp;
                 var addon = item.GetComponent<LocalizationToolAddon>();
                 if (addon.IsNotNull()) _addons.Add(addon);
             }

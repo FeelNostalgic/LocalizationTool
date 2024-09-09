@@ -82,6 +82,7 @@ namespace LocalizationTool.Scripts.Editors
             //
         }
 
+        //TODO: revisar cuando se repinta la interfaz
         protected void RepaintGUI()
         {
             Repaint();
@@ -106,6 +107,8 @@ namespace LocalizationTool.Scripts.Editors
             _categoriesEditor ??= new CategoriesEditor();
             _configurationEditor ??= new ConfigurationEditor();
             if (_currentEditorWindow.IsNull()) _currentEditorWindow = _dictionaryEditor;
+            
+            LocalizationManager.Instance.InitForEditor();
         }
 
         #endregion
@@ -156,9 +159,7 @@ namespace LocalizationTool.Scripts.Editors
         private static void LoadData()
         {
             LocalizationManager.CreateDatabase();
-            CacheData.Instance.Init();
-            LocalizationManager.Instance.Init();
-            
+            CacheData.Instance.InitForEditor();
         }
 
         #endregion

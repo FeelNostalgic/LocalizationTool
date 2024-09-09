@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Data;
+using System.Linq;
 using LocalizationTool.Scripts.API;
 using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.General;
@@ -42,34 +42,32 @@ namespace LocalizationTool.Scripts.Data
         #region PRIVATE VARIABLES
 
         private static CacheData _instance;
-        private static string connectionString;
-        private static IDbConnection dbConnection;
+        private static string _connectionString;
+        private static IDbConnection _dbConnection;
         private bool _isInitialized;
 
         #endregion
 
         #region LOAD CACHE
 
-        public void Init(Action onComplete = null)
+        public void InitForEditor(Action onComplete = null)
         {
             if (_isInitialized) return; // Just the first call
             _isInitialized = true;
 
             LoadCacheData();
             
-#if UNITY_EDITOR
-            LocalizationManager.Log("Database loaded");
-#endif
             onComplete?.Invoke();
-            OnLocalizationToolDataInitialized?.Invoke();
         }
 
-        private static void LoadCacheData()
+        public static void LoadCacheData()
         {
             LoadDictionaryCacheFromDatabase();
             LoadLanguagesCacheFromDatabase();
             LoadCategoriesCacheFromDatabase();
             IsDataLoaded = true;
+            Debug.Log("Database loaded");
+            Instance.OnLocalizationToolDataInitialized?.Invoke();
         }
         
         public static void LoadDictionaryCacheFromDatabase()
@@ -100,30 +98,30 @@ namespace LocalizationTool.Scripts.Data
 
         public static void OpenConnection()
         {
-            connectionString = "URI=file:" + DATABASE_PATH;
-            dbConnection = new SqliteConnection(connectionString);
-            dbConnection.Open();
+            _connectionString = "URI=file:" + DATABASE_PATH;
+            _dbConnection = new SqliteConnection(_connectionString);
+            _dbConnection.Open();
         }
 
         public static void CloseConnection()
         {
-            if (dbConnection == null) return;
+            if (_dbConnection == null) return;
 
-            dbConnection.Close();
-            dbConnection = null;
+            _dbConnection.Close();
+            _dbConnection = null;
         }
 
         public static void ExecuteNonQueryCommand(string query)
         {
-            using var command = dbConnection.CreateCommand();
+            using var command = _dbConnection.CreateCommand();
             command.CommandText = query;
             command.ExecuteNonQuery();
         }
 
         public static IDataReader ExecuteReaderCommand(string query)
         {
-            if (dbConnection.IsNull()) OpenConnection();
-            using var command = dbConnection.CreateCommand();
+            if (_dbConnection.IsNull()) OpenConnection();
+            using var command = _dbConnection.CreateCommand();
             command.CommandText = query;
             return command.ExecuteReader();
         }
@@ -134,19 +132,19 @@ namespace LocalizationTool.Scripts.Data
             {
                 OpenConnection();
                 //Delete translation
-                var query = $"DELETE * FROM {TRANSLATION_TABLE}";
+                var query = $"DELETE FROM {TRANSLATION_TABLE}; DELETE FROM sqlite_sequence WHERE name='{TRANSLATION_TABLE}';";
                 ExecuteNonQueryCommand(query);
 
                 //Delete translations_keys
-                query = $"DELETE * FROM {TRANSLATION_KEY_TABLE}";
+                query =  $"DELETE FROM {TRANSLATION_KEY_TABLE}; DELETE FROM sqlite_sequence WHERE name='{TRANSLATION_KEY_TABLE}';";
                 ExecuteNonQueryCommand(query);
 
                 // Delete category
-                query = $"DELETE * FROM {CATEGORY_TABLE}";
+                query =  $"DELETE FROM {CATEGORY_TABLE}; DELETE FROM sqlite_sequence WHERE name='{CATEGORY_TABLE}';";
                 ExecuteNonQueryCommand(query);
 
                 // Delete language
-                query = $"DELETE * FROM {LANGUAGE_TABLE}";
+                query =  $"DELETE FROM {LANGUAGE_TABLE}; DELETE FROM sqlite_sequence WHERE name='{LANGUAGE_TABLE}';";
                 ExecuteNonQueryCommand(query);
             }
             catch (Exception e)
@@ -197,7 +195,8 @@ namespace LocalizationTool.Scripts.Data
             {
                 OpenConnection();
                 var query = $"SELECT MAX(displayOrder) AS max_display_order FROM {TRANSLATION_KEY_TABLE}";
-                var lastDisplayOrder = Convert.ToInt32(ExecuteReaderCommand(query)["max_display_order"]);
+                var result = ExecuteReaderCommand(query)["max_display_order"];
+                var lastDisplayOrder = result.ToString().IsEmpty() ? 1 : Convert.ToInt32(result);
 
                 query = $"Select id from {CATEGORY_TABLE} where category = '{categoryName}'";
                 var categoryID = Convert.ToInt32(ExecuteReaderCommand(query)["id"]);
@@ -319,16 +318,16 @@ namespace LocalizationTool.Scripts.Data
             }
         }
 
-        public static Dictionary<string, CacheData.KeyData> GetKeysTranslationFromDatabase()
+        public static Dictionary<string, KeyData> GetKeysTranslationFromDatabase()
         {
-            var result = new Dictionary<string, CacheData.KeyData>();
+            var result = new Dictionary<string, KeyData>();
             try
             {
                 OpenConnection();
                 const string query =
                     "select tk.key_name, c.category, l.language, t.translationText from translations_keys tk join categories c on tk.categoryID = c.id join translations t on tk.id = t.keyID join languages l on t.languageID = l.id";
 
-                using var command = dbConnection.CreateCommand();
+                using var command = _dbConnection.CreateCommand();
                 command.CommandText = query;
                 var reader = command.ExecuteReader();
 
@@ -341,7 +340,7 @@ namespace LocalizationTool.Scripts.Data
                     {
                         var language = reader["language"].ToString();
                         var translationText = reader["translationText"].ToString();
-                        var keyData = new CacheData.KeyData()
+                        var keyData = new KeyData
                         {
                             Category = category,
                             TranslationData = new Dictionary<string, string> { { language, translationText } }
@@ -379,12 +378,13 @@ namespace LocalizationTool.Scripts.Data
             {
                 OpenConnection();
                 var query = $"SELECT MAX(displayOrder) AS max_display_order FROM {LANGUAGE_TABLE}";
-                var lastDisplayOrder = Convert.ToInt32(ExecuteReaderCommand(query)["max_display_order"]);
+                var result = ExecuteReaderCommand(query)["max_display_order"];
+                var lastDisplayOrder = result.ToString().IsEmpty() ? 1 : Convert.ToInt32(result);
 
                 query = $"INSERT INTO {LANGUAGE_TABLE} (displayOrder, language, isDefault) VALUES ({lastDisplayOrder + 1}, '{newLanguage}', 0)";
                 ExecuteNonQueryCommand(query);
 
-                foreach (var key in CacheData.Keys)
+                foreach (var key in Keys)
                 {
                     query = $"select id from {TRANSLATION_KEY_TABLE} where key_name = '{key}'";
                     var keyID = Convert.ToInt32(ExecuteReaderCommand(query)["id"]);
@@ -539,9 +539,9 @@ namespace LocalizationTool.Scripts.Data
             return defaultCategory;
         }
 
-        public static List<CacheData.LanguageTuple> GetLanguagesOrderedFromDatabase()
+        public static List<LanguageTuple> GetLanguagesOrderedFromDatabase()
         {
-            var result = new List<CacheData.LanguageTuple>();
+            var result = new List<LanguageTuple>();
             try
             {
                 OpenConnection();
@@ -550,7 +550,7 @@ namespace LocalizationTool.Scripts.Data
 
                 while (reader.Read())
                 {
-                    result.Add(new CacheData.LanguageTuple
+                    result.Add(new LanguageTuple
                     {
                         Language = reader["language"].ToString(),
                         DisplayOrder = Convert.ToInt32(reader["displayOrder"])
@@ -579,8 +579,8 @@ namespace LocalizationTool.Scripts.Data
             {
                 OpenConnection();
                 var query = $"SELECT MAX(displayOrder) AS max_display_order FROM {CATEGORY_TABLE}";
-                var reader = ExecuteReaderCommand(query);
-                var lastDisplayOrder = Convert.ToInt32(reader["max_display_order"]);
+                var result = ExecuteReaderCommand(query)["max_display_order"];
+                var lastDisplayOrder = result.ToString().IsEmpty() ? 1 : Convert.ToInt32(result);
 
                 query = $"INSERT INTO {CATEGORY_TABLE} (displayOrder, category, isDefault) VALUES ({lastDisplayOrder + 1}, '{newCategory}', 0)";
                 ExecuteNonQueryCommand(query);
@@ -733,9 +733,9 @@ namespace LocalizationTool.Scripts.Data
             return defaultCategory;
         }
 
-        public static List<CacheData.CategoryTuple> GetCategoriesOrderedFromDatabase()
+        public static List<CategoryTuple> GetCategoriesOrderedFromDatabase()
         {
-            var result = new List<CacheData.CategoryTuple>();
+            var result = new List<CategoryTuple>();
             try
             {
                 OpenConnection();
@@ -746,7 +746,7 @@ namespace LocalizationTool.Scripts.Data
 
                 while (reader.Read())
                 {
-                    result.Add(new CacheData.CategoryTuple
+                    result.Add(new CategoryTuple
                     {
                         Category = reader["category"].ToString(),
                         DisplayOrder = Convert.ToInt32(reader["displayOrder"])

@@ -186,8 +186,9 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.Space(15);
             GUILayout.BeginVertical();
 
+            EditorGUI.BeginChangeCheck();
             _searchTypeIndex = EditorGUILayout.Popup(LocalizationManager.Configuration.searchTypeIndex, Enums.SEARCH_TYPE, CustomStyles.GetStyle(Enums.CustomStyleName.SearchTypePopup));
-            UpdateSearchType();
+            if(EditorGUI.EndChangeCheck()) UpdateSearchType();
 
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
