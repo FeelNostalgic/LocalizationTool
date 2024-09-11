@@ -161,8 +161,9 @@ namespace LocalizationTool.Scripts.Data
 
         public static void LogChange(string tableName, string action, string param, string oldData, string newData)
         {
-            var query = $"INSERT INTO {CHANGE_LOG_TABLE} (table_name, action, params, old_data, new_data) VALUES ('{tableName}', '{action}', '{param}', '{oldData}', '{newData}')";
-            ExecuteNonQueryCommand(query);
+            //TODO 
+            //var query = $"INSERT INTO {CHANGE_LOG_TABLE} (table_name, action, params, old_data, new_data) VALUES ('{tableName}', '{action}', '{param}', '{oldData}', '{newData}')";
+            //ExecuteNonQueryCommand(query);
         }
 
         #region UPDATE CACHES
