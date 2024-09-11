@@ -58,7 +58,7 @@ namespace LocalizationTool.Scripts.Data
             _isInitialized = true;
 
             LoadCacheData();
-            
+
             onComplete?.Invoke();
         }
 
@@ -71,7 +71,7 @@ namespace LocalizationTool.Scripts.Data
             CustomDebug.Log("Database", Colors.Red, "Loaded");
             Instance.OnLocalizationToolDataInitialized?.Invoke();
         }
-        
+
         public static void LoadDictionaryCacheFromDatabase()
         {
             DictionaryCache = GetKeysTranslationFromDatabase();
@@ -95,17 +95,17 @@ namespace LocalizationTool.Scripts.Data
         }
 
         #endregion
-        
+
         #region DATABASE UPDATES
 
-        public static void OpenConnection()
+        public static void OpenDatabaseConnection()
         {
             _connectionString = "URI=file:" + DATABASE_PATH;
             _dbConnection = new SqliteConnection(_connectionString);
             _dbConnection.Open();
         }
 
-        public static void CloseConnection()
+        public static void CloseDatabaseConnection()
         {
             if (_dbConnection == null) return;
 
@@ -122,7 +122,7 @@ namespace LocalizationTool.Scripts.Data
 
         public static IDataReader ExecuteReaderCommand(string query)
         {
-            if (_dbConnection.IsNull()) OpenConnection();
+            if (_dbConnection.IsNull()) OpenDatabaseConnection();
             using var command = _dbConnection.CreateCommand();
             command.CommandText = query;
             return command.ExecuteReader();
@@ -132,21 +132,21 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 //Delete translation
                 var query = $"DELETE FROM {TRANSLATION_TABLE}; DELETE FROM sqlite_sequence WHERE name='{TRANSLATION_TABLE}';";
                 ExecuteNonQueryCommand(query);
 
                 //Delete translations_keys
-                query =  $"DELETE FROM {TRANSLATION_KEY_TABLE}; DELETE FROM sqlite_sequence WHERE name='{TRANSLATION_KEY_TABLE}';";
+                query = $"DELETE FROM {TRANSLATION_KEY_TABLE}; DELETE FROM sqlite_sequence WHERE name='{TRANSLATION_KEY_TABLE}';";
                 ExecuteNonQueryCommand(query);
 
                 // Delete category
-                query =  $"DELETE FROM {CATEGORY_TABLE}; DELETE FROM sqlite_sequence WHERE name='{CATEGORY_TABLE}';";
+                query = $"DELETE FROM {CATEGORY_TABLE}; DELETE FROM sqlite_sequence WHERE name='{CATEGORY_TABLE}';";
                 ExecuteNonQueryCommand(query);
 
                 // Delete language
-                query =  $"DELETE FROM {LANGUAGE_TABLE}; DELETE FROM sqlite_sequence WHERE name='{LANGUAGE_TABLE}';";
+                query = $"DELETE FROM {LANGUAGE_TABLE}; DELETE FROM sqlite_sequence WHERE name='{LANGUAGE_TABLE}';";
                 ExecuteNonQueryCommand(query);
             }
             catch (Exception e)
@@ -155,8 +155,14 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
+        }
+
+        public static void LogChange(string tableName, string action, string param, string oldData, string newData)
+        {
+            var query = $"INSERT INTO {CHANGE_LOG_TABLE} (table_name, action, params, old_data, new_data) VALUES ('{tableName}', '{action}', '{param}', '{oldData}', '{newData}')";
+            ExecuteNonQueryCommand(query);
         }
 
         #region UPDATE CACHES
@@ -195,7 +201,7 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"SELECT MAX(displayOrder) AS max_display_order FROM {TRANSLATION_KEY_TABLE}";
                 var result = ExecuteReaderCommand(query)["max_display_order"];
                 var lastDisplayOrder = result.ToString().IsEmpty() ? 1 : Convert.ToInt32(result);
@@ -217,6 +223,8 @@ namespace LocalizationTool.Scripts.Data
                     query = $"INSERT INTO {TRANSLATION_TABLE} (keyID, languageID, translationText) VALUES ({keyID},{readerLanguageIDs["id"]},'')";
                     ExecuteNonQueryCommand(query);
                 }
+
+                LogChange(TRANSLATION_TABLE, "INSERT", "", "", $"{keyID}");
             }
             catch (Exception e)
             {
@@ -224,7 +232,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -232,9 +240,11 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"update {TRANSLATION_KEY_TABLE} set key_name = '{newKeyName}' where key_name = '{oldKeyName}'";
                 ExecuteNonQueryCommand(query);
+
+                LogChange(TRANSLATION_KEY_TABLE, "UPDATE", "key_name", $"{oldKeyName}", $"{newKeyName}");
             }
             catch (Exception e)
             {
@@ -242,7 +252,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -250,15 +260,20 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"select id from {TRANSLATION_KEY_TABLE} where key_name = '{key}'";
                 var keyID = Convert.ToInt32(ExecuteReaderCommand(query)["id"]);
 
                 query = $"select id from {LANGUAGE_TABLE} where language = '{language}'";
                 var languageID = Convert.ToInt32(ExecuteReaderCommand(query)["id"]);
 
+                query = $"select translationText from {TRANSLATION_TABLE} where keyID = {keyID} and languageID = {languageID}";
+                var oldText = ExecuteReaderCommand(query)["translationText"].ToString();
+
                 query = $"update {TRANSLATION_TABLE} set translationText = '{newTranslation}' where keyID = {keyID} and languageID = {languageID}";
                 ExecuteNonQueryCommand(query);
+
+                LogChange(TRANSLATION_KEY_TABLE, "UPDATE", "translationText", $"{oldText}", $"{newTranslation}");
             }
             catch (Exception e)
             {
@@ -266,7 +281,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -274,12 +289,17 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"select id from {CATEGORY_TABLE} where category = '{newCategory}'";
                 var categoryID = Convert.ToInt32(ExecuteReaderCommand(query)["id"]);
 
+                query = "select categoryID from {TRANSLATION_KEY_TABLE} where key_name = {key}";
+                var oldCategory = ExecuteReaderCommand(query)["categoryID"].ToString();
+
                 query = $"update {TRANSLATION_KEY_TABLE} set categoryID = '{categoryID}' where key_name = '{key}'";
                 ExecuteNonQueryCommand(query);
+
+                LogChange(TRANSLATION_KEY_TABLE, "UPDATE", "categoryID", $"{oldCategory}", $"{categoryID}");
             }
             catch (Exception e)
             {
@@ -287,7 +307,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -295,7 +315,7 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"select id,displayOrder from {TRANSLATION_KEY_TABLE} where key_name = '{key}'";
                 var reader = ExecuteReaderCommand(query);
                 var keyID = Convert.ToInt32(reader["id"]);
@@ -309,6 +329,8 @@ namespace LocalizationTool.Scripts.Data
 
                 query = $"update {TRANSLATION_KEY_TABLE} set displayOrder = displayOrder - 1 where displayOrder > {keyDisplayOrder}";
                 ExecuteNonQueryCommand(query);
+
+                LogChange(TRANSLATION_KEY_TABLE, "DELETE", "displayOrder", $"{keyDisplayOrder}", "");
             }
             catch (Exception e)
             {
@@ -316,7 +338,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -325,7 +347,7 @@ namespace LocalizationTool.Scripts.Data
             var result = new Dictionary<string, KeyData>();
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 const string query =
                     "select tk.key_name, c.category, l.language, t.translationText from translations_keys tk join categories c on tk.categoryID = c.id join translations t on tk.id = t.keyID join languages l on t.languageID = l.id";
 
@@ -364,7 +386,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
 
             return result;
@@ -378,7 +400,7 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"SELECT MAX(displayOrder) AS max_display_order FROM {LANGUAGE_TABLE}";
                 var result = ExecuteReaderCommand(query)["max_display_order"];
                 var lastDisplayOrder = result.ToString().IsEmpty() ? 1 : Convert.ToInt32(result);
@@ -404,7 +426,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -412,7 +434,7 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"select id,displayOrder from {LANGUAGE_TABLE} where language = '{languageToRemove}'";
                 var reader = ExecuteReaderCommand(query);
                 var languageToRemoveID = Convert.ToInt32(reader["id"]);
@@ -433,7 +455,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -441,7 +463,7 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"select id from {LANGUAGE_TABLE} where language = '{languageToEmpty}'";
                 var reader = ExecuteReaderCommand(query);
                 var languageToEmptyID = Convert.ToInt32(reader["id"]);
@@ -455,15 +477,15 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
-        
+
         public static void UpdateLanguageNameInDatabase(string oldLanguageName, string newLanguageName)
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"update {LANGUAGE_TABLE} set language = '{newLanguageName}' where language = '{oldLanguageName}'";
                 ExecuteNonQueryCommand(query);
             }
@@ -473,7 +495,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -481,7 +503,7 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"update {LANGUAGE_TABLE} set isDefault = 0 where isDefault = 1";
                 ExecuteNonQueryCommand(query);
 
@@ -503,7 +525,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -511,7 +533,7 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 string query;
                 if (oldLanguageDisplayOrder < newLanguageDisplayOrder)
                 {
@@ -535,7 +557,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -544,7 +566,7 @@ namespace LocalizationTool.Scripts.Data
             var defaultCategory = "";
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
 
 
                 var query = $"SELECT language FROM {LANGUAGE_TABLE} where isDefault = 1";
@@ -557,7 +579,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
 
             return defaultCategory;
@@ -568,7 +590,7 @@ namespace LocalizationTool.Scripts.Data
             var result = new List<LanguageTuple>();
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"SELECT displayOrder, language FROM {LANGUAGE_TABLE} order by displayOrder ASC";
                 var reader = ExecuteReaderCommand(query);
 
@@ -587,7 +609,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
 
             return result;
@@ -601,7 +623,7 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"SELECT MAX(displayOrder) AS max_display_order FROM {CATEGORY_TABLE}";
                 var result = ExecuteReaderCommand(query)["max_display_order"];
                 var lastDisplayOrder = result.ToString().IsEmpty() ? 1 : Convert.ToInt32(result);
@@ -615,7 +637,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -623,7 +645,7 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var defaultCategory = GetDefaultCategoryFromDatabase();
 
                 var query = $"select id from {CATEGORY_TABLE} where category = '{defaultCategory}'";
@@ -649,7 +671,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -657,7 +679,7 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"update {CATEGORY_TABLE} set category = '{newCategoryName}' where category = '{oldCategoryName}'";
                 ExecuteNonQueryCommand(query);
             }
@@ -667,7 +689,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -675,7 +697,7 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"update {CATEGORY_TABLE} set isDefault = 0 where isDefault = 1";
                 ExecuteNonQueryCommand(query);
 
@@ -697,7 +719,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -705,7 +727,7 @@ namespace LocalizationTool.Scripts.Data
         {
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 string query;
                 if (oldCategoryDisplayOrder < newCategoryDisplayOrder)
                 {
@@ -731,7 +753,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
         }
 
@@ -740,7 +762,7 @@ namespace LocalizationTool.Scripts.Data
             var defaultCategory = "";
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
                 var query = $"SELECT category FROM {CATEGORY_TABLE} where isDefault = 1";
                 var reader = ExecuteReaderCommand(query);
                 defaultCategory = reader["category"].ToString();
@@ -751,7 +773,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
 
             return defaultCategory;
@@ -762,7 +784,7 @@ namespace LocalizationTool.Scripts.Data
             var result = new List<CategoryTuple>();
             try
             {
-                OpenConnection();
+                OpenDatabaseConnection();
 
                 var query = $"SELECT displayOrder, category FROM {CATEGORY_TABLE} order by displayOrder ASC";
 
@@ -783,7 +805,7 @@ namespace LocalizationTool.Scripts.Data
             }
             finally
             {
-                CloseConnection();
+                CloseDatabaseConnection();
             }
 
             return result;
@@ -792,7 +814,7 @@ namespace LocalizationTool.Scripts.Data
         #endregion
 
         #endregion
-        
+
         #region STRUCTURES
 
         public struct KeyData

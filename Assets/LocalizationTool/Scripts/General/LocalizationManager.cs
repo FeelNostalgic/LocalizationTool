@@ -18,6 +18,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.Data.TemplatesForSerializer;
+using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEditor;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 using static LocalizationTool.Scripts.Commons.EditorPaths;
@@ -38,7 +39,7 @@ namespace LocalizationTool.Scripts.General
         public static int CurrentToolbarLanguageIndex => CacheData.Languages.IndexOf(CurrentLanguageInDictionarySection);
 
         #region Actions
-        
+
         public Action<string> OnDefaultCategoryUpdate { get; set; }
 
         #endregion
@@ -66,10 +67,12 @@ namespace LocalizationTool.Scripts.General
 
         public static void CreateDatabase()
         {
+            CreateChangeLogTable();
+
             if (File.Exists(DATABASE_PATH)) return;
             try
             {
-                CacheData.OpenConnection();
+                CacheData.OpenDatabaseConnection();
                 // Table category
                 var query =
                     $"CREATE TABLE IF NOT EXISTS {CATEGORY_TABLE} (id INTEGER PRIMARY KEY AUTOINCREMENT, displayOrder INTERGER NOT NULL , category VARCHAR({MAX_CATEGORY_CHARACTERS}) NOT NULL UNIQUE, isDefault INTEGER NOT NULL)";
@@ -105,10 +108,30 @@ namespace LocalizationTool.Scripts.General
             }
             finally
             {
-                CacheData.CloseConnection();
+                CacheData.CloseDatabaseConnection();
             }
         }
 
+        private static void CreateChangeLogTable()
+        {
+            try
+            {
+                CacheData.OpenDatabaseConnection();
+                var query =
+                    $"CREATE TABLE {CHANGE_LOG_TABLE} (id INTEGER PRIMARY KEY AUTOINCREMENT, table_name TEXT, action TEXT, params TEXT, old_data TEXT, new_data TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP);";
+                CacheData.ExecuteNonQueryCommand(query);
+            }
+            catch (Exception)
+            {
+                var query = $"DELETE FROM {CHANGE_LOG_TABLE}; DELETE FROM sqlite_sequence WHERE name='{CHANGE_LOG_TABLE}';";
+                CacheData.ExecuteNonQueryCommand(query);
+            }
+            finally
+            {
+                CacheData.CloseDatabaseConnection();
+            }
+        }
+        
         #endregion
 
         #region DICTIONARY
@@ -120,7 +143,7 @@ namespace LocalizationTool.Scripts.General
                 ShowFeedback(DICTIONARY_LABEL, Colors.Blue, EMPTY_KEY_FEEDBACK_LABEL, editor);
                 return;
             }
-            
+
             if (ContainsKey(key))
             {
                 ShowFeedback(DICTIONARY_LABEL, Colors.Blue, string.Format(KEY_EXIST_FEEDBACK_LABEL, key), editor);
@@ -153,7 +176,7 @@ namespace LocalizationTool.Scripts.General
                 ShowFeedback(EMPTY_KEY_FEEDBACK_LABEL, editor);
                 return oldKeyName;
             }
-            
+
             if (ContainsKey(newKeyName))
             {
                 ShowFeedback(string.Format(KEY_EXIST_FEEDBACK_LABEL, oldKeyName), editor);
@@ -198,7 +221,7 @@ namespace LocalizationTool.Scripts.General
 
             // Update cache 
             CacheData.UpdateDictionaryCache();
-            
+
             Log(DICTIONARY_LABEL, CustomDebugPlugin.Colors.Blue, string.Format(DICTIONARY_KEY_CATEGORY_CHANGED_LOG, key, newCategory));
         }
 
@@ -268,7 +291,7 @@ namespace LocalizationTool.Scripts.General
                 ShowFeedback(LANGUAGES_LABEL, Colors.Purple, EMPTY_LANGUAGE_FEEDBACK_LABEL, editor);
                 return;
             }
-            
+
             if (ContainsLanguage(newLanguage))
             {
                 ShowFeedback(LANGUAGES_LABEL, Colors.Purple, string.Format(LANGUAGE_EXIST_FEEDBACK_LABEL, newLanguage), editor);
@@ -280,12 +303,12 @@ namespace LocalizationTool.Scripts.General
                 ShowFeedback(LANGUAGES_LABEL, Colors.Purple, string.Format(CHARACTERS_NUMBER_LANGUAGE_FEEDBACK_LABEL, MAX_LANGUAGE_CHARACTERS), editor);
                 return;
             }
-            
+
             editor?.ClearAddTextField();
 
             // Add category to Database
             CacheData.InsertLanguageToDatabase(newLanguage);
-            
+
             // Update cache 
             CacheData.UpdateLanguageCache();
 
@@ -306,11 +329,11 @@ namespace LocalizationTool.Scripts.General
         {
             // Empty language in database
             CacheData.EmptyLanguageFromDatabase(language);
-            
+
             // Update cache 
             CacheData.UpdateDictionaryCache();
         }
-        
+
         public static void ChangeLanguageValue(string oldLanguageName, string newLanguageName)
         {
             if (CurrentLanguageInDictionarySection.Equals(oldLanguageName)) CurrentLanguageInDictionarySection = newLanguageName;
@@ -377,7 +400,7 @@ namespace LocalizationTool.Scripts.General
                 if (showEditorLogs) ShowFeedback(CATEGORIES_LABEL, Colors.Green, EMPTY_CATEGORY_FEEDBACK_LABEL, editor);
                 return;
             }
-            
+
             // Already in data
             if (ContainsCategory(newCategory))
             {
@@ -395,12 +418,12 @@ namespace LocalizationTool.Scripts.General
 
             // Add category to Database
             CacheData.InsertCategoryToDatabase(newCategory);
-            
+
             // Update cache 
             CacheData.UpdateCategoryCache();
 
             if (CacheData.CategoryCache.Count() == 1) Instance.ChangeDefaultCategory(newCategory);
-            
+
             if (showEditorLogs) ShowFeedback(CATEGORIES_LABEL, Colors.Green, string.Format(CATEGORY_ADDED_FEEDBACK_LABEL, newCategory), editor);
         }
 
@@ -667,7 +690,7 @@ namespace LocalizationTool.Scripts.General
         public static IEnumerator ImportSerializedDataCoroutine(string path, ISerializerService serializer, ImportProgressWindow progressWindow)
         {
             //CacheData.ClearData();
-            
+
             // Load data
             var loadFileTask = SaveLoadFileManager.LoadFile<DictionaryTemplate>(path, serializer);
             var awaiter = loadFileTask.GetAwaiter();
@@ -728,7 +751,7 @@ namespace LocalizationTool.Scripts.General
         public static IEnumerator ImportSerializedDataCoroutineForGameMode(string path, Action onComplete)
         {
             //CacheData.ClearData();
-            
+
             // Load data
             var loadFileTask = SaveLoadFileManager.LoadFile<DictionaryTemplate>(path, new UnityJsonSerializer());
             var awaiter = loadFileTask.GetAwaiter();
@@ -739,14 +762,14 @@ namespace LocalizationTool.Scripts.General
             {
                 yield break;
             }
-            
+
             //Languages
             foreach (var languageValue in data.DictionaryKeyCategoryLanguages[0].LanguageValues)
             {
                 ImportLanguage(languageValue.Language, false);
                 yield return null;
             }
-            
+
             // Keys
             foreach (var keyCategoryLanguage in data.DictionaryKeyCategoryLanguages)
             {
@@ -754,13 +777,13 @@ namespace LocalizationTool.Scripts.General
                 {
                     ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, language, translation, false);
                 }
-                
+
                 yield return null;
             }
 
             onComplete?.Invoke();
         }
-        
+
         public static void ImportLanguage(string languageToImport, bool showLog = true)
         {
             if (ContainsLanguage(languageToImport)) return;
@@ -777,9 +800,9 @@ namespace LocalizationTool.Scripts.General
                 CurrentLanguageInDictionarySection = languageToImport;
             }
 
-            if(showLog) Log("Import", Colors.Magenta, string.Format(IMPORTED_LANGUAGE_LOG, languageToImport));
+            if (showLog) Log("Import", Colors.Magenta, string.Format(IMPORTED_LANGUAGE_LOG, languageToImport));
         }
-        
+
         private static void ImportKey(string keyToImport, string category, Dictionary<string, string> values)
         {
             if (keyToImport.IsEmpty()) return;
@@ -856,8 +879,8 @@ namespace LocalizationTool.Scripts.General
 
         public static void Log(string log)
         {
-            if(_configurationData.IsNull()) return;
-            
+            if (_configurationData.IsNull()) return;
+
             try
             {
                 if (_configurationData.showLogsInConsole) Debug.Log(log);
@@ -867,11 +890,11 @@ namespace LocalizationTool.Scripts.General
                 Debug.Log(e);
             }
         }
-        
+
         public static void Log(string title, Colors color, string log)
         {
-            if(_configurationData.IsNull()) return;
-            
+            if (_configurationData.IsNull()) return;
+
             try
             {
                 if (_configurationData.showLogsInConsole) CustomDebug.Log(title, color, log);
@@ -884,8 +907,8 @@ namespace LocalizationTool.Scripts.General
 
         public static void LogWarning(string log)
         {
-            if(_configurationData.IsNull()) return;
-            
+            if (_configurationData.IsNull()) return;
+
             try
             {
                 if (_configurationData.showLogsInConsole) Debug.LogWarning(log);
@@ -895,11 +918,11 @@ namespace LocalizationTool.Scripts.General
                 Debug.Log(e);
             }
         }
-        
+
         public static void LogWarning(string title, Colors color, string log)
         {
-            if(_configurationData.IsNull()) return;
-            
+            if (_configurationData.IsNull()) return;
+
             try
             {
                 if (_configurationData.showLogsInConsole) CustomDebug.LogWarning(title, color, log);
@@ -909,11 +932,11 @@ namespace LocalizationTool.Scripts.General
                 CustomDebug.LogWarning(title, color, e);
             }
         }
-        
+
         public static void LogError(string log)
         {
-            if(_configurationData.IsNull()) return;
-            
+            if (_configurationData.IsNull()) return;
+
             try
             {
                 if (_configurationData.showLogsInConsole) Debug.LogError(log);
@@ -923,11 +946,11 @@ namespace LocalizationTool.Scripts.General
                 Debug.Log(e);
             }
         }
-        
+
         public static void LogError(string title, Colors color, string log)
         {
-            if(_configurationData.IsNull()) return;
-            
+            if (_configurationData.IsNull()) return;
+
             try
             {
                 if (_configurationData.showLogsInConsole) CustomDebug.LogError(title, color, log);
@@ -937,13 +960,13 @@ namespace LocalizationTool.Scripts.General
                 CustomDebug.LogError(title, color, e);
             }
         }
-        
+
         #endregion
-        
+
         #endregion
 
         #region PRIVATE METHODS
-        
+
         private static void ShowFeedback(string title, Colors color, string text, EditorWindowAbstract editor)
         {
             Log(title, color, text);
@@ -968,14 +991,14 @@ namespace LocalizationTool.Scripts.General
 
             Log("Localization Tool", Colors.Yellow, TOOL_INITIALIZED_LOG);
         }
-        
+
         private async void LoadConfigurationDataFromMemory()
         {
             _configurationData = null;
             _configurationData = await SaveLoadFileManager.LoadFile<ConfigurationData>(CONFIGURATION_PATH, _serializerBinary);
 
             if (_configurationData.IsNotNull()) return;
-            
+
             _configurationData = new ConfigurationData
             {
                 dictionaryDeleteConfirmation = true,
