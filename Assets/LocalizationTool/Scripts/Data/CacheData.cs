@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using CustomDebugPlugin;
 using LocalizationTool.Scripts.API;
 using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.General;
@@ -9,6 +10,7 @@ using Mono.Data.Sqlite;
 using UnityEngine;
 using static LocalizationTool.Scripts.Commons.EditorPaths;
 using static LocalizationTool.Database.DatabaseStrings;
+using Colors = CustomDebugPlugin.Colors;
 
 namespace LocalizationTool.Scripts.Data
 {
@@ -66,7 +68,7 @@ namespace LocalizationTool.Scripts.Data
             LoadLanguagesCacheFromDatabase();
             LoadCategoriesCacheFromDatabase();
             IsDataLoaded = true;
-            Debug.Log("Database loaded");
+            CustomDebug.Log("Database", Colors.Red, "Loaded");
             Instance.OnLocalizationToolDataInitialized?.Invoke();
         }
         

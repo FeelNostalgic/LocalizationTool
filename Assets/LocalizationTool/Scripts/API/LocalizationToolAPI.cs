@@ -5,6 +5,7 @@ using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.General;
 using TMPro;
 using UnityEngine;
+using Colors = CustomDebugPlugin.Colors;
 
 namespace LocalizationTool.Scripts.API
 {
@@ -39,7 +40,7 @@ namespace LocalizationTool.Scripts.API
             CacheData.Instance.OnLocalizationToolDataInitialized += delegate
             {
 #if UNITY_EDITOR
-                LocalizationManager.Log("Localization Tool API Initialized");
+                LocalizationManager.Log("Localization Tool API", Colors.Pink, "Initialized");
 #endif
                 UpdateAllAddons(ActiveLanguage);
             };

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using CustomDebugPlugin;
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.Addons;
 using LocalizationTool.Scripts.Commons;
@@ -17,9 +18,11 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.Data.TemplatesForSerializer;
+using UnityEditor;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 using static LocalizationTool.Scripts.Commons.EditorPaths;
 using static LocalizationTool.Database.DatabaseStrings;
+using Colors = CustomDebugPlugin.Colors;
 
 namespace LocalizationTool.Scripts.General
 {
@@ -114,19 +117,19 @@ namespace LocalizationTool.Scripts.General
         {
             if (key.IsEmpty() || key.IsNull())
             {
-                ShowFeedback(EMPTY_KEY_FEEDBACK_LABEL, editor);
+                ShowFeedback(DICTIONARY_LABEL, Colors.Blue, EMPTY_KEY_FEEDBACK_LABEL, editor);
                 return;
             }
             
             if (ContainsKey(key))
             {
-                ShowFeedback(string.Format(KEY_EXIST_FEEDBACK_LABEL, key), editor);
+                ShowFeedback(DICTIONARY_LABEL, Colors.Blue, string.Format(KEY_EXIST_FEEDBACK_LABEL, key), editor);
                 return;
             }
 
             if (key.Length > MAX_KEY_CHARACTERS)
             {
-                ShowFeedback(string.Format(CHARACTERS_NUMBER_KEY_FEEDBACK_LABEL, MAX_KEY_CHARACTERS), editor);
+                ShowFeedback(DICTIONARY_LABEL, Colors.Blue, string.Format(CHARACTERS_NUMBER_KEY_FEEDBACK_LABEL, MAX_KEY_CHARACTERS), editor);
                 return;
             }
 
@@ -138,7 +141,7 @@ namespace LocalizationTool.Scripts.General
             // Update cache 
             CacheData.UpdateDictionaryCache();
 
-            ShowFeedback(string.Format(KEY_ADDED_FEEDBACK_LABEL, key), editor);
+            ShowFeedback(DICTIONARY_LABEL, Colors.Blue, string.Format(KEY_ADDED_FEEDBACK_LABEL, key), editor);
         }
 
         public static string ChangeKey(string oldKeyName, string newKeyName, RichTextEditor editor)
@@ -195,8 +198,8 @@ namespace LocalizationTool.Scripts.General
 
             // Update cache 
             CacheData.UpdateDictionaryCache();
-
-            Log(string.Format(DICTIONARY_KEY_CATEGORY_CHANGED_LOG, key, newCategory));
+            
+            Log(DICTIONARY_LABEL, CustomDebugPlugin.Colors.Blue, string.Format(DICTIONARY_KEY_CATEGORY_CHANGED_LOG, key, newCategory));
         }
 
         public static void RemoveKey(string key)
@@ -262,19 +265,19 @@ namespace LocalizationTool.Scripts.General
         {
             if (newLanguage.IsEmpty() || newLanguage.IsNull())
             {
-                ShowFeedback(EMPTY_LANGUAGE_FEEDBACK_LABEL, editor);
+                ShowFeedback(LANGUAGES_LABEL, Colors.Purple, EMPTY_LANGUAGE_FEEDBACK_LABEL, editor);
                 return;
             }
             
             if (ContainsLanguage(newLanguage))
             {
-                ShowFeedback(string.Format(LANGUAGE_EXIST_FEEDBACK_LABEL, newLanguage), editor);
+                ShowFeedback(LANGUAGES_LABEL, Colors.Purple, string.Format(LANGUAGE_EXIST_FEEDBACK_LABEL, newLanguage), editor);
                 return;
             }
 
             if (newLanguage.Length > MAX_LANGUAGE_CHARACTERS)
             {
-                ShowFeedback(string.Format(CHARACTERS_NUMBER_LANGUAGE_FEEDBACK_LABEL, MAX_LANGUAGE_CHARACTERS), editor);
+                ShowFeedback(LANGUAGES_LABEL, Colors.Purple, string.Format(CHARACTERS_NUMBER_LANGUAGE_FEEDBACK_LABEL, MAX_LANGUAGE_CHARACTERS), editor);
                 return;
             }
             
@@ -286,7 +289,7 @@ namespace LocalizationTool.Scripts.General
             // Update cache 
             CacheData.UpdateLanguageCache();
 
-            ShowFeedback(string.Format(LANGUAGE_ADDED_FEEDBACK_LABEL, newLanguage), editor);
+            ShowFeedback(LANGUAGES_LABEL, Colors.Purple, string.Format(LANGUAGE_ADDED_FEEDBACK_LABEL, newLanguage), editor);
         }
 
         public static void RemoveLanguage(string language)
@@ -342,7 +345,7 @@ namespace LocalizationTool.Scripts.General
             // Update cache 
             CacheData.UpdateLanguageCache();
 
-            Log(string.Format(LANGUAGE_INDEX_CHANGED_LOG, languageName, newIndex));
+            Log(LANGUAGES_LABEL, Colors.Purple, string.Format(LANGUAGE_INDEX_CHANGED_LOG, languageName, newIndex));
 
             //GUI.FocusControl(null);
         }
@@ -371,20 +374,20 @@ namespace LocalizationTool.Scripts.General
             // Empty value
             if (newCategory.IsEmpty() || newCategory.IsNull())
             {
-                if (showEditorLogs) ShowFeedback(EMPTY_CATEGORY_FEEDBACK_LABEL, editor);
+                if (showEditorLogs) ShowFeedback(CATEGORIES_LABEL, Colors.Green, EMPTY_CATEGORY_FEEDBACK_LABEL, editor);
                 return;
             }
             
             // Already in data
             if (ContainsCategory(newCategory))
             {
-                if (showEditorLogs) ShowFeedback(string.Format(CATEGORY_EXIST_FEEDBACK_LABEL, newCategory), editor);
+                if (showEditorLogs) ShowFeedback(CATEGORIES_LABEL, Colors.Green, string.Format(CATEGORY_EXIST_FEEDBACK_LABEL, newCategory), editor);
                 return;
             }
 
             if (newCategory.Length > MAX_CATEGORY_CHARACTERS)
             {
-                if (showEditorLogs) ShowFeedback(string.Format(CHARACTERS_NUMBER_CATEGORY_FEEDBACK_LABEL, MAX_CATEGORY_CHARACTERS), editor);
+                if (showEditorLogs) ShowFeedback(CATEGORIES_LABEL, Colors.Green, string.Format(CHARACTERS_NUMBER_CATEGORY_FEEDBACK_LABEL, MAX_CATEGORY_CHARACTERS), editor);
                 return;
             }
 
@@ -398,7 +401,7 @@ namespace LocalizationTool.Scripts.General
 
             if (CacheData.CategoryCache.Count() == 1) Instance.ChangeDefaultCategory(newCategory);
             
-            if (showEditorLogs) ShowFeedback(string.Format(CATEGORY_ADDED_FEEDBACK_LABEL, newCategory), editor);
+            if (showEditorLogs) ShowFeedback(CATEGORIES_LABEL, Colors.Green, string.Format(CATEGORY_ADDED_FEEDBACK_LABEL, newCategory), editor);
         }
 
         public static void RemoveCategory(string categoryToRemove)
@@ -443,7 +446,7 @@ namespace LocalizationTool.Scripts.General
             // Update cache 
             CacheData.UpdateCategoryCache();
 
-            Log(string.Format(CATEGORY_INDEX_CHANGED_LOG, categoryName, newIndex));
+            Log(CATEGORIES_LABEL, Colors.Green, string.Format(CATEGORY_INDEX_CHANGED_LOG, categoryName, newIndex));
         }
 
         public static bool IsDefaultCategory(string category)
@@ -774,13 +777,14 @@ namespace LocalizationTool.Scripts.General
                 CurrentLanguageInDictionarySection = languageToImport;
             }
 
-            if(showLog) Log(string.Format(IMPORTED_LANGUAGE_LOG, languageToImport));
+            if(showLog) Log("Import", Colors.Magenta, string.Format(IMPORTED_LANGUAGE_LOG, languageToImport));
         }
         
         private static void ImportKey(string keyToImport, string category, Dictionary<string, string> values)
         {
             if (keyToImport.IsEmpty()) return;
-            Log(string.Format(IMPORTED_KEY_LOG, keyToImport, category, string.Join(" | ", values)));
+            Log("Import", Colors.Magenta, string.Format(IMPORTED_KEY_LOG, keyToImport, category, string.Join(" | ", values)));
+
             if (ContainsKey(keyToImport))
             {
                 //Change category
@@ -816,8 +820,7 @@ namespace LocalizationTool.Scripts.General
         public static void ImportKey(string keyToImport, string category, string language, string translation, bool showLog = true)
         {
             if (keyToImport.Equals("")) return;
-            if(showLog) Log(string.Format(IMPORTED_KEY_SINGLE_LOG, keyToImport, category, language, translation));
-
+            Log("Import", Colors.Magenta, string.Format(IMPORTED_KEY_SINGLE_LOG, keyToImport, category, language, translation));
             ImportLanguage(language, showLog);
 
             if (ContainsKey(keyToImport))
@@ -864,6 +867,20 @@ namespace LocalizationTool.Scripts.General
                 Debug.Log(e);
             }
         }
+        
+        public static void Log(string title, Colors color, string log)
+        {
+            if(_configurationData.IsNull()) return;
+            
+            try
+            {
+                if (_configurationData.showLogsInConsole) CustomDebug.Log(title, color, log);
+            }
+            catch (Exception e)
+            {
+                CustomDebug.LogError(title, color, e);
+            }
+        }
 
         public static void LogWarning(string log)
         {
@@ -878,7 +895,21 @@ namespace LocalizationTool.Scripts.General
                 Debug.Log(e);
             }
         }
-
+        
+        public static void LogWarning(string title, Colors color, string log)
+        {
+            if(_configurationData.IsNull()) return;
+            
+            try
+            {
+                if (_configurationData.showLogsInConsole) CustomDebug.LogWarning(title, color, log);
+            }
+            catch (Exception e)
+            {
+                CustomDebug.LogWarning(title, color, e);
+            }
+        }
+        
         public static void LogError(string log)
         {
             if(_configurationData.IsNull()) return;
@@ -892,22 +923,36 @@ namespace LocalizationTool.Scripts.General
                 Debug.Log(e);
             }
         }
-
+        
+        public static void LogError(string title, Colors color, string log)
+        {
+            if(_configurationData.IsNull()) return;
+            
+            try
+            {
+                if (_configurationData.showLogsInConsole) CustomDebug.LogError(title, color, log);
+            }
+            catch (Exception e)
+            {
+                CustomDebug.LogError(title, color, e);
+            }
+        }
+        
         #endregion
         
         #endregion
 
         #region PRIVATE METHODS
         
-        private static void ShowFeedback(string text, EditorWindowAbstract editor)
+        private static void ShowFeedback(string title, Colors color, string text, EditorWindowAbstract editor)
         {
-            Log(text);
+            Log(title, color, text);
             editor?.ControlFeedbackLabel(text);
         }
 
         private static void ShowFeedback(string text, RichTextEditor editor)
         {
-            Log(text);
+            Log(DICTIONARY_LABEL, Colors.Blue, text);
             editor.ControlFeedbackLabel(text);
         }
 
@@ -921,7 +966,7 @@ namespace LocalizationTool.Scripts.General
             _serializerBinary ??= new BinarySerializer();
             LoadConfigurationDataFromMemory();
 
-            Log(TOOL_INITIALIZED_LOG);
+            Log("Localization Tool", Colors.Yellow, TOOL_INITIALIZED_LOG);
         }
         
         private async void LoadConfigurationDataFromMemory()

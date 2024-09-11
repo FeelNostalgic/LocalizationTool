@@ -155,7 +155,7 @@ namespace LocalizationTool.Scripts.Editors
             if (GUILayout.Button(GetGUIContent(RefreshIcon, RELOAD_BUTTON_TOOLTIP), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
             {
                 LocalizationManager.RefreshLanguagesData();
-                LocalizationManager.Log(LANGUAGES_LOADED_LOG);
+                LocalizationManager.Log(LANGUAGES_LABEL, CustomDebugPlugin.Colors.Purple, LOADED_LOG);
             }
 
             GUILayout.FlexibleSpace();
@@ -277,7 +277,7 @@ namespace LocalizationTool.Scripts.Editors
                 if (GUILayout.Button(GetGUIContent(StarIcon, string.Format(MAKE_LANGUAGE_FAVOURITE_BUTTON_TOOLTIP, language)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     LocalizationManager.ChangeDefaultLanguage(language);
-                    LocalizationManager.Log(string.Format(LANGUAGE_FAVOURITE_LOG, language));
+                    LocalizationManager.Log(LANGUAGES_LABEL, CustomDebugPlugin.Colors.Purple, string.Format(LANGUAGE_FAVOURITE_LOG, language));
                 }
             }
 
@@ -356,13 +356,13 @@ namespace LocalizationTool.Scripts.Editors
         private static void DeleteLanguage(string language)
         {
             LocalizationManager.RemoveLanguage(language);
-            LocalizationManager.Log(string.Format(DELETED_LANGUAGE_LOG, language));
+            LocalizationManager.Log(LANGUAGES_LABEL, CustomDebugPlugin.Colors.Purple, string.Format(DELETED_LANGUAGE_LOG, language));
         }
 
         private static void EmptyLanguage(string language)
         {
             LocalizationManager.EmptyLanguage(language);
-            LocalizationManager.Log(string.Format(EMPTIED_LANGUAGE_LOG, language));
+            LocalizationManager.Log(LANGUAGES_LABEL, CustomDebugPlugin.Colors.Purple, string.Format(EMPTIED_LANGUAGE_LOG, language));
         }
         
         private void Feedback(string language)

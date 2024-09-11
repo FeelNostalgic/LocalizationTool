@@ -150,7 +150,7 @@ namespace LocalizationTool.Scripts.Editors
             if (GUILayout.Button(GetGUIContent(RefreshIcon, RELOAD_BUTTON_TOOLTIP), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
             {
                 LocalizationManager.RefreshCategoriesData();
-                LocalizationManager.Log(CATEGORIES_LOADED_LOG);
+                LocalizationManager.Log(CATEGORIES_LABEL, CustomDebugPlugin.Colors.Green, LOADED_LOG);
             }
         
             GUILayout.FlexibleSpace();
@@ -271,7 +271,7 @@ namespace LocalizationTool.Scripts.Editors
                 if (GUILayout.Button(GetGUIContent(StarIcon, string.Format(MAKE_CATEGORY_DEFAULT_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     LocalizationManager.Instance.ChangeDefaultCategory(category);
-                    LocalizationManager.Log(string.Format(CATEGORY_DEFAULT_LOG, category));
+                    LocalizationManager.Log(CATEGORIES_LABEL, CustomDebugPlugin.Colors.Green,string.Format(CATEGORY_DEFAULT_LOG, category));
                 }
             }
         
@@ -340,7 +340,7 @@ namespace LocalizationTool.Scripts.Editors
         private static void DeleteCategory(string category)
         {
             LocalizationManager.RemoveCategory(category);
-            LocalizationManager.Log(string.Format(DELETED_CATEGORY_LOG, category));
+            LocalizationManager.Log(CATEGORIES_LABEL, CustomDebugPlugin.Colors.Green,string.Format(DELETED_CATEGORY_LOG, category));
         }
         
         private void UpdateCategory(string oldCategory, string newCategory)

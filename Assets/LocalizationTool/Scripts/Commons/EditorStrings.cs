@@ -15,10 +15,10 @@ namespace LocalizationTool.Scripts.Commons
         #region LABELS
 
         public const string MAIN_WINDOW_LABEL = "Localization Tool";
-        public const string DICTIONARY_TOOLBAR_LABEL = "Dictionary";
-        public const string LANGUAGES_TOOLBAR_LABEL = "Languages";
-        public const string CATEGORIES_TOOLBAR_LABEL = "Categories";
-        public const string CONFIGURATION_TOOLBAR_LABEL = "Configuration";
+        public const string DICTIONARY_LABEL = "Dictionary";
+        public const string LANGUAGES_LABEL = "Languages";
+        public const string CATEGORIES_LABEL = "Categories";
+        public const string CONFIGURATION_LABEL = "Configuration";
 
         public const string KEY_LABEL_UPPER = "KEY";
         public const string CATEGORY_LABEL_UPPER = "CATEGORY";
@@ -189,21 +189,19 @@ namespace LocalizationTool.Scripts.Commons
         #region LOG
 
         public const string DICTIONARY_KEY_CATEGORY_CHANGED_LOG = "Key '{0}' changed category to '{1}' correctly";
-
-        public const string DICTIONARY_LOADED_LOG = "Dictionary loaded";
+        
         public const string EDITING_KEY_LOG = "Editing key '{0}'";
         public const string DELETED_KEY_LOG = "Key '{0}' deleted";
 
-        public const string CATEGORIES_LOADED_LOG = "Categories loaded";
-        public const string CATEGORY_DEFAULT_LOG = "Category '{0}' is now default";
-        public const string DELETED_CATEGORY_LOG = "Category '{0}' deleted";
+        public const string LOADED_LOG = "Loaded";
+        public const string CATEGORY_DEFAULT_LOG = "'{0}' is now default";
+        public const string DELETED_CATEGORY_LOG = "'{0}' deleted";
         public const string CATEGORY_INDEX_CHANGED_LOG = "Category '{0}' update to index '{1}' correctly";
-
-        public const string LANGUAGES_LOADED_LOG = "Languages loaded";
-        public const string LANGUAGE_FAVOURITE_LOG = "Language '{0}' is now favorite";
-        public const string DELETED_LANGUAGE_LOG = "Language '{0}' deleted";
-        public const string EMPTIED_LANGUAGE_LOG = "Language '{0}' Emptied";
-        public const string LANGUAGE_INDEX_CHANGED_LOG = "Language '{0}' update to index '{1}' correctly";
+        
+        public const string LANGUAGE_FAVOURITE_LOG = "'{0}' is now favorite";
+        public const string DELETED_LANGUAGE_LOG = "'{0}' deleted";
+        public const string EMPTIED_LANGUAGE_LOG = "'{0}' Emptied";
+        public const string LANGUAGE_INDEX_CHANGED_LOG = "'{0}' update to index '{1}' correctly";
 
         public const string RICH_TEXT_EDITOR_SELECT_TEXT_WARNING_LOG = "Select some text to apply a style";
 
@@ -211,7 +209,7 @@ namespace LocalizationTool.Scripts.Commons
         public const string IMPORTED_KEY_LOG = "Key '{0}' - '{1}' : {2} imported";
         public const string IMPORTED_KEY_SINGLE_LOG = "Key '{0}' - '{1}' - '{2}' : '{3}' imported";
 
-        public const string TOOL_INITIALIZED_LOG = "Localization Tool Initialized";
+        public const string TOOL_INITIALIZED_LOG = "Initialized";
 
         #endregion
 
@@ -226,14 +224,14 @@ namespace LocalizationTool.Scripts.Commons
         public const string EMPTY_CATEGORY_FEEDBACK_LABEL = "Category cannot be an empty value";
         // public const string SPACES_CATEGORY_FEEDBACK_LABEL = "Category cannot contain spaces";
         public const string CHARACTERS_NUMBER_CATEGORY_FEEDBACK_LABEL = "The maximum number of characters({0}) has been exceeded";
-        public const string CATEGORY_EXIST_FEEDBACK_LABEL = "Category '{0}' value already exists";
-        public const string CATEGORY_ADDED_FEEDBACK_LABEL = "Category '{0}' added correctly";
+        public const string CATEGORY_EXIST_FEEDBACK_LABEL = "'{0}' value already exists";
+        public const string CATEGORY_ADDED_FEEDBACK_LABEL = "'{0}' added correctly";
 
         public const string EMPTY_LANGUAGE_FEEDBACK_LABEL = "Language cannot be an empty value";
         // public const string SPACES_LANGUAGE_FEEDBACK_LABEL = "Language cannot contain spaces";
         public const string CHARACTERS_NUMBER_LANGUAGE_FEEDBACK_LABEL = "The maximum number of characters({0}) has been exceeded";
-        public const string LANGUAGE_EXIST_FEEDBACK_LABEL = "Language {0} value already exists";
-        public const string LANGUAGE_ADDED_FEEDBACK_LABEL = "Language '{0}' added correctly";
+        public const string LANGUAGE_EXIST_FEEDBACK_LABEL = "{0} value already exists";
+        public const string LANGUAGE_ADDED_FEEDBACK_LABEL = "'{0}' added correctly";
 
         #endregion
     }

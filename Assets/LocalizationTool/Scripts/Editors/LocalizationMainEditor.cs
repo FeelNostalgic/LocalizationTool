@@ -13,13 +13,11 @@ namespace LocalizationTool.Scripts.Editors
     {
         #region PUBLIC VARIABLES
 
-        public static LocalizationMainEditor Instance => _instance;
+        public static LocalizationMainEditor Instance { get; private set; }
 
         #endregion
 
         #region PRIVATE VARIABLES
-
-        private static LocalizationMainEditor _instance;
 
         #endregion
 
@@ -66,7 +64,7 @@ namespace LocalizationTool.Scripts.Editors
 
         protected void OnEnable()
         {
-            _instance ??= this;
+            Instance ??= this;
             _currentEditorWindow?.OnEnable();
             LoadWindows();
         }
@@ -107,8 +105,7 @@ namespace LocalizationTool.Scripts.Editors
             _languagesEditor ??= new LanguagesEditor();
             _categoriesEditor ??= new CategoriesEditor();
             _configurationEditor ??= new ConfigurationEditor();
-            // TODO: change to _dictionaryEditor
-            if (_currentEditorWindow.IsNull()) _currentEditorWindow = _configurationEditor;
+            if (_currentEditorWindow.IsNull()) _currentEditorWindow = _dictionaryEditor;
             
             LocalizationManager.Instance.InitForEditor();
         }
@@ -122,28 +119,28 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.Space(5);
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
             GUILayout.Space(10);
-            if (GUILayout.Button(new GUIContent(DICTIONARY_TOOLBAR_LABEL), EditorStyles.toolbarButton))
+            if (GUILayout.Button(new GUIContent(DICTIONARY_LABEL), EditorStyles.toolbarButton))
             {
                 _currentEditorWindow = _dictionaryEditor;
                 GUI.FocusControl(null);
             }
 
             GUILayout.Space(10);
-            if (GUILayout.Button(new GUIContent(LANGUAGES_TOOLBAR_LABEL), EditorStyles.toolbarButton))
+            if (GUILayout.Button(new GUIContent(LANGUAGES_LABEL), EditorStyles.toolbarButton))
             {
                 _currentEditorWindow = _languagesEditor;
                 GUI.FocusControl(null);
             }
 
             GUILayout.Space(10);
-            if (GUILayout.Button(new GUIContent(CATEGORIES_TOOLBAR_LABEL), EditorStyles.toolbarButton))
+            if (GUILayout.Button(new GUIContent(CATEGORIES_LABEL), EditorStyles.toolbarButton))
             {
                 _currentEditorWindow = _categoriesEditor;
                 GUI.FocusControl(null);
             }
 
             GUILayout.Space(10);
-            if (GUILayout.Button(new GUIContent(CONFIGURATION_TOOLBAR_LABEL), EditorStyles.toolbarButton))
+            if (GUILayout.Button(new GUIContent(CONFIGURATION_LABEL), EditorStyles.toolbarButton))
             {
                 _currentEditorWindow = _configurationEditor;
                 GUI.FocusControl(null);
