@@ -18,8 +18,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.Data.TemplatesForSerializer;
-using Unity.VisualScripting.Dependencies.Sqlite;
-using UnityEditor;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 using static LocalizationTool.Scripts.Commons.EditorPaths;
 using static LocalizationTool.Database.DatabaseStrings;
@@ -312,6 +310,8 @@ namespace LocalizationTool.Scripts.General
             // Update cache 
             CacheData.UpdateLanguageCache();
 
+            if (CacheData.LanguageCache.Count() == 1) ChangeDefaultLanguage(newLanguage);
+            
             ShowFeedback(LANGUAGES_LABEL, Colors.Purple, string.Format(LANGUAGE_ADDED_FEEDBACK_LABEL, newLanguage), editor);
         }
 
