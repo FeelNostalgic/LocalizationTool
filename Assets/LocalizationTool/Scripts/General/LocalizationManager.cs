@@ -18,6 +18,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.Data.TemplatesForSerializer;
+<<<<<<< Updated upstream
+=======
+using UnityEditor;
+>>>>>>> Stashed changes
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 using static LocalizationTool.Scripts.Commons.EditorPaths;
 using static LocalizationTool.Database.DatabaseStrings;
@@ -309,6 +313,8 @@ namespace LocalizationTool.Scripts.General
 
             // Update cache 
             CacheData.UpdateLanguageCache();
+            
+            if (CacheData.LanguageCache.Count() == 1) ChangeDefaultLanguage(newLanguage);
 
             if (CacheData.LanguageCache.Count() == 1) ChangeDefaultLanguage(newLanguage);
             
@@ -689,7 +695,7 @@ namespace LocalizationTool.Scripts.General
 
         public static IEnumerator ImportSerializedDataCoroutine(string path, ISerializerService serializer, ImportProgressWindow progressWindow)
         {
-            //CacheData.ClearData();
+            CacheData.ClearData();
 
             // Load data
             var loadFileTask = SaveLoadFileManager.LoadFile<DictionaryTemplate>(path, serializer);
