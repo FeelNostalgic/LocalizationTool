@@ -284,23 +284,18 @@ namespace LocalizationTool.Scripts.Editors
                 _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
                 var filteredDicToIterate = GetFilteredDictionary().ToList();
                 
-                // Calcular el índice del primer y último elemento visible
                 var firstVisibleIndex = Mathf.FloorToInt(_scrollCenter.y / 40);
-                int visibleItemsCount = Mathf.FloorToInt(EditorGUIUtility.currentViewWidth / 40);
+                var visibleItemsCount = Mathf.FloorToInt(EditorGUIUtility.currentViewWidth / 40);
                 var lastVisibleIndex = Mathf.Min(firstVisibleIndex + visibleItemsCount, filteredDicToIterate.Count - 1);
 
-                GUILayout.Space(firstVisibleIndex * 40); // Espacio antes del primer elemento visible
-                
-                // foreach (var keyData in filteredDicToIterate)
-                // {
-                    // UnitCenterScrollViewContent(keyData.Key, keyData.Value.Category, keyData.Value.TranslationData[LocalizationManager.CurrentLanguageInDictionarySection]);
-                // }
-                for (int i = firstVisibleIndex; i <= lastVisibleIndex; i++)
+                GUILayout.Space(firstVisibleIndex * 40);
+
+                for (var i = firstVisibleIndex; i <= lastVisibleIndex; i++)
                 {
                     UnitCenterScrollViewContent(filteredDicToIterate[i].Key, filteredDicToIterate[i].Value.Category, filteredDicToIterate[i].Value.TranslationData[LocalizationManager.CurrentLanguageInDictionarySection]);
                 }
 
-                GUILayout.Space((filteredDicToIterate.Count - lastVisibleIndex - 1) * 40); // Espacio después del último elemento visible
+                GUILayout.Space(Mathf.Clamp((filteredDicToIterate.Count - lastVisibleIndex - 1) * 40f,0f,filteredDicToIterate.Count * 40f + 40f)); 
                 
                 EditorGUILayout.EndScrollView();
             }

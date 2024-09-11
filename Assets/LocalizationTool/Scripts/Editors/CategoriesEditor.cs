@@ -165,6 +165,7 @@ namespace LocalizationTool.Scripts.Editors
         private void GenerateCenterScrollViewContent()
         {
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
+            
             try
             {
                 foreach (var (index, category) in CacheData.CategoryCache)
