@@ -282,12 +282,20 @@ namespace LocalizationTool.Scripts.Editors
             try
             {
                 _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
-                var filteredDicToIterate = GetFilteredDictionary();
+                var filteredDicToIterate = GetFilteredDictionary().ToList();
+                
+                var firstVisibleIndex = Mathf.FloorToInt(_scrollCenter.y / 40);
+                var visibleItemsCount = Mathf.FloorToInt(EditorGUIUtility.currentViewWidth / 40);
+                var lastVisibleIndex = Mathf.Min(firstVisibleIndex + visibleItemsCount, filteredDicToIterate.Count - 1);
 
-                foreach (var keyData in filteredDicToIterate)
+                GUILayout.Space(firstVisibleIndex * 40);
+
+                for (var i = firstVisibleIndex; i <= lastVisibleIndex; i++)
                 {
-                    UnitCenterScrollViewContent(keyData.Key, keyData.Value.Category, keyData.Value.TranslationData[LocalizationManager.CurrentLanguageInDictionarySection]);
+                    UnitCenterScrollViewContent(filteredDicToIterate[i].Key, filteredDicToIterate[i].Value.Category, filteredDicToIterate[i].Value.TranslationData[LocalizationManager.CurrentLanguageInDictionarySection]);
                 }
+
+                GUILayout.Space(Mathf.Clamp((filteredDicToIterate.Count - lastVisibleIndex - 1) * 40f,0f,filteredDicToIterate.Count * 40f + 40f)); 
 
                 EditorGUILayout.EndScrollView();
             }
