@@ -168,9 +168,9 @@ namespace LocalizationTool.Scripts.Editors
             
             try
             {
-                foreach (var (index, category) in CacheData.CategoryCache)
+                foreach (var category in CacheDataSO.CategoryCache)
                 {
-                    UnitCenterScrollViewContent(index, category);
+                    UnitCenterScrollViewContent(category.displayOrder, category.categoryName);
                 }
             }
             catch
@@ -181,9 +181,9 @@ namespace LocalizationTool.Scripts.Editors
             EditorGUILayout.EndScrollView();
         }
         
-        private void UnitCenterScrollViewContent(int index, string category)
+        private void UnitCenterScrollViewContent(int index, string categoryName)
         {
-            var height = _feedbackList.ContainsKey(category) ? Height : GUILayout.Height(40 + 20);
+            var height = _feedbackList.ContainsKey(categoryName) ? Height : GUILayout.Height(40 + 20);
             GUI.backgroundColor = EditorGUIUtility.isProSkin ? Color.white : Colors.Alpha(Color.cyan, .1f);
             GUILayout.BeginVertical("box", height);
         
@@ -192,24 +192,24 @@ namespace LocalizationTool.Scripts.Editors
         
             GUILayout.Space(10);
         
-            Column1(index, category);
+            Column1(index, categoryName);
         
-            Column2(index, category);
+            Column2(index, categoryName);
         
-            Column3(index, category);
+            Column3(index, categoryName);
         
-            Column4(category);
+            Column4(categoryName);
         
-            Column5(category);
+            Column5(categoryName);
         
             GUILayout.EndHorizontal();
         
-            Feedback(category);
+            Feedback(categoryName);
         
             GUILayout.EndVertical();
         }
         
-        private void Column1(int index, string category)
+        private void Column1(int index, string categoryName)
         {
             //Number
             GUILayout.BeginVertical("box", GUILayout.Width(35), Height);
@@ -217,11 +217,11 @@ namespace LocalizationTool.Scripts.Editors
         
             GUILayout.FlexibleSpace();
             var tempIndex = EditorGUILayout.IntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Height(30));
-            if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(category, index, tempIndex);
+            if (!LocalizationManager.IsDefaultCategory(categoryName)) UpdateIndex(categoryName, index, tempIndex);
             GUILayout.EndVertical();
         }
         
-        private void Column2(int index, string category)
+        private void Column2(int index, string categoryName)
         {
             //Button To move UP
             GUI.backgroundColor = Color.clear;
@@ -229,15 +229,15 @@ namespace LocalizationTool.Scripts.Editors
             GUI.backgroundColor = Colors.DEFAULT;
         
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button(GetGUIContent(UpIcon, string.Format(MOVE_UP_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(GetGUIContent(UpIcon, string.Format(MOVE_UP_BUTTON_TOOLTIP, categoryName)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                if (!LocalizationManager.IsDefaultCategory(category)) UpdateIndex(category, index, index - 1);
+                if (!LocalizationManager.IsDefaultCategory(categoryName)) UpdateIndex(categoryName, index, index - 1);
             }
         
             GUILayout.EndVertical();
         }
         
-        private void Column3(int index, string category)
+        private void Column3(int index, string categoryName)
         {
             //Button To move DOWN
             GUI.backgroundColor = Color.clear;
@@ -245,15 +245,15 @@ namespace LocalizationTool.Scripts.Editors
             GUI.backgroundColor = Colors.DEFAULT;
         
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button(GetGUIContent(DownIcon, string.Format(MOVE_DOWN_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+            if (GUILayout.Button(GetGUIContent(DownIcon, string.Format(MOVE_DOWN_BUTTON_TOOLTIP, categoryName)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                if (!LocalizationManager.IsDefaultCategory(category) && CacheData.CategoryCache.Count >= index + 1) UpdateIndex(category, index, index + 1);
+                if (!LocalizationManager.IsDefaultCategory(categoryName) && CacheDataSO.CategoryCache.Count >= index + 1) UpdateIndex(categoryName, index, index + 1);
             }
         
             GUILayout.EndVertical();
         }
         
-        private void Column4(string category)
+        private void Column4(string categoryName)
         {
             // Favourite Button
             GUI.backgroundColor = Color.clear;
@@ -261,18 +261,18 @@ namespace LocalizationTool.Scripts.Editors
             GUI.backgroundColor = Colors.DEFAULT;
         
             GUILayout.FlexibleSpace();
-            if (LocalizationManager.IsDefaultCategory(category))
+            if (LocalizationManager.IsDefaultCategory(categoryName))
             {
-                if (GUILayout.Button(GetGUIContent(YellowStarIcon, string.Format(CATEGORY_IS_DEFAULT_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                if (GUILayout.Button(GetGUIContent(YellowStarIcon, string.Format(CATEGORY_IS_DEFAULT_BUTTON_TOOLTIP, categoryName)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                 }
             }
             else
             {
-                if (GUILayout.Button(GetGUIContent(StarIcon, string.Format(MAKE_CATEGORY_DEFAULT_BUTTON_TOOLTIP, category)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
+                if (GUILayout.Button(GetGUIContent(StarIcon, string.Format(MAKE_CATEGORY_DEFAULT_BUTTON_TOOLTIP, categoryName)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
-                    LocalizationManager.Instance.ChangeDefaultCategory(category);
-                    LocalizationManager.Log(CATEGORIES_LABEL, CustomDebugPlugin.Colors.Green,string.Format(CATEGORY_DEFAULT_LOG, category));
+                    LocalizationManager.Instance.ChangeDefaultCategory(categoryName);
+                    LocalizationManager.Log(CATEGORIES_LABEL, CustomDebugPlugin.Colors.Green,string.Format(CATEGORY_DEFAULT_LOG, categoryName));
                 }
             }
         

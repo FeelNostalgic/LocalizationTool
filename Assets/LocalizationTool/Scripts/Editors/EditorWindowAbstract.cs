@@ -164,17 +164,17 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.Label(label, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label));
             GUILayout.Space(5);
 
-            if (CacheData.CategoryCache != null) //To avoid possible errors while loading data
+            if (CacheDataSO.CategoryCache != null) //To avoid possible errors while loading data
             {
-                if (CacheData.Categories.IndexOf(categoryValue) != -1) //Category value is empty when loading
+                if (CacheDataSO.Categories.IndexOf(categoryValue) != -1) //Category value is empty when loading
                 {
-                    var index = EditorGUILayout.Popup(CacheData.Categories.IndexOf(categoryValue), CacheData.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup));
-                    categoryValue = CacheData.Categories[index];
+                    var index = EditorGUILayout.Popup(CacheDataSO.Categories.IndexOf(categoryValue), CacheDataSO.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup));
+                    categoryValue = CacheDataSO.Categories[index];
                 }
                 else
                 {
-                    EditorGUILayout.Popup(0, CacheData.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup));
-                    if (CacheData.CategoryCache.Count > 0) categoryValue = CacheData.Categories[0];
+                    EditorGUILayout.Popup(0, CacheDataSO.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup));
+                    if (CacheDataSO.CategoryCache.Count > 0) categoryValue = CacheDataSO.Categories[0];
                 }
             }
 

@@ -124,7 +124,7 @@ namespace LocalizationTool.Scripts.API
         public static List<string> GetAllCategories()
         {
             //CacheData.LoadCacheData();
-            return CacheData.Categories;
+            return CacheDataSO.Categories;
         }
 
         /// <summary>

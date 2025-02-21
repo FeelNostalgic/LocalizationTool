@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ec3a2ff2463c0148ac836764d54c4e9, type: 3}
   m_Name: Main Menu
   m_EditorClassIdentifier: 
-  categoryName: 
-  displayOrder: 0
-  isDefault: 0
+  categoryName: Main Menu
+  displayOrder: 2
+  isDefault: 1

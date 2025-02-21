@@ -26,10 +26,6 @@ namespace LocalizationTool.Scripts.Data
         public static List<string> Languages => LanguageCache.Select(x => x.Language).ToList();
         public static string DefaultLanguage { get; set; }
 
-        public static List<CategoryTuple> CategoryCache { get; set; }
-        public static List<string> Categories => CategoryCache.Select(x => x.Category).ToList();
-        public static string DefaultCategory { get; set; }
-
         public static Dictionary<string, KeyData> DictionaryCache { get; set; }
         public static List<string> Keys => DictionaryCache.Select(x => x.Key).ToList();
 
@@ -66,7 +62,6 @@ namespace LocalizationTool.Scripts.Data
         {
             LoadDictionaryCacheFromDatabase();
             LoadLanguagesCacheFromDatabase();
-            LoadCategoriesCacheFromDatabase();
             IsDataLoaded = true;
             CustomDebug.Log("Database", Colors.Red, "Loaded");
             Instance.OnLocalizationToolDataInitialized?.Invoke();
@@ -87,13 +82,7 @@ namespace LocalizationTool.Scripts.Data
 #endif
             if (LocalizationToolAPI.Instance.IsNotNull()) LocalizationToolAPI.ActiveLanguage = DefaultLanguage;
         }
-
-        public static void LoadCategoriesCacheFromDatabase()
-        {
-            CategoryCache = GetCategoriesOrderedFromDatabase();
-            DefaultCategory = GetDefaultCategoryFromDatabase();
-        }
-
+        
         #endregion
 
         #region DATABASE UPDATES
@@ -175,8 +164,6 @@ namespace LocalizationTool.Scripts.Data
             DictionaryCache.Clear();
 
             LanguageCache.Clear();
-
-            CategoryCache.Clear();
         }
 
         public static void UpdateDictionaryCache()
@@ -187,11 +174,6 @@ namespace LocalizationTool.Scripts.Data
         public static void UpdateLanguageCache()
         {
             LanguageCache = GetLanguagesOrderedFromDatabase();
-        }
-
-        public static void UpdateCategoryCache()
-        {
-            CategoryCache = GetCategoriesOrderedFromDatabase();
         }
 
         #endregion
@@ -396,35 +378,6 @@ namespace LocalizationTool.Scripts.Data
         #endregion
 
         #region LANGUAGE
-        
-        public static void RemoveLanguageFromDatabase(string languageToRemove)
-        {
-            try
-            {
-                OpenDatabaseConnection();
-                var query = $"select id,displayOrder from {LANGUAGE_TABLE} where language = '{languageToRemove}'";
-                var reader = ExecuteReaderCommand(query);
-                var languageToRemoveID = Convert.ToInt32(reader["id"]);
-                var languageDisplayOrder = Convert.ToInt32(reader["displayOrder"]);
-
-                query = $"delete from {TRANSLATION_TABLE} where languageID = '{languageToRemoveID}'";
-                ExecuteNonQueryCommand(query);
-
-                query = $"delete from {LANGUAGE_TABLE} where language = '{languageToRemove}'";
-                ExecuteNonQueryCommand(query);
-
-                query = $"update {LANGUAGE_TABLE} set displayOrder = displayOrder - 1 where displayOrder > {languageDisplayOrder}";
-                ExecuteNonQueryCommand(query);
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            finally
-            {
-                CloseDatabaseConnection();
-            }
-        }
 
         public static void EmptyLanguageFromDatabase(string languageToEmpty)
         {
@@ -465,37 +418,7 @@ namespace LocalizationTool.Scripts.Data
                 CloseDatabaseConnection();
             }
         }
-
-        public static void UpdateDefaultLanguageInDatabase(string newDefaultLanguage)
-        {
-            try
-            {
-                OpenDatabaseConnection();
-                var query = $"update {LANGUAGE_TABLE} set isDefault = 0 where isDefault = 1";
-                ExecuteNonQueryCommand(query);
-
-                query = $"update {LANGUAGE_TABLE} set isDefault = 1 where language = '{newDefaultLanguage}'";
-                ExecuteNonQueryCommand(query);
-
-                query = $"select displayOrder from {LANGUAGE_TABLE} where language = '{newDefaultLanguage}'";
-                var reader = ExecuteReaderCommand(query);
-
-                query = $"update {LANGUAGE_TABLE} set displayOrder = displayOrder + 1 where displayOrder >= {1} and displayOrder < {Convert.ToInt32(reader["displayOrder"])}";
-                ExecuteNonQueryCommand(query);
-
-                query = $"update {LANGUAGE_TABLE} set displayOrder = 1 where language = '{newDefaultLanguage}'";
-                ExecuteNonQueryCommand(query);
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            finally
-            {
-                CloseDatabaseConnection();
-            }
-        }
-
+        
         public static void UpdateLanguageDisplayOrderInDatabase(string languageName, int oldLanguageDisplayOrder, int newLanguageDisplayOrder)
         {
             try
@@ -586,144 +509,6 @@ namespace LocalizationTool.Scripts.Data
 
         #region CATEGORY
         
-        public static void RemoveCategoryFromDatabase(string categoryToRemove)
-        {
-            try
-            {
-                OpenDatabaseConnection();
-                var defaultCategory = GetDefaultCategoryFromDatabase();
-
-                var query = $"select id from {CATEGORY_TABLE} where category = '{defaultCategory}'";
-                var defaultCategoryID = Convert.ToInt32(ExecuteReaderCommand(query)["id"]);
-
-                query = $"select id,displayOrder from {CATEGORY_TABLE} where category = '{categoryToRemove}'";
-                var reader = ExecuteReaderCommand(query);
-                var categoryToRemoveID = Convert.ToInt32(reader["id"]);
-                var categoryDisplayOrder = Convert.ToInt32(reader["displayOrder"]);
-
-                query = $"update {TRANSLATION_KEY_TABLE} set categoryID = '{defaultCategoryID}' where categoryID = '{categoryToRemoveID}'";
-                ExecuteNonQueryCommand(query);
-
-                query = $"delete from {CATEGORY_TABLE} where category = '{categoryToRemove}'";
-                ExecuteNonQueryCommand(query);
-
-                query = $"update {CATEGORY_TABLE} set displayOrder = displayOrder - 1 where displayOrder > {categoryDisplayOrder}";
-                ExecuteNonQueryCommand(query);
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            finally
-            {
-                CloseDatabaseConnection();
-            }
-        }
-
-        public static void UpdateCategoryNameInDatabase(string oldCategoryName, string newCategoryName)
-        {
-            try
-            {
-                OpenDatabaseConnection();
-                var query = $"update {CATEGORY_TABLE} set category = '{newCategoryName}' where category = '{oldCategoryName}'";
-                ExecuteNonQueryCommand(query);
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            finally
-            {
-                CloseDatabaseConnection();
-            }
-        }
-
-        public static void UpdateDefaultCategoryInDatabase(string newDefaultCategory)
-        {
-            try
-            {
-                OpenDatabaseConnection();
-                var query = $"update {CATEGORY_TABLE} set isDefault = 0 where isDefault = 1";
-                ExecuteNonQueryCommand(query);
-
-                query = $"update {CATEGORY_TABLE} set isDefault = 1 where category = '{newDefaultCategory}'";
-                ExecuteNonQueryCommand(query);
-
-                query = $"select displayOrder from {CATEGORY_TABLE} where category = '{newDefaultCategory}'";
-                var reader = ExecuteReaderCommand(query);
-
-                query = $"update {CATEGORY_TABLE} set displayOrder = displayOrder + 1 where displayOrder >= {1} and displayOrder < {Convert.ToInt32(reader["displayOrder"])}";
-                ExecuteNonQueryCommand(query);
-
-                query = $"update {CATEGORY_TABLE} set displayOrder = 1 where category = '{newDefaultCategory}'";
-                ExecuteNonQueryCommand(query);
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            finally
-            {
-                CloseDatabaseConnection();
-            }
-        }
-
-        public static void UpdateCategoryDisplayOrderInDatabase(string categoryName, int oldCategoryDisplayOrder, int newCategoryDisplayOrder)
-        {
-            try
-            {
-                OpenDatabaseConnection();
-                string query;
-                if (oldCategoryDisplayOrder < newCategoryDisplayOrder)
-                {
-                    // Scroll down elements between oldIndex and newIndex
-
-                    query = $"update {CATEGORY_TABLE} set displayOrder = displayOrder - 1 where displayOrder > {oldCategoryDisplayOrder} and displayOrder <= {newCategoryDisplayOrder}";
-                    ExecuteNonQueryCommand(query);
-                }
-                else if (oldCategoryDisplayOrder > newCategoryDisplayOrder)
-                {
-                    // Scroll up elements between oldIndex and newIndex
-
-                    query = $"update {CATEGORY_TABLE} set displayOrder = displayOrder + 1 where displayOrder >= {newCategoryDisplayOrder} and displayOrder < {oldCategoryDisplayOrder}";
-                    ExecuteNonQueryCommand(query);
-                }
-
-                query = $"update {CATEGORY_TABLE} set displayOrder = '{newCategoryDisplayOrder}' where category = '{categoryName}'";
-                ExecuteNonQueryCommand(query);
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            finally
-            {
-                CloseDatabaseConnection();
-            }
-        }
-
-        public static string GetDefaultCategoryFromDatabase()
-        {
-            var defaultCategory = "";
-            try
-            {
-                OpenDatabaseConnection();
-                var query = $"SELECT category FROM {CATEGORY_TABLE} where isDefault = 1";
-                var reader = ExecuteReaderCommand(query);
-                defaultCategory = reader["category"].ToString();
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            finally
-            {
-                CloseDatabaseConnection();
-            }
-
-            return defaultCategory;
-        }
-
         public static List<CategoryTuple> GetCategoriesOrderedFromDatabase()
         {
             var result = new List<CategoryTuple>();

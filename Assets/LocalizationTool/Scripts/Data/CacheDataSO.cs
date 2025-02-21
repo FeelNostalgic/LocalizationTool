@@ -7,6 +7,7 @@ using LocalizationTool.Scripts.Data.ScriptableObjects;
 using LocalizationTool.Scripts.General;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace LocalizationTool.Scripts.Data
 {
@@ -59,7 +60,7 @@ namespace LocalizationTool.Scripts.Data
             UpdateLanguageCache();
 
             UpdateCategoriesCache();
-            
+
             Instance.OnLocalizationToolDataInitialized?.Invoke();
         }
 
@@ -71,6 +72,12 @@ namespace LocalizationTool.Scripts.Data
             LocalizationManager.CurrentLanguageInDictionarySection = DefaultLanguage;
 #endif
             if (LocalizationToolAPI.Instance.IsNotNull()) LocalizationToolAPI.ActiveLanguage = DefaultLanguage;
+        }
+
+        public static void LoadCategoriesCache()
+        {
+            CreateLocationData();
+            UpdateCategoriesCache();
         }
 
         #endregion
@@ -89,6 +96,7 @@ namespace LocalizationTool.Scripts.Data
                 languageData.translationKeys.Add(translation);
                 AssetDatabase.AddObjectToAsset(translation, languageData);
             }
+
             SaveChanges();
         }
 
@@ -102,10 +110,55 @@ namespace LocalizationTool.Scripts.Data
             AssetDatabase.CreateAsset(newLanguage, $"{LANGUAGES_PATH}/{newLanguageName}.asset");
             newLanguage.languageName = newLanguageName;
             newLanguage.displayOrder = _localizationData.languages.Count + 1;
+            if (_localizationData.languages.Count == 1) newLanguage.isDefault = true;
 
             _localizationData.languages.Add(newLanguage);
             SaveChanges();
             UpdateLanguageCache();
+        }
+
+        public static void SetDefaultLanguage(string newDefaultLanguage)
+        {
+            // Remove old default
+            var currentDefault = _localizationData.languages.FirstOrDefault(l => l.isDefault);
+            System.Diagnostics.Debug.Assert(currentDefault, nameof(currentDefault) + " != null");
+            currentDefault.isDefault = false;
+
+            // Set new default
+            var newDefault = _localizationData.languages.FirstOrDefault(l => l.languageName == newDefaultLanguage);
+            System.Diagnostics.Debug.Assert(newDefault, nameof(newDefault) + " != null");
+            newDefault.isDefault = true;
+
+            // Reorder languages
+            var newDefaultOrder = newDefault.displayOrder;
+            foreach (var language in _localizationData.languages.Where(language => language.displayOrder < newDefaultOrder))
+            {
+                language.displayOrder++; // Shift languages above the new default
+            }
+
+            newDefault.displayOrder = 1;
+
+            UpdateLanguageCache();
+            SaveChanges();
+        }
+
+        public static void RemoveLanguage(string languageName)
+        {
+            var languageToRemove = _localizationData.languages.FirstOrDefault(c => c.languageName.Equals(languageName));
+            var removedDisplayOrder = languageToRemove!.displayOrder;
+
+            // Update display order
+            foreach (var language in _localizationData.languages.Where(language => language.displayOrder > removedDisplayOrder))
+            {
+                language.displayOrder--;
+            }
+
+            _localizationData.languages.Remove(languageToRemove);
+
+            RemoveAsset(languageToRemove);
+
+            UpdateLanguageCache();
+            SaveChanges();
         }
 
         #endregion
@@ -118,10 +171,101 @@ namespace LocalizationTool.Scripts.Data
             AssetDatabase.CreateAsset(newCategory, $"{CATEGORIES_PATH}/{newCategoryName}.asset");
             newCategory.categoryName = newCategoryName;
             newCategory.displayOrder = _localizationData.categories.Count + 1;
+            if (_localizationData.categories.Count == 1) newCategory.isDefault = true;
 
             _localizationData.categories.Add(newCategory);
-            SaveChanges();
+            SaveChanges(newCategory);
             UpdateCategoriesCache();
+        }
+
+        public static void SetDefaultCategory(string newDefaultCategory)
+        {
+            // Remove old default
+            var currentDefault = _localizationData.categories.FirstOrDefault(c => c.isDefault);
+            System.Diagnostics.Debug.Assert(currentDefault, nameof(currentDefault) + " != null");
+            currentDefault.isDefault = false;
+
+            // Set new default
+            var newDefault = _localizationData.categories.FirstOrDefault(c => c.categoryName == newDefaultCategory);
+            System.Diagnostics.Debug.Assert(newDefault, nameof(newDefault) + " != null");
+            newDefault.isDefault = true;
+
+            // Reorder categories
+            var newDefaultOrder = newDefault.displayOrder;
+            foreach (var category in _localizationData.categories.Where(category => category.displayOrder < newDefaultOrder))
+            {
+                category.displayOrder++; // Shift categories above the new default
+            }
+
+            newDefault.displayOrder = 1;
+
+            UpdateCategoriesCache();
+            SaveChanges();
+        }
+
+        public static void RemoveCategory(string categoryName)
+        {
+            var categoryToRemove = _localizationData.categories.FirstOrDefault(c => c.categoryName.Equals(categoryName));
+            var removedDisplayOrder = categoryToRemove!.displayOrder;
+
+            // Update keys that use the categoryToRemove to default category
+            foreach (var translationKey in _localizationData.languages.SelectMany(localizationDataLanguage => localizationDataLanguage.translationKeys.Where(x => x.category.categoryName.Equals(categoryName))))
+            {
+                translationKey.category.categoryName = DefaultCategory;
+            }
+
+            // Update display order
+            foreach (var category in _localizationData.categories.Where(category => category.displayOrder > removedDisplayOrder))
+            {
+                category.displayOrder--;
+            }
+
+            _localizationData.categories.Remove(categoryToRemove);
+
+            RemoveAsset(categoryToRemove);
+
+            UpdateCategoriesCache();
+            SaveChanges();
+        }
+
+        public static void UpdateCategoryDisplayOrder(string categoryName, int oldCategoryDisplayOrder, int newCategoryDisplayOrder)
+        {
+            // Find the category to update
+            var categoryToUpdate = _localizationData.categories.FirstOrDefault(c => c.categoryName == categoryName);
+            newCategoryDisplayOrder = Math.Clamp(newCategoryDisplayOrder, 1, _localizationData.categories.Count);
+
+            // Reorder categories
+            if (oldCategoryDisplayOrder < newCategoryDisplayOrder)
+            {
+                // Scroll down elements between oldIndex and newIndex
+                foreach (var category in _localizationData.categories.Where(category => category.displayOrder > oldCategoryDisplayOrder && category.displayOrder <= newCategoryDisplayOrder))
+                {
+                    category.displayOrder--; // Shift categories down
+                }
+            }
+            else if (oldCategoryDisplayOrder > newCategoryDisplayOrder)
+            {
+                // Scroll up elements between oldIndex and newIndex
+                foreach (var category in _localizationData.categories.Where(category => category.displayOrder >= newCategoryDisplayOrder && category.displayOrder < oldCategoryDisplayOrder))
+                {
+                    category.displayOrder++; // Shift categories up
+                }
+            }
+
+            // Update the target category's display order
+            categoryToUpdate!.displayOrder = newCategoryDisplayOrder;
+
+            UpdateCategoriesCache();
+            SaveChanges();
+        }
+
+        public static void UpdateCategoryName(string oldCategoryName, string newCategoryName)
+        {
+            var categoryToUpdate = _localizationData.categories.FirstOrDefault(c => c.categoryName == oldCategoryName);
+            AssetDatabase.RenameAsset(GetPath(categoryToUpdate), newCategoryName);
+            categoryToUpdate!.categoryName = newCategoryName;
+
+            SaveChanges();
         }
 
         #endregion
@@ -137,15 +281,33 @@ namespace LocalizationTool.Scripts.Data
             AssetDatabase.CreateAsset(_localizationData, DATABASE_PATH);
             SaveChanges();
             Debug.Log("LocalizationDataSO.asset created!");
+
+            InsertCategory("None");
+            InsertLanguage("English");
         }
 
-        private static void SaveChanges()
+        private static void SaveChanges(Object obj = null)
         {
             EditorUtility.SetDirty(_localizationData);
+            if (obj.IsNotNull()) EditorUtility.SetDirty(obj);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
 
+        private static void RemoveAsset(Object assetToRemove)
+        {
+            var assetPath = GetPath(assetToRemove);
+            if (!string.IsNullOrEmpty(assetPath))
+            {
+                AssetDatabase.DeleteAsset(assetPath);
+            }
+        }
+
+        private static string GetPath(Object asset)
+        {
+            return AssetDatabase.GetAssetPath(asset);
+        }
+        
         private static void UpdateLanguageCache()
         {
             LanguageCache = _localizationData.languages

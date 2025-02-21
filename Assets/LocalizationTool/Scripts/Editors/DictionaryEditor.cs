@@ -237,11 +237,11 @@ namespace LocalizationTool.Scripts.Editors
         {
             GUILayout.BeginHorizontal();
 
-            if (CacheData.CategoryCache != null)
+            if (CacheDataSO.CategoryCache != null)
             {
-                if (_searchCategoryIndex >= CacheData.CategoryCache.Count) _searchCategoryIndex = 0;
+                if (_searchCategoryIndex >= CacheDataSO.CategoryCache.Count) _searchCategoryIndex = 0;
                 GUI.SetNextControlName("Popup");
-                _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, CacheData.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup), GUILayout.Width(200));
+                _searchCategoryIndex = EditorGUILayout.Popup(_searchCategoryIndex, CacheDataSO.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.CategoryPopup), GUILayout.Width(200));
             }
 
             GUILayout.Space(5);
@@ -331,7 +331,7 @@ namespace LocalizationTool.Scripts.Editors
             }
 
             if (_searchCategoryIndex != 0)
-                filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Value.Category == CacheData.Categories[_searchCategoryIndex])
+                filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Value.Category == CacheDataSO.Categories[_searchCategoryIndex])
                     .ToDictionary(kv => (kv.Key), kv => kv.Value);
 
             return filteredDicToIterate;
@@ -380,12 +380,12 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.BeginHorizontal(GUILayout.Width(175));
             EditorGUI.BeginChangeCheck();
 
-            if (category.IsEmpty()) category = CacheData.DefaultCategory;
+            if (category.IsEmpty()) category = CacheDataSO.DefaultCategory;
             GUI.backgroundColor = Colors.DEFAULT;
-            var tempCategory = EditorGUILayout.Popup(CacheData.Categories.IndexOf(category), CacheData.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.ScrollViewCategoryPopup));
+            var tempCategory = EditorGUILayout.Popup(CacheDataSO.Categories.IndexOf(category), CacheDataSO.Categories.ToArray(), CustomStyles.GetStyle(Enums.CustomStyleName.ScrollViewCategoryPopup));
 
             if (EditorGUI.EndChangeCheck())
-                UpdateCategory(key, CacheData.Categories[tempCategory]);
+                UpdateCategory(key, CacheDataSO.Categories[tempCategory]);
 
             GUILayout.EndHorizontal();
 
