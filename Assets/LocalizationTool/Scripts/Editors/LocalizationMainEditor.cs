@@ -159,6 +159,7 @@ namespace LocalizationTool.Scripts.Editors
         {
             LocalizationManager.CreateDatabase();
             CacheData.Instance.InitForEditor();
+            CacheDataSO.Instance.InitForEditor();
         }
 
         #endregion

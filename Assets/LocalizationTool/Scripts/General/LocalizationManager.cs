@@ -129,7 +129,7 @@ namespace LocalizationTool.Scripts.General
                 CacheData.CloseDatabaseConnection();
             }
         }
-        
+
         #endregion
 
         #region DICTIONARY
@@ -305,12 +305,13 @@ namespace LocalizationTool.Scripts.General
             editor?.ClearAddTextField();
 
             // Add category to Database
-            CacheData.InsertLanguageToDatabase(newLanguage);
+            //FUTURE: CacheData.InsertLanguageToDatabase(newLanguage);
+            CacheDataSO.InsertLanguage(newLanguage);
 
             // Update cache 
-            CacheData.UpdateLanguageCache();
-            
-            if (CacheData.LanguageCache.Count() == 1) ChangeDefaultLanguage(newLanguage);
+            //FUTURE: CacheData.UpdateLanguageCache();
+
+            //FUTURE: if (CacheData.LanguageCache.Count() == 1) ChangeDefaultLanguage(newLanguage);
 
             ShowFeedback(LANGUAGES_LABEL, Colors.Purple, string.Format(LANGUAGE_ADDED_FEEDBACK_LABEL, newLanguage), editor);
         }
@@ -386,6 +387,7 @@ namespace LocalizationTool.Scripts.General
         public static void RefreshLanguagesData()
         {
             CacheData.LoadLanguagesCacheFromDatabase();
+            CacheDataSO.LoadLanguagesCache();
         }
 
         #endregion
