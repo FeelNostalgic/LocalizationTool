@@ -10,6 +10,6 @@ namespace LocalizationTool.Scripts.Data.ScriptableObjects
 		public string keyName;
 		public CategoryDataSO category;
 		public int displayOrder;
-		public Dictionary<string, string> translations = new Dictionary<string, string>();
+		public string translationText;
 	}
 }

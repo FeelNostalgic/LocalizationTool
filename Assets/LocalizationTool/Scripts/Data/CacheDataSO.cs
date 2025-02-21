@@ -25,8 +25,6 @@ namespace LocalizationTool.Scripts.Data
         public static List<string> Categories => CategoryCache.Select(x => x.categoryName).ToList();
         public static string DefaultCategory => CategoryCache.FirstOrDefault(x => x.isDefault)?.categoryName;
 
-        public static Dictionary<string, TranslationKeyDataSO> DictionaryCache { get; private set; }
-
         public Action OnLocalizationToolDataInitialized { get; set; }
 
         #endregion
@@ -58,17 +56,10 @@ namespace LocalizationTool.Scripts.Data
 
         private static void LoadCacheData()
         {
-            LanguageCache = _localizationData.languages
-                .OrderBy(l => l.displayOrder)
-                .ToList();
+            UpdateLanguageCache();
 
-            CategoryCache = _localizationData.categories
-                .OrderBy(c => c.displayOrder)
-                .ToList();
-
-            DictionaryCache = _localizationData.translationKeys
-                .ToDictionary(k => k.keyName, k => k);
-
+            UpdateCategoriesCache();
+            
             Instance.OnLocalizationToolDataInitialized?.Invoke();
         }
 
@@ -86,15 +77,18 @@ namespace LocalizationTool.Scripts.Data
 
         #region KEYS
 
-        public static void InsertKey(string keyName, CategoryDataSO category)
+        public static void InsertKey(string keyName, string categoryName)
         {
-            var newKey = ScriptableObject.CreateInstance<TranslationKeyDataSO>();
-            newKey.keyName = keyName;
-            newKey.category = category;
-            newKey.displayOrder = _localizationData.translationKeys.Count + 1;
-
-            _localizationData.translationKeys.Add(newKey);
-            AssetDatabase.AddObjectToAsset(newKey, _localizationData);
+            foreach (var languageData in LanguageCache)
+            {
+                var translation = ScriptableObject.CreateInstance<TranslationKeyDataSO>();
+                translation.name = keyName;
+                translation.keyName = keyName;
+                translation.category = CategoryCache.FirstOrDefault(x => x.categoryName.Equals(categoryName));
+                translation.displayOrder = languageData.translationKeys.Count + 1;
+                languageData.translationKeys.Add(translation);
+                AssetDatabase.AddObjectToAsset(translation, languageData);
+            }
             SaveChanges();
         }
 
@@ -106,12 +100,10 @@ namespace LocalizationTool.Scripts.Data
         {
             var newLanguage = ScriptableObject.CreateInstance<LanguageDataSO>();
             AssetDatabase.CreateAsset(newLanguage, $"{LANGUAGES_PATH}/{newLanguageName}.asset");
-            //newLanguage.name = newLanguageName;
             newLanguage.languageName = newLanguageName;
             newLanguage.displayOrder = _localizationData.languages.Count + 1;
 
             _localizationData.languages.Add(newLanguage);
-            //AssetDatabase.AddObjectToAsset(newLanguage, _localizationData);
             SaveChanges();
             UpdateLanguageCache();
         }
@@ -123,12 +115,13 @@ namespace LocalizationTool.Scripts.Data
         public static void InsertCategory(string newCategoryName)
         {
             var newCategory = ScriptableObject.CreateInstance<CategoryDataSO>();
+            AssetDatabase.CreateAsset(newCategory, $"{CATEGORIES_PATH}/{newCategoryName}.asset");
             newCategory.categoryName = newCategoryName;
             newCategory.displayOrder = _localizationData.categories.Count + 1;
 
             _localizationData.categories.Add(newCategory);
-            AssetDatabase.AddObjectToAsset(newCategory, _localizationData);
             SaveChanges();
+            UpdateCategoriesCache();
         }
 
         #endregion
@@ -157,6 +150,13 @@ namespace LocalizationTool.Scripts.Data
         {
             LanguageCache = _localizationData.languages
                 .OrderBy(l => l.displayOrder)
+                .ToList();
+        }
+
+        private static void UpdateCategoriesCache()
+        {
+            CategoryCache = _localizationData.categories
+                .OrderBy(c => c.displayOrder)
                 .ToList();
         }
 

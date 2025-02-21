@@ -305,13 +305,9 @@ namespace LocalizationTool.Scripts.General
             editor?.ClearAddTextField();
 
             // Add category to Database
-            //FUTURE: CacheData.InsertLanguageToDatabase(newLanguage);
             CacheDataSO.InsertLanguage(newLanguage);
-
-            // Update cache 
-            //FUTURE: CacheData.UpdateLanguageCache();
-
-            //FUTURE: if (CacheData.LanguageCache.Count() == 1) ChangeDefaultLanguage(newLanguage);
+            
+            if (CacheDataSO.LanguageCache.Count() == 1) ChangeDefaultLanguage(newLanguage);
 
             ShowFeedback(LANGUAGES_LABEL, Colors.Purple, string.Format(LANGUAGE_ADDED_FEEDBACK_LABEL, newLanguage), editor);
         }
@@ -419,12 +415,9 @@ namespace LocalizationTool.Scripts.General
             editor?.ClearAddTextField();
 
             // Add category to Database
-            CacheData.InsertCategoryToDatabase(newCategory);
-
-            // Update cache 
-            CacheData.UpdateCategoryCache();
-
-            if (CacheData.CategoryCache.Count() == 1) Instance.ChangeDefaultCategory(newCategory);
+            CacheDataSO.InsertCategory(newCategory);
+            
+            if (CacheDataSO.CategoryCache.Count() == 1) Instance.ChangeDefaultCategory(newCategory);
 
             if (showEditorLogs) ShowFeedback(CATEGORIES_LABEL, Colors.Green, string.Format(CATEGORY_ADDED_FEEDBACK_LABEL, newCategory), editor);
         }
@@ -791,7 +784,7 @@ namespace LocalizationTool.Scripts.General
             if (ContainsLanguage(languageToImport)) return;
 
             // Add category to Database
-            CacheData.InsertLanguageToDatabase(languageToImport);
+            CacheDataSO.InsertLanguage(languageToImport);
 
             // Update cache 
             CacheData.UpdateLanguageCache();

@@ -9,6 +9,5 @@ namespace LocalizationTool.Scripts.Data.ScriptableObjects
 	{
 		public List<LanguageDataSO> languages = new List<LanguageDataSO>();
 		public List<CategoryDataSO> categories = new List<CategoryDataSO>();
-		public List<TranslationKeyDataSO> translationKeys = new List<TranslationKeyDataSO>();
 	}
 }

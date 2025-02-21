@@ -396,41 +396,7 @@ namespace LocalizationTool.Scripts.Data
         #endregion
 
         #region LANGUAGE
-
-        public static void InsertLanguageToDatabase(string newLanguage)
-        {
-            try
-            {
-                OpenDatabaseConnection();
-                var query = $"SELECT MAX(displayOrder) AS max_display_order FROM {LANGUAGE_TABLE}";
-                var result = ExecuteReaderCommand(query)["max_display_order"];
-                var lastDisplayOrder = result.ToString().IsEmpty() ? 1 : Convert.ToInt32(result);
-
-                query = $"INSERT INTO {LANGUAGE_TABLE} (displayOrder, language, isDefault) VALUES ({lastDisplayOrder + 1}, '{newLanguage}', 0)";
-                ExecuteNonQueryCommand(query);
-
-                foreach (var key in Keys)
-                {
-                    query = $"select id from {TRANSLATION_KEY_TABLE} where key_name = '{key}'";
-                    var keyID = Convert.ToInt32(ExecuteReaderCommand(query)["id"]);
-
-                    query = $"select id from {LANGUAGE_TABLE} where language = '{newLanguage}'";
-                    var languageID = Convert.ToInt32(ExecuteReaderCommand(query)["id"]);
-
-                    query = $"INSERT INTO {TRANSLATION_TABLE} (keyID, languageID, translationText) VALUES ({keyID},{languageID},'')";
-                    ExecuteNonQueryCommand(query);
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            finally
-            {
-                CloseDatabaseConnection();
-            }
-        }
-
+        
         public static void RemoveLanguageFromDatabase(string languageToRemove)
         {
             try
@@ -619,29 +585,7 @@ namespace LocalizationTool.Scripts.Data
         #endregion
 
         #region CATEGORY
-
-        public static void InsertCategoryToDatabase(string newCategory)
-        {
-            try
-            {
-                OpenDatabaseConnection();
-                var query = $"SELECT MAX(displayOrder) AS max_display_order FROM {CATEGORY_TABLE}";
-                var result = ExecuteReaderCommand(query)["max_display_order"];
-                var lastDisplayOrder = result.ToString().IsEmpty() ? 1 : Convert.ToInt32(result);
-
-                query = $"INSERT INTO {CATEGORY_TABLE} (displayOrder, category, isDefault) VALUES ({lastDisplayOrder + 1}, '{newCategory}', 0)";
-                ExecuteNonQueryCommand(query);
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            finally
-            {
-                CloseDatabaseConnection();
-            }
-        }
-
+        
         public static void RemoveCategoryFromDatabase(string categoryToRemove)
         {
             try
