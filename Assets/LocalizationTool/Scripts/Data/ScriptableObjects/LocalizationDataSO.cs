@@ -14,6 +14,7 @@ namespace LocalizationTool.Scripts.Data.ScriptableObjects
 		public List<KeyDataSO> keys = new();
 		
 		private Dictionary<string, LanguageDataSO> _languageCacheDictionary = new();
+		private Dictionary<string, CategoryDataSO> _categoryCacheDictionary = new();
 		private Dictionary<string, KeyDataSO> _keyCacheDictionary = new();
 		
 		public Dictionary<string, LanguageDataSO> LanguagesDictionary
@@ -25,6 +26,15 @@ namespace LocalizationTool.Scripts.Data.ScriptableObjects
 			}
 		}
 
+		public Dictionary<string, CategoryDataSO> CategoriesDictionary
+		{
+			get
+			{
+				if (_categoryCacheDictionary.IsNotNull() || categories.Count != _categoryCacheDictionary.Count) BuildCategoriesDictionary();
+				return _categoryCacheDictionary;
+			}
+		}
+		
 		public Dictionary<string, KeyDataSO> KeysDictionary
 		{
 			get
@@ -37,6 +47,11 @@ namespace LocalizationTool.Scripts.Data.ScriptableObjects
 		private void BuildLanguagesDictionary()
 		{
 			_languageCacheDictionary = languages.ToDictionary(x => x.languageName, x => x);
+		}
+
+		private void BuildCategoriesDictionary()
+		{
+			_categoryCacheDictionary = categories.ToDictionary(x => x.categoryName, x => x);
 		}
 
 		private void BuildKeysDictionary()

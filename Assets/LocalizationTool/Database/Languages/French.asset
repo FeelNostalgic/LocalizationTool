@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa3b9213c4f2fcc489b7efa1580dcdeb, type: 3}
-  m_Name: Spanish
+  m_Name: French
   m_EditorClassIdentifier: 
-  languageName: Spanish
-  displayOrder: 2
+  languageName: French
+  displayOrder: 3
   isDefault: 0
   translationKeys:
-  - {fileID: 5902700128377342711}
-  - {fileID: 6591490240712344451}
---- !u!114 &5902700128377342711
+  - {fileID: 3025746094489728302}
+  - {fileID: 4085806332005445066}
+--- !u!114 &3025746094489728302
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -31,8 +31,8 @@ MonoBehaviour:
   m_Name: 1
   m_EditorClassIdentifier: 
   keyName: 1
-  translationText: Hola
---- !u!114 &6591490240712344451
+  translationText: Bonjour
+--- !u!114 &4085806332005445066
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
