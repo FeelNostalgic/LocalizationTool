@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-3684323171698742676
+--- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,12 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c74921811585e04a9816cbed79332e8, type: 3}
-  m_Name: 1
+  m_Script: {fileID: 11500000, guid: aa3b9213c4f2fcc489b7efa1580dcdeb, type: 3}
+  m_Name: Spanish
   m_EditorClassIdentifier: 
-  keyName: 1
-  translationText: 
---- !u!114 &-1958113902504637537
+  languageName: Spanish
+  displayOrder: 2
+  isDefault: 0
+  translationKeys:
+  - {fileID: 5902700128377342711}
+  - {fileID: 6591490240712344451}
+  - {fileID: 5652943722404857275}
+--- !u!114 &5652943722404857275
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -28,7 +33,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   keyName: 2
   translationText: 
---- !u!114 &11400000
+--- !u!114 &5902700128377342711
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -37,17 +42,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa3b9213c4f2fcc489b7efa1580dcdeb, type: 3}
-  m_Name: English
+  m_Script: {fileID: 11500000, guid: 9c74921811585e04a9816cbed79332e8, type: 3}
+  m_Name: 1
   m_EditorClassIdentifier: 
-  languageName: English
-  displayOrder: 1
-  isDefault: 1
-  translationKeys:
-  - {fileID: -3684323171698742676}
-  - {fileID: 1986971017774504835}
-  - {fileID: -1958113902504637537}
---- !u!114 &1986971017774504835
+  keyName: 1
+  translationText: 
+--- !u!114 &6591490240712344451
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

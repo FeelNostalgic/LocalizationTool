@@ -114,7 +114,7 @@ namespace LocalizationTool.Scripts.General
             }
 
             // Update database
-            CacheData.UpdateKeyNameInDatabase(oldKeyName, newKeyName);
+            CacheDataSO.UpdateKeyName(oldKeyName, newKeyName);
 
             UpdateAddonsOnKeyUpdated(oldKeyName, newKeyName);
 
@@ -127,7 +127,7 @@ namespace LocalizationTool.Scripts.General
             if (CacheDataSO.localizationData.LanguagesDictionary[CurrentLanguageInDictionarySection].TranslationDictionary[key].translationText.Equals(newTranslation)) return;
 
             // Update database
-            CacheData.UpdateKeyTranslationInDatabase(key, newTranslation, CurrentLanguageInDictionarySection);
+            CacheDataSO.SetKeyTranslation(key, newTranslation, CurrentLanguageInDictionarySection);
         }
 
         public static void ChangeCategory(string key, string newCategory)
@@ -135,15 +135,15 @@ namespace LocalizationTool.Scripts.General
             if (CacheDataSO.localizationData.KeysDictionary[key].category.name.Equals(newCategory)) return;
 
             // Update database
-            CacheData.UpdateKeyCategoryInDatabase(key, newCategory);
+            CacheDataSO.UpdateKeyCategory(key, newCategory);
 
-            Log(DICTIONARY_LABEL, CustomDebugPlugin.Colors.Blue, string.Format(DICTIONARY_KEY_CATEGORY_CHANGED_LOG, key, newCategory));
+            Log(DICTIONARY_LABEL, Colors.Blue, string.Format(DICTIONARY_KEY_CATEGORY_CHANGED_LOG, key, newCategory));
         }
 
         public static void RemoveKey(string key)
         {
             // Update database
-            CacheData.RemoveKeyFromDatabase(key);
+            CacheDataSO.RemoveKey(key);
 
             UpdateAddonsOnKeyRemoved(key);
         }
@@ -233,7 +233,7 @@ namespace LocalizationTool.Scripts.General
         public static void EmptyLanguage(string language)
         {
             // Empty language in database
-            CacheData.EmptyLanguageFromDatabase(language);
+            CacheDataSO.EmptyLanguage(language);
         }
 
         public static void ChangeLanguageValue(string oldLanguageName, string newLanguageName)
@@ -691,13 +691,13 @@ namespace LocalizationTool.Scripts.General
                 {
                     if (!ContainsCategory(category)) AddNewCategory(category.IsEmpty() ? CacheDataSO.DefaultCategory : category, null, false);
 
-                    CacheData.UpdateKeyCategoryInDatabase(keyToImport, category);
+                    CacheDataSO.UpdateKeyCategory(keyToImport, category);
                 }
 
                 //Update values
                 foreach (var (language, translation) in values)
                 {
-                    CacheData.UpdateKeyTranslationInDatabase(keyToImport, translation, language);
+                    CacheDataSO.SetKeyTranslation(keyToImport, translation, language);
                 }
             }
             else
@@ -708,7 +708,7 @@ namespace LocalizationTool.Scripts.General
                 CacheDataSO.InsertKey(keyToImport, category);
                 foreach (var (language, translation) in values)
                 {
-                    CacheData.UpdateKeyTranslationInDatabase(keyToImport, translation, language);
+                    CacheDataSO.SetKeyTranslation(keyToImport, translation, language);
                 }
             }
 
@@ -730,11 +730,11 @@ namespace LocalizationTool.Scripts.General
                 if (CacheDataSO.localizationData.KeysDictionary[keyToImport].category.categoryName != category)
                 {
                     //Change category
-                    CacheData.UpdateKeyCategoryInDatabase(keyToImport, category);
+                    CacheDataSO.UpdateKeyCategory(keyToImport, category);
                 }
 
                 //Update value
-                CacheData.UpdateKeyTranslationInDatabase(keyToImport, translation, language);
+                CacheDataSO.SetKeyTranslation(keyToImport, translation, language);
             }
             else
             {
@@ -742,7 +742,7 @@ namespace LocalizationTool.Scripts.General
                 if (!ContainsCategory(category)) AddNewCategory(category.IsEmpty() ? CacheDataSO.DefaultCategory : category, null, false);
 
                 CacheDataSO.InsertKey(keyToImport, category);
-                CacheData.UpdateKeyTranslationInDatabase(keyToImport, translation, language);
+                CacheDataSO.SetKeyTranslation(keyToImport, translation, language);
             }
 
             //Update cache

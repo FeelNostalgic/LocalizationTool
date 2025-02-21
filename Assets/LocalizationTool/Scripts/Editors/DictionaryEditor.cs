@@ -10,6 +10,7 @@ using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.Data.ScriptableObjects;
 using LocalizationTool.Scripts.General;
 using UnityEditor;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 
@@ -462,7 +463,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private void UpdateValue(string key, string tempValue)
         {
-            if (tempValue.Equals(_currentKeyValueDictionary[key])) return;
+            if (tempValue.IsNull() || tempValue.Equals(_currentKeyValueDictionary[key])) return;
 
             _currentKeyValueDictionary[key] = tempValue;
             LocalizationManager.ChangeValue(key, tempValue);
