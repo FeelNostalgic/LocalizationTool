@@ -94,7 +94,7 @@ namespace LocalizationTool.Scripts.Editors
         protected void OnGUI()
         {
             if (!hasFocus) return;
-            if (!CacheData.IsDataLoaded) return;
+            if (!CacheDataSO.IsDataLoaded) return;
             WindowToolbar();
             _currentEditorWindow?.ShowLayout();
         }
@@ -157,8 +157,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private static void LoadData()
         {
-            CacheData.Instance.InitForEditor();
-            CacheDataSO.Instance.InitForEditor();
+            CacheDataSO.InitForEditor();
         }
 
         #endregion

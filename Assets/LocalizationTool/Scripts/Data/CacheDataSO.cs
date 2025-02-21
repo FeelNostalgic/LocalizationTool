@@ -15,7 +15,7 @@ namespace LocalizationTool.Scripts.Data
     {
         #region PUBLIC VARIABLES
 
-        public static CacheDataSO Instance => _instance ??= new CacheDataSO();
+        //public static CacheDataSO Instance => _instance ??= new CacheDataSO();
         public static bool IsDataLoaded { get; private set; }
 
         public static List<LanguageDataSO> LanguageCache { get; private set; }
@@ -26,7 +26,7 @@ namespace LocalizationTool.Scripts.Data
         public static List<string> Categories => CategoryCache.Select(x => x.categoryName).ToList();
         public static string DefaultCategory => CategoryCache.FirstOrDefault(x => x.isDefault)?.categoryName;
 
-        public Action OnLocalizationToolDataInitialized { get; set; }
+        public static Action OnLocalizationToolDataInitialized { get; set; }
 
         #endregion
 
@@ -45,7 +45,7 @@ namespace LocalizationTool.Scripts.Data
 
         #region LOAD CACHE
 
-        public void InitForEditor(Action onComplete = null)
+        public static void InitForEditor(Action onComplete = null)
         {
             if (IsDataLoaded) return;
 
@@ -55,7 +55,7 @@ namespace LocalizationTool.Scripts.Data
             onComplete?.Invoke();
         }
 
-        private static void LoadCacheData()
+        public static void LoadCacheData()
         {
             UpdateLanguageCache();
 
@@ -67,7 +67,7 @@ namespace LocalizationTool.Scripts.Data
 
             if (LocalizationToolAPI.Instance.IsNotNull()) LocalizationToolAPI.ActiveLanguage = DefaultLanguage;
 
-            Instance.OnLocalizationToolDataInitialized?.Invoke();
+            OnLocalizationToolDataInitialized?.Invoke();
         }
 
         public static void LoadLanguagesCache()
@@ -92,6 +92,11 @@ namespace LocalizationTool.Scripts.Data
 #if UNITY_EDITOR
             LocalizationManager.CurrentLanguageInDictionarySection = DefaultLanguage;
 #endif
+        }
+
+        public static void ClearData()
+        {
+            // TODO
         }
 
         #endregion

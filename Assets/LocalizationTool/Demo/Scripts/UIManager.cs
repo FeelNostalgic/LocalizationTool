@@ -47,12 +47,12 @@ namespace UIManager
         {
             mainMenuGroup.SetActive(true);
             optionsGroup.SetActive(false);
-            CacheData.Instance.OnLocalizationToolDataInitialized += ToolInitialized;
+            CacheDataSO.OnLocalizationToolDataInitialized += ToolInitialized;
         }
 
         private void OnDisable()
         {
-            CacheData.Instance.OnLocalizationToolDataInitialized -= ToolInitialized;
+            CacheDataSO.OnLocalizationToolDataInitialized -= ToolInitialized;
 
             LoadBackupData();
         }
@@ -82,7 +82,7 @@ namespace UIManager
             SaveLoadFileManager.SaveFile(BACKUP_PATH, LocalizationManager.BuildSerializedData(new UnityJsonSerializer()));
             Debug.Log("Data saved to backup");
 
-            CacheData.ClearData();
+            CacheDataSO.ClearData();
             LoadDemoData();
         }
 
@@ -109,7 +109,7 @@ namespace UIManager
 
         private static void LoadBackupData()
         {
-            CacheData.ClearData();
+            CacheDataSO.ClearData();
 
             var currentLogValue = LocalizationManager.Configuration.showLogsInConsole;
             LocalizationManager.Configuration.showLogsInConsole = false;

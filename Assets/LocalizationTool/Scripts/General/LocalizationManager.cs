@@ -20,7 +20,6 @@ using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.Data.TemplatesForSerializer;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 using static LocalizationTool.Scripts.Commons.EditorPaths;
-using static LocalizationTool.Database.DatabaseStrings;
 using Colors = CustomDebugPlugin.Colors;
 
 namespace LocalizationTool.Scripts.General

@@ -38,7 +38,7 @@ namespace LocalizationTool.Scripts.API
             
             FindAllAddons();
             
-            CacheData.Instance.OnLocalizationToolDataInitialized += delegate
+            CacheDataSO.OnLocalizationToolDataInitialized += delegate
             {
 #if UNITY_EDITOR
                 LocalizationManager.Log("Localization Tool API", Colors.Pink, "Initialized");
@@ -49,7 +49,7 @@ namespace LocalizationTool.Scripts.API
 
         private void Start()
         {
-            CacheData.LoadCacheData();
+            CacheDataSO.LoadCacheData();
         }
 
         #endregion
@@ -65,7 +65,7 @@ namespace LocalizationTool.Scripts.API
         public static string GetValueByKey(string key, out bool found)
         {
             found = false;
-            if (!CacheData.IsDataLoaded) return "";
+            if (!CacheDataSO.IsDataLoaded) return "";
             if (key.IsNull()) return "";
 
             found = CacheDataSO.localizationData.KeysDictionary.ContainsKey(key);
