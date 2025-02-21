@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa3b9213c4f2fcc489b7efa1580dcdeb, type: 3}
   m_Name: English
   m_EditorClassIdentifier: 
-  languageName: 
-  displayOrder: 0
-  isDefault: 0
+  languageName: English
+  displayOrder: 1
+  isDefault: 1
   translationKeys: []

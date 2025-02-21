@@ -252,7 +252,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(DownIcon, string.Format(MOVE_DOWN_BUTTON_TOOLTIP, languageName)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
-                if (!LocalizationManager.IsDefaultLanguage(languageName) && CacheData.LanguageCache.Count >= index + 1) UpdateIndex(languageName, index, index + 1);
+                if (!LocalizationManager.IsDefaultLanguage(languageName) && CacheDataSO.LanguageCache.Count >= index + 1) UpdateIndex(languageName, index, index + 1);
             }
 
             GUILayout.EndVertical();
@@ -403,7 +403,7 @@ namespace LocalizationTool.Scripts.Editors
                 return;
             }
 
-            if (CacheData.Languages.Contains(newLanguage))
+            if (CacheDataSO.Languages.Contains(newLanguage))
             {
                 ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldLanguage] = s; }, string.Format(LANGUAGE_EXIST_FEEDBACK_LABEL, newLanguage), delegate { _feedbackList.Remove(oldLanguage); });
                 return;

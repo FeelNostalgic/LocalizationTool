@@ -34,7 +34,7 @@ namespace LocalizationTool.Scripts.General
         public static ConfigurationData Configuration => _configurationData ?? new ConfigurationData();
 
         public static string CurrentLanguageInDictionarySection { get; set; }
-        public static int CurrentToolbarLanguageIndex => CacheData.Languages.IndexOf(CurrentLanguageInDictionarySection);
+        public static int CurrentToolbarLanguageIndex => CacheDataSO.Languages.IndexOf(CurrentLanguageInDictionarySection);
 
         #region Actions
 
@@ -330,10 +330,7 @@ namespace LocalizationTool.Scripts.General
             if (CurrentLanguageInDictionarySection.Equals(oldLanguageName)) CurrentLanguageInDictionarySection = newLanguageName;
 
             // Update database
-            CacheData.UpdateLanguageNameInDatabase(oldLanguageName, newLanguageName);
-
-            // Update cache 
-            CacheData.UpdateLanguageCache();
+            CacheDataSO.UpdateLanguageName(oldLanguageName, newLanguageName);
 
             //Log($"Language '{oldLanguageName}' update to '{newLanguageName}' correctly");
         }
@@ -349,15 +346,12 @@ namespace LocalizationTool.Scripts.General
             if (newIndex <= 1) return;
             if (oldIndex == newIndex) return; //the new index is the same
 
+            newIndex = Math.Clamp(newIndex, 1, CacheDataSO.LanguageCache.Count);
+            
             // Update database
-            CacheData.UpdateLanguageDisplayOrderInDatabase(languageName, oldIndex, newIndex);
-
-            // Update cache 
-            CacheData.UpdateLanguageCache();
-
+            CacheDataSO.UpdateLanguageDisplayOrder(languageName, oldIndex, newIndex);
+            
             Log(LANGUAGES_LABEL, Colors.Purple, string.Format(LANGUAGE_INDEX_CHANGED_LOG, languageName, newIndex));
-
-            //GUI.FocusControl(null);
         }
 
         public static bool IsDefaultLanguage(string language)
@@ -438,6 +432,8 @@ namespace LocalizationTool.Scripts.General
             if (newIndex <= 1) return;
             if (oldIndex == newIndex) return; //the new index is the same
 
+            newIndex = Math.Clamp(newIndex, 1, CacheDataSO.CategoryCache.Count);
+            
             // Update database
             CacheDataSO.UpdateCategoryDisplayOrder(categoryName, oldIndex, newIndex);
 
@@ -530,12 +526,12 @@ namespace LocalizationTool.Scripts.General
             var serializer = new CSV_Serializer();
             serializer.SetSeparator(separator);
 
-            serializer.AddTitle(CacheData.Languages);
+            serializer.AddTitle(CacheDataSO.Languages);
 
             var languageDictionary = new Dictionary<string, int>();
-            for (var i = 0; i < CacheData.LanguageCache.Count; i++)
+            for (var i = 0; i < CacheDataSO.LanguageCache.Count; i++)
             {
-                languageDictionary.Add(CacheData.Languages[i], i);
+                languageDictionary.Add(CacheDataSO.Languages[i], i);
             }
 
             var data = new Dictionary<string, CacheData.KeyData>(CacheData.DictionaryCache);
@@ -572,7 +568,7 @@ namespace LocalizationTool.Scripts.General
             {
                 var category = keyData.Category;
                 var languageValues = keyData.TranslationData.Select(item => new DictionaryTemplate.LanguageValue { Language = item.Key, Value = item.Value }).ToList()
-                    .OrderBy(x => CacheData.LanguageCache.First(y => y.Language.Equals(x.Language)).DisplayOrder).ToList();
+                    .OrderBy(x => CacheDataSO.LanguageCache.First(y => y.languageName.Equals(x.Language)).displayOrder).ToList();
                 dataToSerialize.DictionaryKeyCategoryLanguages.Add(new DictionaryTemplate.KeyCategoryLanguageValues
                 {
                     Key = key,
@@ -763,10 +759,7 @@ namespace LocalizationTool.Scripts.General
             // Add category to Database
             CacheDataSO.InsertLanguage(languageToImport);
 
-            // Update cache 
-            CacheData.UpdateLanguageCache();
-
-            if (CacheData.LanguageCache.Count() == 1)
+            if (CacheDataSO.LanguageCache.Count() == 1)
             {
                 ChangeDefaultLanguage(languageToImport);
                 CurrentLanguageInDictionarySection = languageToImport;

@@ -193,13 +193,13 @@ namespace LocalizationTool.Scripts.Editors
                 GUILayout.Space(10);
                 GUILayout.BeginHorizontal();
                 _scrollToolbar = EditorGUILayout.BeginScrollView(_scrollToolbar, GUILayout.Height(40));
-                var toolbarItems = CacheData.Languages.Select(t => t).ToArray();
+                var toolbarItems = CacheDataSO.Languages.Select(t => t).ToArray();
                 if (toolbarItems.Length != 0)
                 {
                     _currentLanguageToolbarIndex = GUILayout.Toolbar(LocalizationManager.CurrentToolbarLanguageIndex, toolbarItems);
-                    if (LocalizationManager.CurrentLanguageInDictionarySection != CacheData.Languages[_currentLanguageToolbarIndex])
+                    if (LocalizationManager.CurrentLanguageInDictionarySection != CacheDataSO.Languages[_currentLanguageToolbarIndex])
                     {
-                        LocalizationManager.CurrentLanguageInDictionarySection = CacheData.Languages[_currentLanguageToolbarIndex];
+                        LocalizationManager.CurrentLanguageInDictionarySection = CacheDataSO.Languages[_currentLanguageToolbarIndex];
                         GUI.FocusControl(null);
                     }
                 }

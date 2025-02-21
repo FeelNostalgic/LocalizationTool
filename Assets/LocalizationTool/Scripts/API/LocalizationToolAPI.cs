@@ -83,7 +83,7 @@ namespace LocalizationTool.Scripts.API
         /// <returns>The value of the key. Empty value if key was not found</returns>
         public static string GetValueByKeyAndLanguage(string key, string language, out bool found)
         {
-            if (!CacheData.Languages.Contains(language))
+            if (!CacheDataSO.Languages.Contains(language))
             {
                 found = false;
                 return "";
@@ -102,7 +102,7 @@ namespace LocalizationTool.Scripts.API
         /// <returns>Return true if newLanguage exist, otherwise return false</returns>
         public static bool ChangeLanguage(string newLanguage)
         {
-            if (!CacheData.Languages.Contains(newLanguage)) return false;
+            if (!CacheDataSO.Languages.Contains(newLanguage)) return false;
             ActiveLanguage = newLanguage;
             UpdateAllAddons(newLanguage);
             return true;
@@ -114,7 +114,7 @@ namespace LocalizationTool.Scripts.API
         /// <returns>List of all languages</returns>
         public static List<string> GetAvailableLanguages()
         {
-            return CacheData.Languages;
+            return CacheDataSO.Languages;
         }
 
         /// <summary>

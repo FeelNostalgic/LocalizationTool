@@ -21,11 +21,7 @@ namespace LocalizationTool.Scripts.Data
         public static CacheData Instance => _instance ??= new CacheData();
 
         public static bool IsDataLoaded { get; private set; }
-
-        public static List<LanguageTuple> LanguageCache { get; set; }
-        public static List<string> Languages => LanguageCache.Select(x => x.Language).ToList();
-        public static string DefaultLanguage { get; set; }
-
+        
         public static Dictionary<string, KeyData> DictionaryCache { get; set; }
         public static List<string> Keys => DictionaryCache.Select(x => x.Key).ToList();
 
@@ -61,7 +57,6 @@ namespace LocalizationTool.Scripts.Data
         public static void LoadCacheData()
         {
             LoadDictionaryCacheFromDatabase();
-            LoadLanguagesCacheFromDatabase();
             IsDataLoaded = true;
             CustomDebug.Log("Database", Colors.Red, "Loaded");
             Instance.OnLocalizationToolDataInitialized?.Invoke();
@@ -70,17 +65,6 @@ namespace LocalizationTool.Scripts.Data
         public static void LoadDictionaryCacheFromDatabase()
         {
             DictionaryCache = GetKeysTranslationFromDatabase();
-        }
-
-        public static void LoadLanguagesCacheFromDatabase()
-        {
-            LanguageCache = GetLanguagesOrderedFromDatabase();
-
-            DefaultLanguage = GetDefaultLanguageFromDatabase();
-#if UNITY_EDITOR
-            LocalizationManager.CurrentLanguageInDictionarySection = DefaultLanguage;
-#endif
-            if (LocalizationToolAPI.Instance.IsNotNull()) LocalizationToolAPI.ActiveLanguage = DefaultLanguage;
         }
         
         #endregion
@@ -162,20 +146,13 @@ namespace LocalizationTool.Scripts.Data
             DeleteDatabase();
 
             DictionaryCache.Clear();
-
-            LanguageCache.Clear();
         }
 
         public static void UpdateDictionaryCache()
         {
             DictionaryCache = GetKeysTranslationFromDatabase();
         }
-
-        public static void UpdateLanguageCache()
-        {
-            LanguageCache = GetLanguagesOrderedFromDatabase();
-        }
-
+        
         #endregion
 
         #region KEYS
@@ -400,111 +377,7 @@ namespace LocalizationTool.Scripts.Data
                 CloseDatabaseConnection();
             }
         }
-
-        public static void UpdateLanguageNameInDatabase(string oldLanguageName, string newLanguageName)
-        {
-            try
-            {
-                OpenDatabaseConnection();
-                var query = $"update {LANGUAGE_TABLE} set language = '{newLanguageName}' where language = '{oldLanguageName}'";
-                ExecuteNonQueryCommand(query);
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            finally
-            {
-                CloseDatabaseConnection();
-            }
-        }
         
-        public static void UpdateLanguageDisplayOrderInDatabase(string languageName, int oldLanguageDisplayOrder, int newLanguageDisplayOrder)
-        {
-            try
-            {
-                OpenDatabaseConnection();
-                string query;
-                if (oldLanguageDisplayOrder < newLanguageDisplayOrder)
-                {
-                    // Scroll down elements between oldIndex and newIndex
-                    query = $"update {LANGUAGE_TABLE} set displayOrder = displayOrder - 1 where displayOrder > {oldLanguageDisplayOrder} and displayOrder <= {newLanguageDisplayOrder}";
-                    ExecuteNonQueryCommand(query);
-                }
-                else if (oldLanguageDisplayOrder > newLanguageDisplayOrder)
-                {
-                    // Scroll up elements between oldIndex and newIndex
-                    query = $"update {LANGUAGE_TABLE} set displayOrder = displayOrder + 1 where displayOrder >= {newLanguageDisplayOrder} and displayOrder < {oldLanguageDisplayOrder}";
-                    ExecuteNonQueryCommand(query);
-                }
-
-                query = $"update {LANGUAGE_TABLE} set displayOrder = '{newLanguageDisplayOrder}' where language = '{languageName}'";
-                ExecuteNonQueryCommand(query);
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            finally
-            {
-                CloseDatabaseConnection();
-            }
-        }
-
-        public static string GetDefaultLanguageFromDatabase()
-        {
-            var defaultCategory = "";
-            try
-            {
-                OpenDatabaseConnection();
-
-
-                var query = $"SELECT language FROM {LANGUAGE_TABLE} where isDefault = 1";
-                var reader = ExecuteReaderCommand(query);
-                defaultCategory = reader["language"].ToString();
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            finally
-            {
-                CloseDatabaseConnection();
-            }
-
-            return defaultCategory;
-        }
-
-        public static List<LanguageTuple> GetLanguagesOrderedFromDatabase()
-        {
-            var result = new List<LanguageTuple>();
-            try
-            {
-                OpenDatabaseConnection();
-                var query = $"SELECT displayOrder, language FROM {LANGUAGE_TABLE} order by displayOrder ASC";
-                var reader = ExecuteReaderCommand(query);
-
-                while (reader.Read())
-                {
-                    result.Add(new LanguageTuple
-                    {
-                        Language = reader["language"].ToString(),
-                        DisplayOrder = Convert.ToInt32(reader["displayOrder"])
-                    });
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            finally
-            {
-                CloseDatabaseConnection();
-            }
-
-            return result;
-        }
-
         #endregion
 
         #region CATEGORY

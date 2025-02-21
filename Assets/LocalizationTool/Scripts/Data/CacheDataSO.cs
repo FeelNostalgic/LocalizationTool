@@ -61,6 +61,12 @@ namespace LocalizationTool.Scripts.Data
 
             UpdateCategoriesCache();
 
+#if UNITY_EDITOR
+            LocalizationManager.CurrentLanguageInDictionarySection = DefaultLanguage;
+#endif
+            
+            if (LocalizationToolAPI.Instance.IsNotNull()) LocalizationToolAPI.ActiveLanguage = DefaultLanguage;
+            
             Instance.OnLocalizationToolDataInitialized?.Invoke();
         }
 
@@ -161,6 +167,45 @@ namespace LocalizationTool.Scripts.Data
             SaveChanges();
         }
 
+        public static void UpdateLanguageDisplayOrder(string languageName, int oldDisplayOrder, int newDisplayOrder)
+        {
+            // Find the category to update
+            var languageToUpdate = _localizationData.languages.FirstOrDefault(l => l.languageName.Equals(languageName));
+
+            // Reorder categories
+            if (oldDisplayOrder < newDisplayOrder)
+            {
+                // Scroll down elements between oldIndex and newIndex
+                foreach (var language in _localizationData.languages.Where(language => language.displayOrder > oldDisplayOrder && language.displayOrder <= newDisplayOrder))
+                {
+                    language.displayOrder--; // Shift down
+                }
+            }
+            else if (oldDisplayOrder > newDisplayOrder)
+            {
+                // Scroll up elements between oldIndex and newIndex
+                foreach (var language in _localizationData.languages.Where(language => language.displayOrder >= newDisplayOrder && language.displayOrder < oldDisplayOrder))
+                {
+                    language.displayOrder++; // Shift up
+                }
+            }
+
+            // Update the target's display order
+            languageToUpdate!.displayOrder = newDisplayOrder;
+
+            UpdateLanguageCache();
+            SaveChanges();
+        }
+
+        public static void UpdateLanguageName(string oldLanguageName, string newLanguageName)
+        {
+            var languageToUpdate = _localizationData.languages.FirstOrDefault(l => l.languageName == oldLanguageName);
+            AssetDatabase.RenameAsset(GetPath(languageToUpdate), newLanguageName);
+            languageToUpdate!.languageName = newLanguageName;
+
+            SaveChanges();
+        }
+
         #endregion
 
         #region CATEGORIES
@@ -232,7 +277,6 @@ namespace LocalizationTool.Scripts.Data
         {
             // Find the category to update
             var categoryToUpdate = _localizationData.categories.FirstOrDefault(c => c.categoryName == categoryName);
-            newCategoryDisplayOrder = Math.Clamp(newCategoryDisplayOrder, 1, _localizationData.categories.Count);
 
             // Reorder categories
             if (oldCategoryDisplayOrder < newCategoryDisplayOrder)
