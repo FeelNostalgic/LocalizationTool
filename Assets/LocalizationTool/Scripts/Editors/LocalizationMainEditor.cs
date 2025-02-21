@@ -157,7 +157,6 @@ namespace LocalizationTool.Scripts.Editors
 
         private static void LoadData()
         {
-            LocalizationManager.CreateDatabase();
             CacheData.Instance.InitForEditor();
             CacheDataSO.Instance.InitForEditor();
         }

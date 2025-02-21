@@ -30,7 +30,7 @@ namespace LocalizationTool.Scripts.Editors
         #region PRIVATE VARIABLES
 
         private string _language;
-        
+
         private Enums.ExportImportMethods _exportMethod;
         private Enums.ExportImportMethods _importMethod;
 
@@ -68,7 +68,7 @@ namespace LocalizationTool.Scripts.Editors
 
             ShowHeader2(IMPORT_LABEL_UPPER);
             ShowImportSection();
-            
+
             GUILayout.EndVertical();
         }
 
@@ -98,6 +98,7 @@ namespace LocalizationTool.Scripts.Editors
                             SaveFile(path, fileContent);
                         }
                     }
+
                     GUILayout.Space(8);
                     GUILayout.EndHorizontal();
                     GUILayout.Space(3);
@@ -108,7 +109,7 @@ namespace LocalizationTool.Scripts.Editors
                     var style = new GUIStyle(GUI.skin.label) { wordWrap = true, };
                     GUILayout.Label(CSV_WARNING_LABEL, style);
                     GUILayout.EndHorizontal();
-                    
+
                     break;
                 case Enums.ExportImportMethods.JSON:
                     GUILayout.FlexibleSpace();
@@ -122,6 +123,7 @@ namespace LocalizationTool.Scripts.Editors
                             SaveFile(path, fileContent);
                         }
                     }
+
                     GUILayout.Space(8);
                     GUILayout.EndHorizontal();
 
@@ -139,6 +141,7 @@ namespace LocalizationTool.Scripts.Editors
                             SaveFile(path, fileContent);
                         }
                     }
+
                     GUILayout.Space(8);
                     GUILayout.EndHorizontal();
 
@@ -146,6 +149,7 @@ namespace LocalizationTool.Scripts.Editors
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
             GUILayout.EndVertical();
         }
 
@@ -179,7 +183,7 @@ namespace LocalizationTool.Scripts.Editors
                         {
                             var progressWindow = ImportProgressWindow.OpenWindow(string.Format(IMPORT_WINDOW_LANGUAGE_LABEL, _language, CSV_LABEL_UPPER));
                             EditorCoroutineUtility.StartCoroutine(ImportCSV(path, progressWindow), progressWindow);
-                            
+
                             Close();
                         }
                     }
@@ -196,11 +200,11 @@ namespace LocalizationTool.Scripts.Editors
                             var progressWindow = ImportProgressWindow.OpenWindow(string.Format(IMPORT_WINDOW_LANGUAGE_LABEL, _language, JSON_LABEL_UPPER));
 
                             EditorCoroutineUtility.StartCoroutine(ImportSerializedData(path, _jsonSerializer, progressWindow), progressWindow);
-                           
+
                             Close();
                         }
                     }
-                    
+
                     break;
                 case Enums.ExportImportMethods.XML:
                     GUILayout.FlexibleSpace();
@@ -213,7 +217,7 @@ namespace LocalizationTool.Scripts.Editors
                             var progressWindow = ImportProgressWindow.OpenWindow(string.Format(IMPORT_WINDOW_LANGUAGE_LABEL, _language, XML_LABEL_UPPER));
 
                             EditorCoroutineUtility.StartCoroutine(ImportSerializedData(path, _xmlSerializer, progressWindow), progressWindow);
-                            
+
                             Close();
                         }
                     }
@@ -234,11 +238,13 @@ namespace LocalizationTool.Scripts.Editors
         {
             var serializer = new CSV_Serializer();
             serializer.SetSeparator(CsvSeparators[_selectedCsvSeparatorIndexForExport]);
-            
+
             serializer.AddTitle(_language);
-            
+
+            //TODO
+            /*
             var data = new Dictionary<string, CacheData.KeyData>(CacheData.DictionaryCache);
-            
+
             foreach (var (key, keyData) in data)
             {
                 var items = new List<string>();
@@ -250,6 +256,7 @@ namespace LocalizationTool.Scripts.Editors
 
                 serializer.AddLine(items);
             }
+            */
 
             return serializer.File();
         }
@@ -261,6 +268,8 @@ namespace LocalizationTool.Scripts.Editors
                 Language = _language
             };
 
+            // TODO
+            /*
             var data = new Dictionary<string, CacheData.KeyData>(CacheData.DictionaryCache);
             foreach (var (key, keyData) in data)
             {
@@ -272,7 +281,8 @@ namespace LocalizationTool.Scripts.Editors
                     Value = data[key].TranslationData[_language]
                 });
             }
-
+            */
+            
             return serializer.Serialize(dataToSerialize);
         }
 
@@ -290,7 +300,7 @@ namespace LocalizationTool.Scripts.Editors
             var header = reader.ReadLine();
             Debug.Assert(header != null, nameof(header) + " != null");
             bytesRead += header.Length + Environment.NewLine.Length;
-            progressWindow.SetProgress( (float)bytesRead / totalBytes);
+            progressWindow.SetProgress((float)bytesRead / totalBytes);
             var separator = CsvSeparators[_selectedCsvSeparatorIndexForImport];
             var headerItems = header.Split(separator);
 
@@ -298,9 +308,9 @@ namespace LocalizationTool.Scripts.Editors
             {
                 var sbResultError = new StringBuilder();
                 sbResultError.AppendLine("Error while importing CSV");
-                sbResultError.AppendLine( $"Separator [ {separator} ] not found");
+                sbResultError.AppendLine($"Separator [ {separator} ] not found");
                 progressWindow.Complete(sbResultError.ToString());
-                
+
                 yield break;
             }
 
@@ -320,13 +330,13 @@ namespace LocalizationTool.Scripts.Editors
 
                 nKeys++;
                 if (!LocalizationManager.ContainsCategory(category)) nCategories++;
-                
+
                 LocalizationManager.ImportKey(key, category, _language, value);
 
-                progressWindow.SetProgress( (float)bytesRead / totalBytes);
+                progressWindow.SetProgress((float)bytesRead / totalBytes);
                 progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_KEY_CATEGORY, key, category));
             }
-            
+
             var sb = new StringBuilder();
             sb.AppendLine(IMPORT_RESULT_SUCCESS);
             sb.AppendLine(string.Format(IMPORT_CATEGORIES_RESULT, nCategories));
@@ -337,14 +347,14 @@ namespace LocalizationTool.Scripts.Editors
 
         private IEnumerator ImportSerializedData(string path, ISerializerService serializer, ImportProgressWindow progressWindow)
         {
-            var loadFileTask =  SaveLoadFileManager.LoadFile<LanguageTemplate>(path, serializer);
+            var loadFileTask = SaveLoadFileManager.LoadFile<LanguageTemplate>(path, serializer);
             var awaiter = loadFileTask.GetAwaiter();
             while (!awaiter.IsCompleted) yield return null;
             var data = awaiter.GetResult();
-            
+
             var totalItems = data.Data.Count;
             var itemCount = 0f;
-            
+
 
             LocalizationManager.ImportLanguage(data.Language);
 
@@ -357,11 +367,11 @@ namespace LocalizationTool.Scripts.Editors
                 if (!LocalizationManager.ContainsCategory(keyCategoryLanguage.Category)) nCategories++;
 
                 LocalizationManager.ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, _language, keyCategoryLanguage.Value);
-                
+
                 progressWindow.SetProgress(itemCount++ / totalItems);
                 progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_KEY_CATEGORY, keyCategoryLanguage.Key, keyCategoryLanguage.Category));
             }
-            
+
             var sb = new StringBuilder();
             sb.AppendLine(IMPORT_RESULT_SUCCESS);
             sb.AppendLine(string.Format(IMPORT_CATEGORIES_RESULT, nCategories));

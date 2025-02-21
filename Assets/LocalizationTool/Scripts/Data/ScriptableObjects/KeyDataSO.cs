@@ -1,13 +1,13 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace LocalizationTool.Scripts.Data.ScriptableObjects
 { 
 	[Serializable]
-	public class TranslationKeyDataSO : ScriptableObject
+	public class KeyDataSO : ScriptableObject
 	{
 		public string keyName;
-		public string translationText;
+		public CategoryDataSO category;
+		public int displayOrder;
 	}
 }

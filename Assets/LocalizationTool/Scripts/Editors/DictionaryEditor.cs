@@ -7,6 +7,7 @@ using LocalizationTool.Data;
 using LocalizationTool.Scripts.API;
 using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.Data;
+using LocalizationTool.Scripts.Data.ScriptableObjects;
 using LocalizationTool.Scripts.General;
 using UnityEditor;
 using UnityEngine;
@@ -283,31 +284,36 @@ namespace LocalizationTool.Scripts.Editors
             {
                 _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
                 var filteredDicToIterate = GetFilteredDictionary().ToList();
-                
-                var firstVisibleIndex = Mathf.FloorToInt(_scrollCenter.y / 40);
-                var visibleItemsCount = Mathf.FloorToInt(EditorGUIUtility.currentViewWidth / 40);
-                var lastVisibleIndex = Mathf.Min(firstVisibleIndex + visibleItemsCount, filteredDicToIterate.Count - 1);
 
-                GUILayout.Space(firstVisibleIndex * 40);
-
-                for (var i = firstVisibleIndex; i <= lastVisibleIndex; i++)
+                if (filteredDicToIterate.Count > 0)
                 {
-                    UnitCenterScrollViewContent(filteredDicToIterate[i].Key, filteredDicToIterate[i].Value.Category, filteredDicToIterate[i].Value.TranslationData[LocalizationManager.CurrentLanguageInDictionarySection]);
-                }
+                    var firstVisibleIndex = Mathf.FloorToInt(_scrollCenter.y / 40);
+                    var visibleItemsCount = Mathf.FloorToInt(EditorGUIUtility.currentViewWidth / 40);
+                    var lastVisibleIndex = Mathf.Min(firstVisibleIndex + visibleItemsCount, filteredDicToIterate.Count - 1);
 
-                GUILayout.Space(Mathf.Clamp((filteredDicToIterate.Count - lastVisibleIndex - 1) * 40f,0f,filteredDicToIterate.Count * 40f + 40f)); 
+                    GUILayout.Space(firstVisibleIndex * 40);
+
+                    for (var i = firstVisibleIndex; i <= lastVisibleIndex; i++)
+                    {
+                        UnitCenterScrollViewContent(filteredDicToIterate[i].Key, CacheDataSO.localizationData.KeysDictionary[filteredDicToIterate[i].Key].category.categoryName,
+                            filteredDicToIterate[i].Value.translationText);
+                    }
+
+                    GUILayout.Space(Mathf.Clamp((filteredDicToIterate.Count - lastVisibleIndex - 1) * 40f,0f,filteredDicToIterate.Count * 40f + 40f)); 
+                }
                 
                 EditorGUILayout.EndScrollView();
             }
-            catch
+            catch(Exception e)
             {
                 // ignored
+                Debug.LogError(e);
             }
         }
 
-        private Dictionary<string, CacheData.KeyData> GetFilteredDictionary()
+        private Dictionary<string, TranslationKeyDataSO> GetFilteredDictionary()
         {
-            var filteredDicToIterate = new Dictionary<string, CacheData.KeyData>(CacheData.DictionaryCache);
+            var filteredDicToIterate = new Dictionary<string, TranslationKeyDataSO>(CacheDataSO.localizationData.LanguagesDictionary[LocalizationManager.CurrentLanguageInDictionarySection].TranslationDictionary);
 
             switch (LocalizationManager.Configuration.searchTypeIndex)
             {
@@ -331,7 +337,7 @@ namespace LocalizationTool.Scripts.Editors
             }
 
             if (_searchCategoryIndex != 0)
-                filteredDicToIterate = filteredDicToIterate.Where(pair => pair.Value.Category == CacheDataSO.Categories[_searchCategoryIndex])
+                filteredDicToIterate = filteredDicToIterate.Where(pair => CacheDataSO.localizationData.KeysDictionary[pair.Key].category.categoryName == CacheDataSO.Categories[_searchCategoryIndex])
                     .ToDictionary(kv => (kv.Key), kv => kv.Value);
 
             return filteredDicToIterate;

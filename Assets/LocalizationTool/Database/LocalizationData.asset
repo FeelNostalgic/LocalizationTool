@@ -13,10 +13,8 @@ MonoBehaviour:
   m_Name: LocalizationData
   m_EditorClassIdentifier: 
   languages:
-  - {fileID: 11400000, guid: 959826c157e8a8b4e84479858c2a5941, type: 2}
-  - {fileID: 11400000, guid: 64279d867b67ed54e8828183ef9b1283, type: 2}
   - {fileID: 11400000, guid: cf90eda9e13e808448c30fa0a4f5c76a, type: 2}
   categories:
   - {fileID: 11400000, guid: 3e22f37a2c655a048b76d221c5d31f2d, type: 2}
-  - {fileID: 11400000, guid: 00dd2505879b6ec418e714a9e39252c8, type: 2}
-  - {fileID: 11400000, guid: 6cc4b9d1ea19a634b837d517e5dfa2e7, type: 2}
+  keys:
+  - {fileID: 11400000, guid: cb229497d3f9b0c49b2129a305730001, type: 2}

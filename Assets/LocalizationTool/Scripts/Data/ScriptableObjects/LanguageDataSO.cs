@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using LocalizationTool.Scripts.Commons;
 using UnityEngine;
 
 namespace LocalizationTool.Scripts.Data.ScriptableObjects
@@ -12,27 +13,26 @@ namespace LocalizationTool.Scripts.Data.ScriptableObjects
         public int displayOrder;
         public bool isDefault;
 
-        public List<TranslationKeyDataSO> translationKeys = new List<TranslationKeyDataSO>();
-        public List<TranslationKeyDataSO> translationsOrdered => translationKeys.OrderBy(x => x.displayOrder).ToList();
+        public List<TranslationKeyDataSO> translationKeys = new();
 
-        private Dictionary<string, TranslationKeyDataSO> cacheDictionary;
+        private Dictionary<string, TranslationKeyDataSO> _cacheDictionary = new();
 
-        public Dictionary<string, TranslationKeyDataSO> translationDictionary
+        public Dictionary<string, TranslationKeyDataSO> TranslationDictionary
         {
             get
             {
-                if (cacheDictionary == null)
+                if (_cacheDictionary.IsNotNull() || translationKeys.Count != _cacheDictionary.Count)
                 {
                     BuildDictionary();
                 }
 
-                return cacheDictionary;
+                return _cacheDictionary;
             }
         }
 
         private void BuildDictionary()
         {
-            cacheDictionary = translationKeys.ToDictionary(x => x.keyName, x => x);
+            _cacheDictionary = translationKeys.ToDictionary(x => x.keyName, x => x);
         }
     }
 }

@@ -169,7 +169,7 @@ namespace LocalizationTool.Scripts.Editors
                 filteredKeys = filteredKeys.Where(key => key.Contains(_filterKeyText, StringComparison.InvariantCulture)).ToList();
             
             if (_filterCategoryIndex != 0)
-                filteredKeys = filteredKeys.Where(key => CacheData.DictionaryCache[key].Category == allCategories[_filterCategoryIndex]).ToList();
+                filteredKeys = filteredKeys.Where(key => CacheDataSO.localizationData.KeysDictionary[key].category.name == allCategories[_filterCategoryIndex]).ToList();
             return filteredKeys;
         }
 

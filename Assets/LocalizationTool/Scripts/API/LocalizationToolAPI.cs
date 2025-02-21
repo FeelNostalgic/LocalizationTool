@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using LocalizationTool.Scripts.Addons;
 using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.Data;
@@ -66,11 +67,11 @@ namespace LocalizationTool.Scripts.API
             found = false;
             if (!CacheData.IsDataLoaded) return "";
             if (key.IsNull()) return "";
-            
-            found = CacheData.DictionaryCache.ContainsKey(key);
-            if(found) found = CacheData.DictionaryCache[key].TranslationData.ContainsKey(ActiveLanguage);
+
+            found = CacheDataSO.localizationData.KeysDictionary.ContainsKey(key);
+            if (found) found = CacheDataSO.localizationData.LanguagesDictionary[ActiveLanguage].TranslationDictionary.ContainsKey(key);
             return found
-                ? CacheData.DictionaryCache[key].TranslationData[ActiveLanguage]
+                ? CacheDataSO.localizationData.LanguagesDictionary[ActiveLanguage].TranslationDictionary[key].translationText
                 : "";
         }
 
@@ -79,7 +80,7 @@ namespace LocalizationTool.Scripts.API
         /// </summary>
         /// <param name="key">Key to get value from</param>
         /// <param name="language">Language to get value from</param>
-        /// <param name="found">True if key was found. False if language doesnt exist or key was not found</param>
+        /// <param name="found">True if key was found. False if language doesn't exist or key was not found</param>
         /// <returns>The value of the key. Empty value if key was not found</returns>
         public static string GetValueByKeyAndLanguage(string key, string language, out bool found)
         {
@@ -89,9 +90,9 @@ namespace LocalizationTool.Scripts.API
                 return "";
             }
 
-            found = CacheData.DictionaryCache[key].TranslationData.ContainsKey(language);
+            found = CacheDataSO.localizationData.LanguagesDictionary[language].TranslationDictionary.ContainsKey(key);
             return found
-                ? CacheData.DictionaryCache[key].TranslationData[ActiveLanguage]
+                ? CacheDataSO.localizationData.LanguagesDictionary[language].TranslationDictionary[key].translationText
                 : "";
         }
 
@@ -134,8 +135,8 @@ namespace LocalizationTool.Scripts.API
         public static List<string> GetAllKeys()
         {
             //CacheData.LoadCacheData();
-            if (!CacheData.IsDataLoaded) return null;
-            var keys = CacheData.Keys;
+            if (!CacheDataSO.IsDataLoaded) return null;
+            var keys = CacheDataSO.localizationData.keys.Select(x=>x.name).ToList();
 
             return keys;
         }
