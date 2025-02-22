@@ -376,7 +376,7 @@ namespace LocalizationTool.Scripts.Editors
                 return;
             }
 
-            if (LocalizationManager.ContainsCategory(newCategory))
+            if (LocalizationManager.ExistsCategory(newCategory))
             {
                 ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, string.Format(CATEGORY_EXIST_FEEDBACK_LABEL, newCategory), delegate { _feedbackList.Remove(oldCategory); });
                 return;

@@ -324,7 +324,7 @@ namespace LocalizationTool.Scripts.Editors
                 var value = lineItems[2];
 
                 nKeys++;
-                if (!LocalizationManager.ContainsCategory(category)) nCategories++;
+                if (!LocalizationManager.ExistsCategory(category)) nCategories++;
 
                 LocalizationManager.ImportKey(key, category, _language, value);
 
@@ -359,7 +359,7 @@ namespace LocalizationTool.Scripts.Editors
             foreach (var keyCategoryLanguage in data.Data)
             {
                 nKeys++;
-                if (!LocalizationManager.ContainsCategory(keyCategoryLanguage.Category)) nCategories++;
+                if (!LocalizationManager.ExistsCategory(keyCategoryLanguage.Category)) nCategories++;
 
                 LocalizationManager.ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, _language, keyCategoryLanguage.Value);
 

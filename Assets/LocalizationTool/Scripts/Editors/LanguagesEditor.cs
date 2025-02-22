@@ -14,10 +14,6 @@ namespace LocalizationTool.Scripts.Editors
 {
     public class LanguagesEditor : EditorWindowAbstract
     {
-        #region PUBLIC VARIABLES
-
-        #endregion
-
         #region PRIVATE VARIABLES
 
         #region EDITOR VARIABLES

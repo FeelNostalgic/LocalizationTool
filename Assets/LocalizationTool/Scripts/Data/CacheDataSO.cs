@@ -51,8 +51,7 @@ namespace LocalizationTool.Scripts.Data
         public static void InitForEditor(Action onComplete = null)
         {
             if (IsDataLoaded) return;
-
-            CreateLocalizationData();
+            
             LoadCacheData();
             IsDataLoaded = true;
             onComplete?.Invoke();
@@ -60,6 +59,8 @@ namespace LocalizationTool.Scripts.Data
 
         public static void LoadCacheData()
         {
+            CreateOrLoadLocalizationData();
+            
             UpdateLanguageCache();
 
             UpdateCategoriesCache();
@@ -75,7 +76,7 @@ namespace LocalizationTool.Scripts.Data
 
         public static void LoadLanguagesCache()
         {
-            CreateLocalizationData();
+            CreateOrLoadLocalizationData();
             UpdateLanguageCache();
 #if UNITY_EDITOR
             LocalizationManager.CurrentLanguageInDictionarySection = DefaultLanguage;
@@ -85,13 +86,13 @@ namespace LocalizationTool.Scripts.Data
 
         public static void LoadCategoriesCache()
         {
-            CreateLocalizationData();
+            CreateOrLoadLocalizationData();
             UpdateCategoriesCache();
         }
 
         public static void LoadKeysCache()
         {
-            CreateLocalizationData();
+            CreateOrLoadLocalizationData();
 #if UNITY_EDITOR
             LocalizationManager.CurrentLanguageInDictionarySection = DefaultLanguage;
 #endif
@@ -99,7 +100,15 @@ namespace LocalizationTool.Scripts.Data
 
         public static void ClearData()
         {
-            // TODO
+            var tempKList = new List<KeyDataSO>(Keys);
+            tempKList.ForEach(x => RemoveKey(x.keyName));
+            
+            var tempLList = new List<LanguageDataSO>(LanguageCache);
+            tempLList.ForEach(x => RemoveLanguage(x.languageName));
+            
+            
+            var tempCList = new List<CategoryDataSO>(CategoryCache);
+            tempCList.ForEach(x => RemoveCategory(x.categoryName));
         }
 
         #endregion
@@ -108,7 +117,7 @@ namespace LocalizationTool.Scripts.Data
 
         public static void InsertKey(string keyName, string categoryName)
         {
-            CreateDirectory(KEYS_PATH);
+            CreateDirectoryIfNotExist(KEYS_PATH);
             
             var newKey = ScriptableObject.CreateInstance<KeyDataSO>();
             AssetDatabase.CreateAsset(newKey, $"{KEYS_PATH}/{keyName}.asset");
@@ -404,9 +413,9 @@ namespace LocalizationTool.Scripts.Data
 
         #region PRIVATE METHODS
 
-        private static void CreateLocalizationData()
+        private static void CreateOrLoadLocalizationData()
         {
-            CreateDirectory(DATABASE_PATH);
+            CreateDirectoryIfNotExist(DATABASE_PATH);
             
             localizationData = AssetDatabase.LoadAssetAtPath<LocalizationDataSO>(LOCALIZATION_DATA_PATH) ?? ScriptableObject.CreateInstance<LocalizationDataSO>();
         
@@ -416,24 +425,26 @@ namespace LocalizationTool.Scripts.Data
                 Debug.Log("LocalizationData.asset created!");
             }
         
-            InsertFirstLanguage();
-            InsertFirstCategory();
+            InsertFirstLanguageIfNotExist();
+            InsertFirstCategoryIfNotExist();
             SaveChanges();
+            
+            Debug.Log("LocalizationData.asset loaded!");
         }
-
-        private static void InsertFirstLanguage()
+        
+        private static void InsertFirstLanguageIfNotExist()
         {
             if (localizationData.languages.IsNotEmpty()) return;
             
-            CreateDirectory(LANGUAGES_PATH);
+            CreateDirectoryIfNotExist(LANGUAGES_PATH);
             InsertLanguage("English");
         }
 
-        private static void InsertFirstCategory()
+        private static void InsertFirstCategoryIfNotExist()
         {
             if (localizationData.categories.IsNotEmpty()) return;
             
-            CreateDirectory(CATEGORIES_PATH);
+            CreateDirectoryIfNotExist(CATEGORIES_PATH);
             InsertCategory("None");
         }
 
@@ -454,7 +465,7 @@ namespace LocalizationTool.Scripts.Data
             }
         }
 
-        private static void CreateDirectory(string path)
+        private static void CreateDirectoryIfNotExist(string path)
         {
             if (Directory.Exists(path)) return;
             

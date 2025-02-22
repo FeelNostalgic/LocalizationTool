@@ -9,7 +9,7 @@ using TMPro;
 using Unity.EditorCoroutines.Editor;
 using UnityEngine;
 
-namespace UIManager
+namespace LocalizationTool.Demo.Scripts
 {
     [DefaultExecutionOrder(100)]
     public class UIManager : MonoBehaviour
@@ -29,11 +29,7 @@ namespace UIManager
         [SerializeField] private LocalizationToolAddon backButton;
 
         #endregion
-
-        #region Public Variables
-
-        #endregion
-
+        
         #region Private Variables
 
         private const string BACKUP_PATH = "Assets/LocalizationTool/PersistentData/Backups/CurrentBackup.json";

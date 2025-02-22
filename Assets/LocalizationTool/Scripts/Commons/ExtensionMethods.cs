@@ -27,6 +27,11 @@ namespace LocalizationTool.Scripts.Commons
 			return !obj.IsEmpty();
 		}
 
+		public static bool NotEquals(this string str, string other)
+		{
+			return !str.Equals(other);
+		}
+
 		#endregion
 
 		#region OBJECT
