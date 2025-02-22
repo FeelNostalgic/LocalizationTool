@@ -20,7 +20,7 @@ namespace LocalizationTool.Scripts.Data
         public static bool IsDataLoaded { get; private set; }
 
         public static List<KeyDataSO> Keys => localizationData.keys;
-        
+
         public static List<LanguageDataSO> LanguageCache { get; private set; }
         public static List<string> Languages => LanguageCache.Select(x => x.languageName).ToList();
         public static string DefaultLanguage => LanguageCache.FirstOrDefault(x => x.isDefault)?.languageName;
@@ -51,7 +51,7 @@ namespace LocalizationTool.Scripts.Data
         public static void InitForEditor(Action onComplete = null)
         {
             if (IsDataLoaded) return;
-            
+
             LoadCacheData();
             IsDataLoaded = true;
             onComplete?.Invoke();
@@ -60,9 +60,9 @@ namespace LocalizationTool.Scripts.Data
         public static void LoadCacheData()
         {
             if (IsDataLoaded) return;
-            
+
             CreateOrLoadLocalizationData();
-            
+
             UpdateLanguageCache();
 
             UpdateCategoriesCache();
@@ -74,7 +74,7 @@ namespace LocalizationTool.Scripts.Data
             if (LocalizationToolAPI.Instance.IsNotNull()) LocalizationToolAPI.ActiveLanguage = DefaultLanguage;
 
             IsDataLoaded = true;
-            
+
             OnLocalizationToolDataInitialized?.Invoke();
         }
 
@@ -106,10 +106,10 @@ namespace LocalizationTool.Scripts.Data
         {
             var tempKList = new List<KeyDataSO>(Keys);
             tempKList.ForEach(x => RemoveKey(x.keyName));
-            
+
             var tempLList = new List<LanguageDataSO>(LanguageCache);
             tempLList.ForEach(x => RemoveLanguage(x.languageName));
-            
+
             var tempCList = new List<CategoryDataSO>(CategoryCache);
             tempCList.ForEach(x => RemoveCategory(x.categoryName));
         }
@@ -121,7 +121,7 @@ namespace LocalizationTool.Scripts.Data
         public static void InsertKey(string keyName, string categoryName)
         {
             CreateDirectoryIfNotExist(KEYS_PATH);
-            
+
             var newKey = ScriptableObject.CreateInstance<KeyDataSO>();
             AssetDatabase.CreateAsset(newKey, $"{KEYS_PATH}/{keyName}.asset");
             newKey.keyName = keyName;
@@ -140,7 +140,7 @@ namespace LocalizationTool.Scripts.Data
 
             SaveChanges();
         }
-        
+
         public static void RemoveKey(string keyName)
         {
             var keyToRemove = localizationData.KeysDictionary[keyName];
@@ -154,7 +154,7 @@ namespace LocalizationTool.Scripts.Data
                 AssetDatabase.RemoveObjectFromAsset(translationToRemove);
                 Object.DestroyImmediate(translationToRemove, true);
             }
-            
+
             SaveChanges();
         }
 
@@ -162,25 +162,30 @@ namespace LocalizationTool.Scripts.Data
         {
             var keyToUpdate = localizationData.KeysDictionary[key];
             keyToUpdate.category = localizationData.CategoriesDictionary[newCategory];
-            
+
             SaveChanges();
         }
 
         public static void SetKeyTranslation(string key, string newTranslation, string language)
         {
             localizationData.LanguagesDictionary[language].TranslationDictionary[key].translationText = newTranslation;
-            
+
             SaveChanges();
         }
 
         public static void UpdateKeyName(string oldKeyName, string newKeyName)
         {
-            localizationData.KeysDictionary[oldKeyName].keyName = newKeyName;
-            foreach (var language in LanguageCache)
+            var keyToUpdate = localizationData.keys.FirstOrDefault(x => x.keyName.Equals(oldKeyName));
+            keyToUpdate!.keyName = newKeyName;
+            EditorUtility.SetDirty(keyToUpdate);
+            AssetDatabase.RenameAsset(GetPath(keyToUpdate), newKeyName);
+
+            foreach (var translationToUpdate in LanguageCache.Select(language => language.TranslationDictionary[oldKeyName]))
             {
-                language.translationKeys.FirstOrDefault(x=> x.keyName.Equals(oldKeyName))!.keyName = newKeyName;
+                translationToUpdate.keyName = newKeyName;
+                translationToUpdate.name = newKeyName;
             }
-            
+
             SaveChanges();
         }
 
@@ -248,13 +253,13 @@ namespace LocalizationTool.Scripts.Data
             }
 
             localizationData.languages.Remove(languageToRemove);
-            
+
             foreach (var translationKeyData in languageToRemove.translationKeys)
             {
                 AssetDatabase.RemoveObjectFromAsset(translationKeyData);
                 Object.DestroyImmediate(translationKeyData, true);
             }
-            
+
             RemoveAsset(languageToRemove);
 
             UpdateLanguageCache();
@@ -307,7 +312,7 @@ namespace LocalizationTool.Scripts.Data
             {
                 translationKeyData.translationText = "";
             }
-            
+
             SaveChanges();
         }
 
@@ -424,26 +429,26 @@ namespace LocalizationTool.Scripts.Data
         private static void CreateOrLoadLocalizationData()
         {
             CreateDirectoryIfNotExist(DATABASE_PATH);
-            
+
             localizationData = AssetDatabase.LoadAssetAtPath<LocalizationDataSO>(LOCALIZATION_DATA_PATH) ?? ScriptableObject.CreateInstance<LocalizationDataSO>();
-        
+
             if (!AssetDatabase.Contains(localizationData))
             {
                 AssetDatabase.CreateAsset(localizationData, LOCALIZATION_DATA_PATH);
                 //Debug.Log("LocalizationData.asset created!");
             }
-        
+
             InsertFirstLanguageIfNotExist();
             InsertFirstCategoryIfNotExist();
             SaveChanges();
-            
+
             //Debug.Log("LocalizationData.asset loaded!");
         }
-        
+
         private static void InsertFirstLanguageIfNotExist()
         {
             if (localizationData.languages.IsNotEmpty()) return;
-            
+
             CreateDirectoryIfNotExist(LANGUAGES_PATH);
             InsertLanguage("English");
         }
@@ -451,7 +456,7 @@ namespace LocalizationTool.Scripts.Data
         private static void InsertFirstCategoryIfNotExist()
         {
             if (localizationData.categories.IsNotEmpty()) return;
-            
+
             CreateDirectoryIfNotExist(CATEGORIES_PATH);
             InsertCategory("None");
         }
@@ -476,12 +481,12 @@ namespace LocalizationTool.Scripts.Data
         private static void CreateDirectoryIfNotExist(string path)
         {
             if (Directory.Exists(path)) return;
-            
+
             Directory.CreateDirectory(path);
             AssetDatabase.Refresh();
         }
 
-        
+
         private static string GetPath(Object asset)
         {
             return AssetDatabase.GetAssetPath(asset);
