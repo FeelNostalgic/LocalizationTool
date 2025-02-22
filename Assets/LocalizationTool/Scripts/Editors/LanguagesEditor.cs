@@ -173,29 +173,36 @@ namespace LocalizationTool.Scripts.Editors
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
 
             const float itemHeight = 40f;
+            const int visibleItemsCount = 50;
+
             try
             {
-                var scrollY = _scrollCenter.y;
-                var viewHeight = EditorGUIUtility.currentViewWidth;
-        
-                var startIdx = Mathf.Max(0, Mathf.FloorToInt(scrollY / itemHeight));
-                var endIdx = Mathf.Min(CacheDataSO.LanguageCache.Count, Mathf.CeilToInt((scrollY + viewHeight) / itemHeight));
-        
-                for (var i = startIdx; i < endIdx; i++)
+                GUILayout.BeginVertical();
+                
+                var firstVisibleIndex = Mathf.Max(0, Mathf.FloorToInt(_scrollCenter.y / visibleItemsCount));
+                var lastVisibleIndex = Mathf.Min(firstVisibleIndex + visibleItemsCount, CacheDataSO.LanguageCache.Count);
+                
+                GUILayout.Space(firstVisibleIndex * itemHeight);
+                
+                for (var i = firstVisibleIndex; i < lastVisibleIndex; i++)
                 {
                     var language = CacheDataSO.LanguageCache[i];
-                    UnitCenterScrollViewContent(language.displayOrder, language.languageName);
+                    DrawLanguageItem(language.displayOrder, language.languageName);
                 }
+                
+                GUILayout.Space(Mathf.Clamp((CacheDataSO.LanguageCache.Count - lastVisibleIndex - 1) * itemHeight, 0f, CacheDataSO.LanguageCache.Count * itemHeight)+40);
+                
+                GUILayout.EndVertical();
             }
             catch(Exception e)
             {
-                Debug.LogError(e);
+                if(e is not ExitGUIException) Debug.LogError(e);
             }
 
             EditorGUILayout.EndScrollView();
         }
 
-        private void UnitCenterScrollViewContent(int index, string languageName)
+        private void DrawLanguageItem(int index, string languageName)
         {
             var height = _feedbackList.ContainsKey(languageName) ? Height : GUILayout.Height(40 + 20);
             GUI.backgroundColor = EditorGUIUtility.isProSkin ? Color.white : Colors.Alpha(Color.cyan, .1f);

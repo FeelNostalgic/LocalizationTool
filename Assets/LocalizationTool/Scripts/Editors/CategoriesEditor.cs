@@ -71,9 +71,9 @@ namespace LocalizationTool.Scripts.Editors
         #endregion
 
         #region PRRIVATE METHODS
-        
+
         #region LEFT SECTION
-        
+
         private void ShowLeftSection()
         {
             GUILayout.Space(5);
@@ -83,29 +83,29 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.FlexibleSpace();
             GUILayout.EndVertical();
         }
-        
+
         private void ShowAddSection()
         {
             ShowHorizontalLine(5);
             GUILayout.BeginVertical("box");
             GUILayout.Space(5);
-        
+
             GUILayout.Label(CATEGORY_LABEL_UPPER, CustomStyles.GetStyle(Enums.CustomStyleName.Header2BoldMiddleCenter15Label));
             GUILayout.Space(5);
-        
+
             GUILayout.BeginHorizontal();
             GUILayout.Space(3);
-        
+
             GUI.SetNextControlName(CATEGORY_LABEL_UPPER);
             _addCategoryValue = EditorGUILayout.TextField(_addCategoryValue, CustomStyles.GetStyle(Enums.CustomStyleName.KeyTextField), GUILayout.Height(30));
-        
+
             GUILayout.Space(5);
-        
+
             if (GUILayout.Button(GetGUIContent(AddIcon, ADD_CATEGORY_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 LocalizationManager.AddNewCategory(_addCategoryValue, this);
             }
-        
+
             if (GUI.GetNameOfFocusedControl() == CATEGORY_LABEL_UPPER)
             {
                 if (Event.current is { keyCode: (KeyCode.Return or KeyCode.KeypadEnter) })
@@ -113,38 +113,38 @@ namespace LocalizationTool.Scripts.Editors
                     if (!AddActionRunning) LocalizationManager.AddNewCategory(_addCategoryValue, this);
                 }
             }
-        
+
             GUILayout.Space(3);
             GUILayout.EndHorizontal();
             GUILayout.Space(5);
-        
+
             ShowTextAreaFeedback(FeedbackLabel);
             GUILayout.EndVertical();
-        
+
             ShowHorizontalLine(5);
         }
-        
+
         #endregion
-        
+
         #region CENTER SECTION
-        
+
         private void ShowCenterSection()
         {
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true));
-        
+
             GUILayout.Space(5);
-        
+
             TitleCenterSection();
-        
+
             ShowHorizontalLine(5);
-        
+
             GUILayout.Space(10);
-        
+
             GenerateCenterScrollViewContent();
-        
+
             GUILayout.EndVertical();
         }
-        
+
         private static void TitleCenterSection()
         {
             GUILayout.BeginHorizontal();
@@ -153,126 +153,126 @@ namespace LocalizationTool.Scripts.Editors
                 LocalizationManager.RefreshCategoriesData();
                 LocalizationManager.Log(CATEGORIES_LABEL, CustomDebug.Colors.Green, LOADED_LOG);
             }
-        
+
             GUILayout.FlexibleSpace();
-        
+
             GUILayout.Label(CATEGORIES_LABEL_UPPER, CustomStyles.GetStyle(Enums.CustomStyleName.Header1BoldMiddleCenter20Label));
-        
+
             GUILayout.FlexibleSpace();
-        
+
             GUILayout.EndHorizontal();
         }
-        
+
         private void GenerateCenterScrollViewContent()
         {
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
-            
+
             const float itemHeight = 40f;
+            const int visibleItemsCount = 50;
+
             try
             {
-                var scrollY = _scrollCenter.y;
-                var viewHeight = EditorGUIUtility.currentViewWidth;
-        
-                var startIdx = Mathf.Max(0, Mathf.FloorToInt(scrollY / itemHeight));
-                var endIdx = Mathf.Min(CacheDataSO.CategoryCache.Count, Mathf.CeilToInt((scrollY + viewHeight) / itemHeight));
-        
                 GUILayout.BeginVertical();
-                
-                for (var i = startIdx; i < endIdx; i++)
+
+                var firstVisibleIndex = Mathf.Max(0, Mathf.FloorToInt(_scrollCenter.y / visibleItemsCount));
+                var lastVisibleIndex = Mathf.Min(firstVisibleIndex + visibleItemsCount, CacheDataSO.CategoryCache.Count);
+
+                GUILayout.Space(firstVisibleIndex * itemHeight);
+
+                for (var i = firstVisibleIndex; i < lastVisibleIndex; i++)
                 {
-                    if (i >= CacheDataSO.CategoryCache.Count) continue;
                     var category = CacheDataSO.CategoryCache[i];
-                    UnitCenterScrollViewContent(category.displayOrder, category.categoryName);
+                    DrawCategoryItem(category.displayOrder, category.categoryName);
                 }
+
+                GUILayout.Space(Mathf.Clamp((CacheDataSO.CategoryCache.Count - lastVisibleIndex - 1) * itemHeight, 0f, CacheDataSO.CategoryCache.Count * itemHeight)+40);
+
                 GUILayout.EndVertical();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                Debug.LogError(e);
+                if (e is not ExitGUIException) Debug.LogError(e);
             }
-        
+
             EditorGUILayout.EndScrollView();
         }
-        
-        private void UnitCenterScrollViewContent(int index, string categoryName)
+
+        private void DrawCategoryItem(int index, string categoryName)
         {
-            var height = _feedbackList.ContainsKey(categoryName) ? Height : GUILayout.Height(40 + 20);
+            var hasFeedback = _feedbackList.ContainsKey(categoryName);
+            var itemHeight = hasFeedback ? Height : GUILayout.Height(60);
+
             GUI.backgroundColor = EditorGUIUtility.isProSkin ? Color.white : Colors.Alpha(Color.cyan, .1f);
-            GUILayout.BeginVertical("box", height); 
-        
+            GUILayout.BeginVertical("box", itemHeight);
+
             GUI.backgroundColor = Color.clear;
-            GUILayout.BeginHorizontal(Height);
-        
+            GUILayout.BeginHorizontal(itemHeight);
             GUILayout.Space(10);
-        
+
             Column1(index, categoryName);
-        
             Column2(index, categoryName);
-        
             Column3(index, categoryName);
-        
             Column4(categoryName);
-        
             Column5(categoryName);
-        
+
             GUILayout.EndHorizontal();
-        
+
             Feedback(categoryName);
-        
+
             GUILayout.EndVertical();
         }
-        
+
         private void Column1(int index, string categoryName)
         {
             //Number
             GUILayout.BeginVertical("box", GUILayout.Width(35), Height);
             GUI.backgroundColor = Colors.DEFAULT;
-        
+
             GUILayout.FlexibleSpace();
             var tempIndex = EditorGUILayout.IntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Height(30));
             if (!LocalizationManager.IsDefaultCategory(categoryName)) UpdateIndex(categoryName, index, tempIndex);
             GUILayout.EndVertical();
         }
-        
+
         private void Column2(int index, string categoryName)
         {
             //Button To move UP
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginVertical("box", GUILayout.Width(23), Height);
             GUI.backgroundColor = Colors.DEFAULT;
-        
+
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(UpIcon, string.Format(MOVE_UP_BUTTON_TOOLTIP, categoryName)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 if (!LocalizationManager.IsDefaultCategory(categoryName)) UpdateIndex(categoryName, index, index - 1);
             }
-        
+
             GUILayout.EndVertical();
         }
-        
+
         private void Column3(int index, string categoryName)
         {
             //Button To move DOWN
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginVertical("box", GUILayout.Width(23), Height);
             GUI.backgroundColor = Colors.DEFAULT;
-        
+
             GUILayout.FlexibleSpace();
             if (GUILayout.Button(GetGUIContent(DownIcon, string.Format(MOVE_DOWN_BUTTON_TOOLTIP, categoryName)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 if (!LocalizationManager.IsDefaultCategory(categoryName) && CacheDataSO.CategoryCache.Count >= index + 1) UpdateIndex(categoryName, index, index + 1);
             }
-        
+
             GUILayout.EndVertical();
         }
-        
+
         private void Column4(string categoryName)
         {
             // Favourite Button
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginVertical("box", GUILayout.Width(26), Height);
             GUI.backgroundColor = Colors.DEFAULT;
-        
+
             GUILayout.FlexibleSpace();
             if (LocalizationManager.IsDefaultCategory(categoryName))
             {
@@ -285,25 +285,25 @@ namespace LocalizationTool.Scripts.Editors
                 if (GUILayout.Button(GetGUIContent(StarIcon, string.Format(MAKE_CATEGORY_DEFAULT_BUTTON_TOOLTIP, categoryName)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     LocalizationManager.Instance.ChangeDefaultCategory(categoryName);
-                    LocalizationManager.Log(CATEGORIES_LABEL, CustomDebug.Colors.Green,string.Format(CATEGORY_DEFAULT_LOG, categoryName));
+                    LocalizationManager.Log(CATEGORIES_LABEL, CustomDebug.Colors.Green, string.Format(CATEGORY_DEFAULT_LOG, categoryName));
                 }
             }
-        
+
             GUILayout.EndVertical();
         }
-        
+
         private void Column5(string category)
         {
             // FIELDS
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginHorizontal("box", Height, GUILayout.ExpandWidth(true));
             GUI.backgroundColor = Colors.DEFAULT;
-        
+
             // Text
             EditorGUI.BeginChangeCheck();
             var tempValue = EditorGUILayout.TextField(category, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), GUILayout.Height(40));
             if (EditorGUI.EndChangeCheck()) UpdateCategory(category, tempValue);
-        
+
             // Delete Button
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginVertical("box", GUILayout.Width(23));
@@ -327,12 +327,12 @@ namespace LocalizationTool.Scripts.Editors
                         DeleteCategory(category);
                 }
             }
-        
+
             GUILayout.EndVertical();
-        
+
             GUILayout.EndHorizontal();
         }
-        
+
         private void Feedback(string category)
         {
             //Feedback
@@ -346,60 +346,61 @@ namespace LocalizationTool.Scripts.Editors
                 GUILayout.EndHorizontal();
             }
         }
-        
+
         #endregion
-        
+
         #region UPDATE METHODS
-        
+
         private static void DeleteCategory(string category)
         {
             LocalizationManager.RemoveCategory(category);
-            LocalizationManager.Log(CATEGORIES_LABEL, CustomDebug.Colors.Green,string.Format(DELETED_CATEGORY_LOG, category));
+            LocalizationManager.Log(CATEGORIES_LABEL, CustomDebug.Colors.Green, string.Format(DELETED_CATEGORY_LOG, category));
         }
-        
+
         private void UpdateCategory(string oldCategory, string newCategory)
         {
             if (oldCategory.Equals(newCategory)) return;
-        
+
             _feedbackList.TryAdd(oldCategory, "");
-        
+
             if (newCategory.IsEmpty())
             {
                 ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, EMPTY_CATEGORY_FEEDBACK_LABEL, delegate { _feedbackList.Remove(oldCategory); });
                 return;
             }
-            
+
             if (newCategory.Length > MAX_CATEGORY_CHARACTERS)
             {
-                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, string.Format(CHARACTERS_NUMBER_CATEGORY_FEEDBACK_LABEL, MAX_CATEGORY_CHARACTERS), delegate { _feedbackList.Remove(oldCategory); });
+                ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, string.Format(CHARACTERS_NUMBER_CATEGORY_FEEDBACK_LABEL, MAX_CATEGORY_CHARACTERS),
+                    delegate { _feedbackList.Remove(oldCategory); });
                 return;
             }
-        
+
             if (LocalizationManager.ContainsCategory(newCategory))
             {
                 ControlFeedbackLabelInRow(delegate(string s) { _feedbackList[oldCategory] = s; }, string.Format(CATEGORY_EXIST_FEEDBACK_LABEL, newCategory), delegate { _feedbackList.Remove(oldCategory); });
                 return;
             }
-        
+
             LocalizationManager.ChangeCategoryName(oldCategory, newCategory);
-        
+
             _feedbackList.Remove(oldCategory);
         }
-        
-        private static void UpdateIndex(string categoryName,int oldIndex, int newIndex)
+
+        private static void UpdateIndex(string categoryName, int oldIndex, int newIndex)
         {
             LocalizationManager.ChangeCategoryIndex(categoryName, oldIndex, newIndex);
         }
-        
+
         public override void ClearAddTextField()
         {
             if (!LocalizationManager.Configuration.categoryClearAdd) return;
             _addCategoryValue = "";
             RepaintGUI();
         }
-        
+
         #endregion
-        
+
         #endregion
     }
 }

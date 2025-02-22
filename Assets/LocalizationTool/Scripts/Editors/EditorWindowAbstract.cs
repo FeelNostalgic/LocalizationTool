@@ -18,7 +18,7 @@ namespace LocalizationTool.Scripts.Editors
 
         protected static readonly Vector2 WindowSize = new(1400, 1000);
         protected readonly GUILayoutOption Height = GUILayout.Height(40);
-
+        
         #endregion
         
 		#region TEXTURE VARAIBLES

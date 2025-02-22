@@ -10,7 +10,6 @@ using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.Data.ScriptableObjects;
 using LocalizationTool.Scripts.General;
 using UnityEditor;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 
@@ -45,7 +44,7 @@ namespace LocalizationTool.Scripts.Editors
         #region DIMENSION VARIABLES
 
         private const float LEFT_SECTION_WIDTH_PERCENT = 0.225f;
-        
+
 
         // FUTURE: divider
         // private float _dividerPosition = 305f;
@@ -87,7 +86,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
         }
-        
+
         protected override void ControlFocus(string focus)
         {
             if (!LocalizationManager.Configuration.dictionaryClearAdd) return;
@@ -278,39 +277,7 @@ namespace LocalizationTool.Scripts.Editors
 
             GUI.backgroundColor = Colors.DEFAULT;
         }
-
-        private void GenerateCenterScrollViewContent()
-        {
-            try
-            {
-                _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
-                var filteredDicToIterate = GetFilteredDictionary().ToList();
-
-                if (filteredDicToIterate.Count > 0)
-                {
-                    var firstVisibleIndex = Mathf.FloorToInt(_scrollCenter.y / 40);
-                    var visibleItemsCount = Mathf.FloorToInt(EditorGUIUtility.currentViewWidth / 40);
-                    var lastVisibleIndex = Mathf.Min(firstVisibleIndex + visibleItemsCount, filteredDicToIterate.Count - 1);
-
-                    GUILayout.Space(firstVisibleIndex * 40);
-
-                    for (var i = firstVisibleIndex; i <= lastVisibleIndex; i++)
-                    {
-                        UnitCenterScrollViewContent(filteredDicToIterate[i].Key, CacheDataSO.localizationData.KeysDictionary[filteredDicToIterate[i].Key].category.categoryName,
-                            filteredDicToIterate[i].Value.translationText);
-                    }
-
-                    GUILayout.Space(Mathf.Clamp((filteredDicToIterate.Count - lastVisibleIndex - 1) * 40f,0f,filteredDicToIterate.Count * 40f + 40f)); 
-                }
-                
-                EditorGUILayout.EndScrollView();
-            }
-            catch(Exception e)
-            {
-                Debug.LogError(e);
-            }
-        }
-
+        
         private Dictionary<string, TranslationKeyDataSO> GetFilteredDictionary()
         {
             var filteredDicToIterate = new Dictionary<string, TranslationKeyDataSO>(CacheDataSO.localizationData.LanguagesDictionary[LocalizationManager.CurrentLanguageInDictionarySection].TranslationDictionary);
@@ -343,16 +310,55 @@ namespace LocalizationTool.Scripts.Editors
             return filteredDicToIterate;
         }
 
-        private void UnitCenterScrollViewContent(string key, string category, string value)
+        
+        private void GenerateCenterScrollViewContent()
         {
-            if (!_currentKeyValueDictionary.ContainsKey(key)) _currentKeyValueDictionary.Add(key, value);
-            if (!_currentKeyGroupDictionary.ContainsKey(key)) _currentKeyGroupDictionary.Add(key, category);
-            if (!_currentKeyScrollPosition.ContainsKey(key)) _currentKeyScrollPosition.Add(key, Vector2.zero);
+            _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
+
+            const float itemHeight = 40f;
+            const int visibleItemsCount = 50;
+            var filteredDicToIterate = GetFilteredDictionary().ToList();
+
+            try
+            {
+                if (filteredDicToIterate.Count > 0)
+                {
+                    GUILayout.BeginVertical();
+
+                    var firstVisibleIndex = Mathf.Max(0, Mathf.FloorToInt(_scrollCenter.y / visibleItemsCount));
+                    var lastVisibleIndex = Mathf.Min(firstVisibleIndex + visibleItemsCount, filteredDicToIterate.Count);
+
+                    GUILayout.Space(firstVisibleIndex * itemHeight);
+
+                    for (var i = firstVisibleIndex; i < lastVisibleIndex; i++)
+                    {
+                        var item = filteredDicToIterate[i];
+                        DrawKeyItem(item.Key, CacheDataSO.localizationData.KeysDictionary[item.Key].category.categoryName, item.Value.translationText);
+                    }
+
+                    GUILayout.Space(Mathf.Clamp((filteredDicToIterate.Count - lastVisibleIndex - 1) * itemHeight, 0f, filteredDicToIterate.Count * itemHeight)+40);
+                    
+                    GUILayout.EndVertical();
+                }
+            }
+            catch (Exception e)
+            {
+                //if (e is not ExitGUIException) Debug.LogError(e);
+            }
+
+            EditorGUILayout.EndScrollView();
+        }
+        
+        private void DrawKeyItem(string key, string category, string value)
+        {
+            _currentKeyValueDictionary.TryAdd(key, value);
+            _currentKeyGroupDictionary.TryAdd(key, category);
+            _currentKeyScrollPosition.TryAdd(key, Vector2.zero);
 
             GUI.backgroundColor = EditorGUIUtility.isProSkin ? Color.white : Colors.Alpha(Color.cyan, .1f);
             GUILayout.BeginHorizontal("box", Height);
             GUI.backgroundColor = Color.clear;
-
+            
             Column1(key);
 
             Column2(key, category);
@@ -421,7 +427,6 @@ namespace LocalizationTool.Scripts.Editors
             {
                 RichTextEditor.ShowWindow(tempValue, key, delegate(string s) { UpdateValue(key, s); });
                 LocalizationManager.Log(DICTIONARY_LABEL, CustomDebug.Colors.Blue, string.Format(EDITING_KEY_LOG, key));
-
             }
 
             GUILayout.Space(5);

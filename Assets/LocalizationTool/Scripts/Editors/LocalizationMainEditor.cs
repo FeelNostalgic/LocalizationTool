@@ -16,11 +16,7 @@ namespace LocalizationTool.Scripts.Editors
         public static LocalizationMainEditor Instance { get; private set; }
 
         #endregion
-
-        #region PRIVATE VARIABLES
-
-        #endregion
-
+        
         #region EDITOR VARIABLES
 
         private int _currentWindowToolbarIndex;
@@ -39,8 +35,7 @@ namespace LocalizationTool.Scripts.Editors
         #region DIMENSION VARIABLES
 
         private static readonly Vector2 WindowSize = new(1400, 1000);
-        public Rect Position => position;
-
+        
         #endregion
 
         [MenuItem("Tools/LocalizationTool/Manager", false, -30)]
