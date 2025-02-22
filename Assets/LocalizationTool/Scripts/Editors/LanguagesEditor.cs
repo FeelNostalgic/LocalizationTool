@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 
+using System;
 using System.Collections.Generic;
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.Commons;
@@ -170,17 +171,25 @@ namespace LocalizationTool.Scripts.Editors
         private void GenerateCenterScrollViewContent()
         {
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
-            
+
+            const float itemHeight = 40f;
             try
             {
-                foreach (var language in CacheDataSO.LanguageCache)
+                var scrollY = _scrollCenter.y;
+                var viewHeight = EditorGUIUtility.currentViewWidth;
+        
+                var startIdx = Mathf.Max(0, Mathf.FloorToInt(scrollY / itemHeight));
+                var endIdx = Mathf.Min(CacheDataSO.LanguageCache.Count, Mathf.CeilToInt((scrollY + viewHeight) / itemHeight));
+        
+                for (var i = startIdx; i < endIdx; i++)
                 {
+                    var language = CacheDataSO.LanguageCache[i];
                     UnitCenterScrollViewContent(language.displayOrder, language.languageName);
                 }
             }
-            catch
+            catch(Exception e)
             {
-                // ignored
+                Debug.LogError(e);
             }
 
             EditorGUILayout.EndScrollView();

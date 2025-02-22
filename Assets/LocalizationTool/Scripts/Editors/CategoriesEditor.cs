@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 
+using System;
 using System.Collections.Generic;
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.Commons;
@@ -150,7 +151,7 @@ namespace LocalizationTool.Scripts.Editors
             if (GUILayout.Button(GetGUIContent(RefreshIcon, RELOAD_BUTTON_TOOLTIP), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
             {
                 LocalizationManager.RefreshCategoriesData();
-                LocalizationManager.Log(CATEGORIES_LABEL, CustomDebugPlugin.Colors.Green, LOADED_LOG);
+                LocalizationManager.Log(CATEGORIES_LABEL, CustomDebug.Colors.Green, LOADED_LOG);
             }
         
             GUILayout.FlexibleSpace();
@@ -166,16 +167,28 @@ namespace LocalizationTool.Scripts.Editors
         {
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
             
+            const float itemHeight = 40f;
             try
             {
-                foreach (var category in CacheDataSO.CategoryCache)
+                var scrollY = _scrollCenter.y;
+                var viewHeight = EditorGUIUtility.currentViewWidth;
+        
+                var startIdx = Mathf.Max(0, Mathf.FloorToInt(scrollY / itemHeight));
+                var endIdx = Mathf.Min(CacheDataSO.CategoryCache.Count, Mathf.CeilToInt((scrollY + viewHeight) / itemHeight));
+        
+                GUILayout.BeginVertical();
+                
+                for (var i = startIdx; i < endIdx; i++)
                 {
+                    if (i >= CacheDataSO.CategoryCache.Count) continue;
+                    var category = CacheDataSO.CategoryCache[i];
                     UnitCenterScrollViewContent(category.displayOrder, category.categoryName);
                 }
+                GUILayout.EndVertical();
             }
-            catch
+            catch(Exception e)
             {
-                // ignored
+                Debug.LogError(e);
             }
         
             EditorGUILayout.EndScrollView();
@@ -185,7 +198,7 @@ namespace LocalizationTool.Scripts.Editors
         {
             var height = _feedbackList.ContainsKey(categoryName) ? Height : GUILayout.Height(40 + 20);
             GUI.backgroundColor = EditorGUIUtility.isProSkin ? Color.white : Colors.Alpha(Color.cyan, .1f);
-            GUILayout.BeginVertical("box", height);
+            GUILayout.BeginVertical("box", height); 
         
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginHorizontal(Height);
@@ -272,7 +285,7 @@ namespace LocalizationTool.Scripts.Editors
                 if (GUILayout.Button(GetGUIContent(StarIcon, string.Format(MAKE_CATEGORY_DEFAULT_BUTTON_TOOLTIP, categoryName)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     LocalizationManager.Instance.ChangeDefaultCategory(categoryName);
-                    LocalizationManager.Log(CATEGORIES_LABEL, CustomDebugPlugin.Colors.Green,string.Format(CATEGORY_DEFAULT_LOG, categoryName));
+                    LocalizationManager.Log(CATEGORIES_LABEL, CustomDebug.Colors.Green,string.Format(CATEGORY_DEFAULT_LOG, categoryName));
                 }
             }
         
@@ -341,14 +354,14 @@ namespace LocalizationTool.Scripts.Editors
         private static void DeleteCategory(string category)
         {
             LocalizationManager.RemoveCategory(category);
-            LocalizationManager.Log(CATEGORIES_LABEL, CustomDebugPlugin.Colors.Green,string.Format(DELETED_CATEGORY_LOG, category));
+            LocalizationManager.Log(CATEGORIES_LABEL, CustomDebug.Colors.Green,string.Format(DELETED_CATEGORY_LOG, category));
         }
         
         private void UpdateCategory(string oldCategory, string newCategory)
         {
             if (oldCategory.Equals(newCategory)) return;
         
-            if (!_feedbackList.ContainsKey(oldCategory)) _feedbackList.Add(oldCategory, "");
+            _feedbackList.TryAdd(oldCategory, "");
         
             if (newCategory.IsEmpty())
             {

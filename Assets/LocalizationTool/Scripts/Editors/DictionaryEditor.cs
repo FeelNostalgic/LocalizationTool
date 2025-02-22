@@ -223,7 +223,7 @@ namespace LocalizationTool.Scripts.Editors
             if (GUILayout.Button(new GUIContent(RefreshIcon, RELOAD_BUTTON_TOOLTIP), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
             {
                 LocalizationManager.RefreshDictionaryData();
-                LocalizationManager.Log(DICTIONARY_LABEL, CustomDebugPlugin.Colors.Blue, LOADED_LOG);
+                LocalizationManager.Log(DICTIONARY_LABEL, CustomDebug.Colors.Blue, LOADED_LOG);
             }
 
             GUILayout.FlexibleSpace();
@@ -307,7 +307,6 @@ namespace LocalizationTool.Scripts.Editors
             }
             catch(Exception e)
             {
-                // ignored
                 Debug.LogError(e);
             }
         }
@@ -372,7 +371,7 @@ namespace LocalizationTool.Scripts.Editors
             if (GUILayout.Button(new GUIContent(key, KEY_SELECTABLE_LABEL_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.KeySelectableLabel), GUILayout.Width(275), GUILayout.Height(30)))
             {
                 EditorGUIUtility.systemCopyBuffer = key;
-                LocalizationManager.Log(DICTIONARY_LABEL, CustomDebugPlugin.Colors.Blue, string.Format(COPY_KEY_TOOLTIP, key));
+                LocalizationManager.Log(DICTIONARY_LABEL, CustomDebug.Colors.Blue, string.Format(COPY_KEY_TOOLTIP, key));
             }
 
             GUILayout.EndVertical();
@@ -421,7 +420,7 @@ namespace LocalizationTool.Scripts.Editors
             if (GUILayout.Button(new GUIContent(GearIcon, OPEN_TEXT_EDITOR_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
             {
                 RichTextEditor.ShowWindow(tempValue, key, delegate(string s) { UpdateValue(key, s); });
-                LocalizationManager.Log(DICTIONARY_LABEL, CustomDebugPlugin.Colors.Blue, string.Format(EDITING_KEY_LOG, key));
+                LocalizationManager.Log(DICTIONARY_LABEL, CustomDebug.Colors.Blue, string.Format(EDITING_KEY_LOG, key));
 
             }
 
@@ -450,7 +449,7 @@ namespace LocalizationTool.Scripts.Editors
         private static void DeleteKey(string key)
         {
             LocalizationManager.RemoveKey(key);
-            LocalizationManager.Log(DICTIONARY_LABEL, CustomDebugPlugin.Colors.Blue, string.Format(DELETED_KEY_LOG, key));
+            LocalizationManager.Log(DICTIONARY_LABEL, CustomDebug.Colors.Blue, string.Format(DELETED_KEY_LOG, key));
         }
 
         private void UpdateCategory(string key, string tempCategory)

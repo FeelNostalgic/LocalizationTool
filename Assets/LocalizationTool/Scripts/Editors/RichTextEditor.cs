@@ -374,7 +374,7 @@ namespace LocalizationTool.Scripts.Editors
 
             if (length == 0)
             {
-                LocalizationManager.LogWarning("Rich Text Editor", CustomDebugPlugin.Colors.LightBlue, RICH_TEXT_EDITOR_SELECT_TEXT_WARNING_LOG);
+                LocalizationManager.LogWarning("Rich Text Editor", CustomDebug.Colors.LightBlue, RICH_TEXT_EDITOR_SELECT_TEXT_WARNING_LOG);
                 return;
             }
 
