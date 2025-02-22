@@ -46,6 +46,11 @@ namespace LocalizationTool.Scripts.Editors
 
         private string _tempValue;
         private EditorCoroutine _currentCoroutine;
+        
+        private double _lastEditTime;
+        private const float DELAY_TIME = 0.20f;
+        
+        private static Action<string> _onTextChanged;
 
         #endregion
 
@@ -56,6 +61,7 @@ namespace LocalizationTool.Scripts.Editors
             window.maxSize = new Vector2(WindowSize.x, 100000);
             window._key = key;
             window._richText = initialText;
+            _onTextChanged = onTextChanged;
         }
         
         public void ControlFeedbackLabel(string text)
@@ -132,7 +138,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.BeginVertical("box",GUILayout.Height(FeedbackLabel.IsNotEmpty() ? 60 : 35));
 
             GUI.SetNextControlName("VALUE");
-            var temp = EditorGUILayout.TextField(_key, CustomStyles.GetStyle(Enums.CustomStyleName.RichTextEditorKeyTextField), GUILayout.Height(30));
+            var temp = EditorGUILayout.DelayedTextField(_key, CustomStyles.GetStyle(Enums.CustomStyleName.RichTextEditorKeyTextField), GUILayout.Height(30));
             UpdateKey(_key, temp);
 
             if (FeedbackLabel.IsNotEmpty())
@@ -153,28 +159,34 @@ namespace LocalizationTool.Scripts.Editors
         {
             EditorGUILayout.BeginHorizontal(GUILayout.ExpandHeight(true));
             GUI.SetNextControlName("TextArea");
+
             var richTextStyle = new GUIStyle(GUI.skin.textArea)
             {
                 richText = _showRichTextTags,
                 wordWrap = true,
                 fontSize = FONT_SIZE_TEXT_AREA * _zoom / 100,
                 padding = { top = 5, bottom = 5, left = 5, right = 5 },
-                normal =
-                {
-                    textColor = Color.white
-                }
+                normal = { textColor = Color.white }
             };
 
             GUILayout.BeginHorizontal("box");
             _scrollView = GUILayout.BeginScrollView(_scrollView, GUILayout.ExpandHeight(true));
             
             _tempValue = EditorGUILayout.TextArea(_richText, richTextStyle, GUILayout.ExpandHeight(true));
-            UpdateValue(_key, _tempValue);
+            
+            if (_tempValue != _richText)
+            {
+                _richText = _tempValue;
+                _lastEditTime = EditorApplication.timeSinceStartup;
+            }
 
             GUILayout.EndScrollView();
             GUILayout.EndHorizontal();
-
             EditorGUILayout.EndHorizontal();
+            
+            if (!(EditorApplication.timeSinceStartup - _lastEditTime > DELAY_TIME)) return;
+            UpdateValue(_key, _richText);
+            _lastEditTime = float.MaxValue;
         }
 
         private void RichTextToggle()
@@ -487,9 +499,9 @@ namespace LocalizationTool.Scripts.Editors
 
         private void AddTags(string selectedText, int startIndex, int length, string openingTag, string closingTag)
         {
-            string styledText;
-            //Add Tags
-            styledText = $"{openingTag}{selectedText}{closingTag}";
+            var styledText =
+                //Add Tags
+                $"{openingTag}{selectedText}{closingTag}";
             _richText = $"{_richText[..startIndex]}{styledText}{_richText[(startIndex + length)..]}";
         }
 
@@ -509,6 +521,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private void UpdateValue(string key, string tempValue)
         {
+            _onTextChanged.Invoke(tempValue);
             _richText = tempValue;
             LocalizationManager.ChangeValue(key, tempValue);
         }

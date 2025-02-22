@@ -239,7 +239,7 @@ namespace LocalizationTool.Scripts.Editors
             GUI.backgroundColor = Colors.DEFAULT;
             GUILayout.FlexibleSpace();
             EditorGUI.BeginChangeCheck();
-            var tempIndex = EditorGUILayout.IntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Height(30));
+            var tempIndex = EditorGUILayout.DelayedIntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Height(30));
             if (EditorGUI.EndChangeCheck()) UpdateIndex(languageName, index, tempIndex);
             GUILayout.EndVertical();
         }
@@ -312,7 +312,7 @@ namespace LocalizationTool.Scripts.Editors
 
             // Text
             EditorGUI.BeginChangeCheck();
-            var tempValue = EditorGUILayout.TextField(languageName, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), GUILayout.Height(40));
+            var tempValue = EditorGUILayout.DelayedTextField(languageName, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), GUILayout.Height(40));
 
             if (EditorGUI.EndChangeCheck()) UpdateLanguage(languageName, tempValue);
 
@@ -406,7 +406,7 @@ namespace LocalizationTool.Scripts.Editors
         {
             if (oldLanguage.Equals(newLanguage)) return;
 
-            if (!_feedbackList.ContainsKey(oldLanguage)) _feedbackList.Add(oldLanguage, "");
+            _feedbackList.TryAdd(oldLanguage, "");
 
             if (newLanguage.IsEmpty())
             {

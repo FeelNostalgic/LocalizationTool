@@ -235,7 +235,7 @@ namespace LocalizationTool.Scripts.Editors
             GUI.backgroundColor = Colors.DEFAULT;
 
             GUILayout.FlexibleSpace();
-            var tempIndex = EditorGUILayout.IntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Height(30));
+            var tempIndex = EditorGUILayout.DelayedIntField(index, CustomStyles.GetStyle(Enums.CustomStyleName.OrderIntField), GUILayout.Height(30));
             if (!LocalizationManager.IsDefaultCategory(categoryName)) UpdateIndex(categoryName, index, tempIndex);
             GUILayout.EndVertical();
         }
@@ -307,7 +307,7 @@ namespace LocalizationTool.Scripts.Editors
 
             // Text
             EditorGUI.BeginChangeCheck();
-            var tempValue = EditorGUILayout.TextField(category, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), GUILayout.Height(40));
+            var tempValue = EditorGUILayout.DelayedTextField(category, CustomStyles.GetStyle(Enums.CustomStyleName.ValueMiddleLeftTextField), GUILayout.Height(40));
             if (EditorGUI.EndChangeCheck()) UpdateCategory(category, tempValue);
 
             // Delete Button

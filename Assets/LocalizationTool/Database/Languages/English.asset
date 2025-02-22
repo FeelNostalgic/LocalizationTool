@@ -27,7 +27,14 @@ MonoBehaviour:
   m_Name: 5
   m_EditorClassIdentifier: 
   keyName: 5
-  translationText: 
+  translationText: 'gjkhdfkghkjh bmkjdhfgkjdfghkjehrkjhcfkjbkjhdfg
+
+
+
+
+    fsdfsdlhsldkfgldfg
+
+'
 --- !u!114 &-6263934435302093208
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38,9 +45,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c74921811585e04a9816cbed79332e8, type: 3}
-  m_Name: 3
+  m_Name: 1
   m_EditorClassIdentifier: 
-  keyName: 3
+  keyName: 1
   translationText: 1
 --- !u!114 &-5890781847892774533
 MonoBehaviour:
@@ -111,7 +118,7 @@ MonoBehaviour:
   m_Name: 2
   m_EditorClassIdentifier: 
   keyName: 2
-  translationText: fdsfsd
+  translationText: fsdfsd
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -185,7 +192,9 @@ MonoBehaviour:
   m_Name: 7
   m_EditorClassIdentifier: 
   keyName: 7
-  translationText: 
+  translationText: 'sdfsdfsdfsdf xddddddddddddddd
+
+    fsdfsdf'
 --- !u!114 &2538627818647338623
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,7 +222,18 @@ MonoBehaviour:
   m_Name: 6
   m_EditorClassIdentifier: 
   keyName: 6
-  translationText: 
+  translationText: 'Hola que talfsfsdfsdfsdfe
+
+
+
+
+    gdlhdfhgkjhgdfgdf
+
+
+
+
+
+'
 --- !u!114 &4701972382239694720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -227,7 +247,12 @@ MonoBehaviour:
   m_Name: 4
   m_EditorClassIdentifier: 
   keyName: 4
-  translationText: 
+  translationText: 'gjkhdfkghkjh bmkjdhfgkjdfghkjehrkjhcfkjbkjhdfg
+
+    fsdfsdlhsldkfgldfgdfgdfrgd
+
+
+'
 --- !u!114 &4840302397035033588
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -36,9 +36,13 @@ namespace LocalizationTool.Scripts.Editors
         private Vector2 _scrollToolbar;
         private int _currentLanguageToolbarIndex;
 
-        private readonly Dictionary<string, string> _currentKeyValueDictionary = new();
+        //private readonly Dictionary<string, string> _currentKeyValueDictionary = new();
         private readonly Dictionary<string, string> _currentKeyGroupDictionary = new();
         private readonly Dictionary<string, Vector2> _currentKeyScrollPosition = new();
+        
+        private readonly Dictionary<string, string> _textBuffer = new();
+        private readonly Dictionary<string, double> _lastEditTime = new();
+        private const float DELAY_TIME = 0.20f;
 
         #endregion
 
@@ -278,7 +282,7 @@ namespace LocalizationTool.Scripts.Editors
 
             GUI.backgroundColor = Colors.DEFAULT;
         }
-        
+
         private Dictionary<string, TranslationKeyDataSO> GetFilteredDictionary()
         {
             var filteredDicToIterate = new Dictionary<string, TranslationKeyDataSO>(CacheDataSO.localizationData.LanguagesDictionary[LocalizationManager.CurrentLanguageInDictionarySection].TranslationDictionary);
@@ -311,7 +315,7 @@ namespace LocalizationTool.Scripts.Editors
             return filteredDicToIterate;
         }
 
-        
+
         private void GenerateCenterScrollViewContent()
         {
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
@@ -342,8 +346,8 @@ namespace LocalizationTool.Scripts.Editors
                         DrawKeyItem(item.Key, CacheDataSO.localizationData.KeysDictionary[item.Key].category.categoryName, item.Value.translationText);
                     }
 
-                    GUILayout.Space(Mathf.Clamp((filteredDicToIterate.Count - lastVisibleIndex - 1) * itemHeight, 0f, filteredDicToIterate.Count * itemHeight)+40);
-                    
+                    GUILayout.Space(Mathf.Clamp((filteredDicToIterate.Count - lastVisibleIndex - 1) * itemHeight, 0f, filteredDicToIterate.Count * itemHeight) + 40);
+
                     GUILayout.EndVertical();
                 }
             }
@@ -354,20 +358,20 @@ namespace LocalizationTool.Scripts.Editors
                     Debug.LogError(e);
                 }
             }
-            
+
             EditorGUILayout.EndScrollView();
         }
-        
+
         private void DrawKeyItem(string key, string category, string value)
         {
-            _currentKeyValueDictionary.TryAdd(key, value);
+            //_currentKeyValueDictionary.TryAdd(key, value);
             _currentKeyGroupDictionary.TryAdd(key, category);
             _currentKeyScrollPosition.TryAdd(key, Vector2.zero);
 
             GUI.backgroundColor = EditorGUIUtility.isProSkin ? Color.white : Colors.Alpha(Color.cyan, .1f);
             GUILayout.BeginHorizontal("box", Height);
             GUI.backgroundColor = Color.clear;
-            
+
             Column1(key);
 
             Column2(key, category);
@@ -416,17 +420,35 @@ namespace LocalizationTool.Scripts.Editors
         private void Column3(string key, string value)
         {
             GUI.backgroundColor = Color.clear;
-
             GUILayout.BeginHorizontal("box", Height, GUILayout.ExpandWidth(true));
-
             GUI.backgroundColor = Colors.DEFAULT;
 
             GUILayout.BeginHorizontal(CustomStyles.GetStyle(Enums.CustomStyleName.ValueEditorPreviewBox));
+
             _currentKeyScrollPosition[key] = EditorGUILayout.BeginScrollView(_currentKeyScrollPosition[key], GUILayout.ExpandWidth(true), GUILayout.Height(40));
-            var tempValue = EditorGUILayout.TextArea(value, CustomStyles.GetStyle(Enums.CustomStyleName.ValueEditorPreviewTextArea), GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
-            UpdateValue(key, tempValue);
+            
+            _textBuffer.TryAdd(key, value);
+            
+            var tempValue = EditorGUILayout.TextArea(_textBuffer[key], CustomStyles.GetStyle(Enums.CustomStyleName.ValueEditorPreviewTextArea), GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
+            
+            if (tempValue != _textBuffer[key])
+            {
+                _textBuffer[key] = tempValue;
+                _lastEditTime[key] = EditorApplication.timeSinceStartup;
+            }
+
             EditorGUILayout.EndScrollView();
             GUILayout.EndHorizontal();
+            
+            if (_lastEditTime.ContainsKey(key) && EditorApplication.timeSinceStartup - _lastEditTime[key] > DELAY_TIME)
+            {
+                if (value != _textBuffer[key])
+                {
+                    UpdateValue(key, _textBuffer[key]);
+                }
+
+                _lastEditTime.Remove(key);
+            }
 
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginHorizontal("box");
@@ -452,7 +474,6 @@ namespace LocalizationTool.Scripts.Editors
             }
 
             GUILayout.EndHorizontal();
-
             GUILayout.EndHorizontal();
         }
 
@@ -476,9 +497,9 @@ namespace LocalizationTool.Scripts.Editors
 
         private void UpdateValue(string key, string tempValue)
         {
-            if (tempValue.IsNull() || tempValue.Equals(_currentKeyValueDictionary[key])) return;
+            if (tempValue.IsNull()) return;
 
-            _currentKeyValueDictionary[key] = tempValue;
+            _textBuffer[key] = tempValue;
             LocalizationManager.ChangeValue(key, tempValue);
         }
 

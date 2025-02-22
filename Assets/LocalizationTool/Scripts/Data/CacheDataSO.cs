@@ -300,6 +300,7 @@ namespace LocalizationTool.Scripts.Data
         {
             var languageToUpdate = localizationData.LanguagesDictionary[oldLanguageName];
             languageToUpdate!.languageName = newLanguageName;
+            EditorUtility.SetDirty(languageToUpdate);
             AssetDatabase.RenameAsset(GetPath(languageToUpdate), newLanguageName);
 
             SaveChanges();
@@ -417,6 +418,7 @@ namespace LocalizationTool.Scripts.Data
         {
             var categoryToUpdate = localizationData.CategoriesDictionary[oldCategoryName];
             categoryToUpdate!.categoryName = newCategoryName;
+            EditorUtility.SetDirty(categoryToUpdate);
             AssetDatabase.RenameAsset(GetPath(categoryToUpdate), newCategoryName);
 
             SaveChanges();
