@@ -1,5 +1,4 @@
 #if UNITY_EDITOR
-
 using System;
 using System.Collections;
 using System.Reflection;
@@ -9,7 +8,6 @@ using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.General;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
-using UnityEditor.TerrainTools;
 using UnityEngine;
 using ColorUtility = UnityEngine.ColorUtility;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
@@ -22,6 +20,7 @@ namespace LocalizationTool.Scripts.Editors
         #region PUBLIC VARIABLES
 
         public bool AddActionRunning { get; set; }
+        //public static RichTextEditor Instance => _instance ??= GetWindow<RichTextEditor>();
 
         #endregion
 
@@ -33,6 +32,8 @@ namespace LocalizationTool.Scripts.Editors
 
         #region PRIVATE VARIABLES
 
+        private static RichTextEditor _instance;
+        
         private const int FONT_SIZE_TEXT_AREA = 12;
 
         // If you want more font size, just add them to this array
@@ -62,11 +63,11 @@ namespace LocalizationTool.Scripts.Editors
             var window = GetWindow<RichTextEditor>(RICH_TEXT_EDITOR_WINDOW_LABEL);
             window.minSize = WindowSize;
             window.maxSize = new Vector2(WindowSize.x, 100000);
-            _key = key;
+            RichTextEditor._key = key;
             _richText = initialText;
             _onTextChanged = onTextChanged;
         }
-
+        
         public void ControlFeedbackLabel(string text)
         {
             AddActionRunning = true;
@@ -91,16 +92,15 @@ namespace LocalizationTool.Scripts.Editors
             UpdateValue(_key, _tempValue);
         }
 
-        public static void RefreshTextBuffer()
+        public static void RefreshTextArea()
         {
             _richText = CacheDataSO.localizationData.LanguagesDictionary[LocalizationManager.CurrentLanguageInDictionarySection].TranslationDictionary[_key].translationText;
-
-            // Forzar redibujado de la UI
+            
             EditorApplication.delayCall += () => GetWindow<RichTextEditor>().Repaint();
         }
-
+        
         #region PRIVATE METHODS
-
+        
         private void OnGUI()
         {
             GUILayout.BeginVertical();
@@ -545,6 +545,7 @@ namespace LocalizationTool.Scripts.Editors
         }
 
         #endregion
+    
     }
 }
 #endif

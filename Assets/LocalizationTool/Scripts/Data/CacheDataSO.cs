@@ -175,24 +175,29 @@ namespace LocalizationTool.Scripts.Data
             translationToUpdate.translationText = newTranslation;
 
             SaveChanges();
-            
+
             Undo.undoRedoPerformed -= DictionaryEditor.RefreshTextBuffer;
-            Undo.undoRedoPerformed -= RichTextEditor.RefreshTextBuffer;
+            Undo.undoRedoPerformed -= RichTextEditor.RefreshTextArea;
             Undo.undoRedoPerformed += DictionaryEditor.RefreshTextBuffer;
-            Undo.undoRedoPerformed += RichTextEditor.RefreshTextBuffer;
+            Undo.undoRedoPerformed += RichTextEditor.RefreshTextArea;
         }
 
         public static void UpdateKeyName(string oldKeyName, string newKeyName)
         {
             var keyToUpdate = localizationData.keys.FirstOrDefault(x => x.keyName.Equals(oldKeyName));
+            // FUTURE: Undo.RecordObject(keyToUpdate, $"Rename Key '{oldKeyName}' to '{newKeyName}'");
             keyToUpdate!.keyName = newKeyName;
             EditorUtility.SetDirty(keyToUpdate);
             AssetDatabase.RenameAsset(GetPath(keyToUpdate), newKeyName);
-
-            foreach (var translationToUpdate in LanguageCache.Select(language => language.TranslationDictionary[oldKeyName]))
+            
+            foreach (var language in LanguageCache)
             {
+                if (!language.TranslationDictionary.TryGetValue(oldKeyName, out var translationToUpdate)) continue;
+
+                // FUTURE: Undo.RecordObject(translationToUpdate, $"Rename Translation Key '{oldKeyName}' to '{newKeyName}'");
                 translationToUpdate.keyName = newKeyName;
                 translationToUpdate.name = newKeyName;
+                EditorUtility.SetDirty(translationToUpdate);
             }
 
             SaveChanges();
