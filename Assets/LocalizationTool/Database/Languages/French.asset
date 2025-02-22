@@ -240,7 +240,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c74921811585e04a9816cbed79332e8, type: 3}
   m_Name: 1
   m_EditorClassIdentifier: 
-  keyName: 1
+  keyName: 123123
   translationText: Bonjour
 --- !u!114 &9050095526467784162
 MonoBehaviour:

@@ -82,8 +82,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c74921811585e04a9816cbed79332e8, type: 3}
   m_Name: 1
   m_EditorClassIdentifier: 
-  keyName: 1
-  translationText: Hello
+  keyName: 123123
+  translationText: 'Hello '
 --- !u!114 &-423469371312561593
 MonoBehaviour:
   m_ObjectHideFlags: 0

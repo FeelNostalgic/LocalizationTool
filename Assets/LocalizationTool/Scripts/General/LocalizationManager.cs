@@ -102,7 +102,7 @@ namespace LocalizationTool.Scripts.General
 
             if (ExistsKey(newKeyName))
             {
-                ShowFeedback(string.Format(KEY_EXIST_FEEDBACK_LABEL, oldKeyName), editor);
+                ShowFeedback(string.Format(KEY_EXIST_FEEDBACK_LABEL, newKeyName), editor);
                 return oldKeyName;
             }
 

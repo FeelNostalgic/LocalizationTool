@@ -96,7 +96,7 @@ namespace LocalizationTool.Scripts.Editors
 
             GUILayout.Space(3);
 
-            HistoryButtons();
+            //FUTURE: HistoryButtons();
 
             Separator();
 
@@ -216,7 +216,6 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.EndVertical();
         }
         
-        //FUTURE: HistoryButtons
         private void HistoryButtons()
         {
             GUILayout.BeginVertical();
@@ -225,12 +224,12 @@ namespace LocalizationTool.Scripts.Editors
 
             if (GUILayout.Button(GetGUIContent(UndoIcon, RICH_TEXT_EDITOR_UNDO_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
-                //FUTURE: Undo
+                // Undo
             }
 
             if (GUILayout.Button(GetGUIContent(RedoIcon, RICH_TEXT_EDITOR_REDO_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
-                //FUTURE: Redo
+                // Redo
             }
 
             GUILayout.EndHorizontal();

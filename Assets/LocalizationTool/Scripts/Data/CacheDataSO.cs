@@ -176,6 +176,11 @@ namespace LocalizationTool.Scripts.Data
         public static void UpdateKeyName(string oldKeyName, string newKeyName)
         {
             localizationData.KeysDictionary[oldKeyName].keyName = newKeyName;
+            foreach (var language in LanguageCache)
+            {
+                language.translationKeys.FirstOrDefault(x=> x.keyName.Equals(oldKeyName))!.keyName = newKeyName;
+            }
+            
             SaveChanges();
         }
 
@@ -425,14 +430,14 @@ namespace LocalizationTool.Scripts.Data
             if (!AssetDatabase.Contains(localizationData))
             {
                 AssetDatabase.CreateAsset(localizationData, LOCALIZATION_DATA_PATH);
-                Debug.Log("LocalizationData.asset created!");
+                //Debug.Log("LocalizationData.asset created!");
             }
         
             InsertFirstLanguageIfNotExist();
             InsertFirstCategoryIfNotExist();
             SaveChanges();
             
-            Debug.Log("LocalizationData.asset loaded!");
+            //Debug.Log("LocalizationData.asset loaded!");
         }
         
         private static void InsertFirstLanguageIfNotExist()
