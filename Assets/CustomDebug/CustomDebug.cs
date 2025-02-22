@@ -200,19 +200,38 @@ namespace CustomDebug
             return colorOpen;
         }
 
+        // private static (string script, int number) GetTraceScript()
+        // {
+        //     var stackTrace = new StackTrace(true);
+        //     var frame = stackTrace.GetFrame(2);
+        //
+        //     var callingScript = frame.GetFileName();
+        //     var lineNumber = frame.GetFileLineNumber();
+        //
+        //     callingScript = callingScript != null ? System.IO.Path.GetFileNameWithoutExtension(callingScript) : "Unknown";
+        //
+        //     return (callingScript, lineNumber);
+        // }
+
         private static (string script, int number) GetTraceScript()
         {
             var stackTrace = new StackTrace(true);
-            var frame = stackTrace.GetFrame(2);
+            
+            for (var i = 0; i < stackTrace.FrameCount; i++)
+            {
+                var frame = stackTrace.GetFrame(i);
+                var fileName = frame.GetFileName();
 
-            var callingScript = frame.GetFileName();
-            var lineNumber = frame.GetFileLineNumber();
+                if (fileName == null || fileName.Contains("CustomDebug")) continue;
+                
+                var callingScript = System.IO.Path.GetFileNameWithoutExtension(fileName);
+                var lineNumber = frame.GetFileLineNumber();
+                return (callingScript, lineNumber);
+            }
 
-            callingScript = callingScript != null ? System.IO.Path.GetFileNameWithoutExtension(callingScript) : "Unknown";
-
-            return (callingScript, lineNumber);
+            return ("Unknown", 0); 
         }
-
+        
         #endregion
     }
 }
