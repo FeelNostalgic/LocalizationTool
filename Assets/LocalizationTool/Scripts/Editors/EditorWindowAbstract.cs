@@ -80,7 +80,6 @@ namespace LocalizationTool.Scripts.Editors
 
         protected virtual void ControlFocus(string focus)
         {
-            
             if (GUI.GetNameOfFocusedControl() != focus) return;
             if (Event.current is { isKey: true }) EditorGUI.FocusTextInControl(focus);
         }

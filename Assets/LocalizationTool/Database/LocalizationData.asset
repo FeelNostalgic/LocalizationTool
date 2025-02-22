@@ -13,12 +13,18 @@ MonoBehaviour:
   m_Name: LocalizationData
   m_EditorClassIdentifier: 
   languages:
+  - {fileID: 11400000, guid: 568550591885adc4db3bd3d800338db5, type: 2}
   - {fileID: 11400000, guid: a5cb1fa41f8366d4f815786d06cecf81, type: 2}
   - {fileID: 11400000, guid: 59b1cfbf8dbdf9f47853c56ea17d7875, type: 2}
-  - {fileID: 11400000, guid: 568550591885adc4db3bd3d800338db5, type: 2}
   categories:
   - {fileID: 11400000, guid: 3e22f37a2c655a048b76d221c5d31f2d, type: 2}
   - {fileID: 11400000, guid: a54e1664308c30148800f6eb8a0b7725, type: 2}
+  - {fileID: 11400000, guid: 7dee57bd990e8774ca2808c5edccffe7, type: 2}
+  - {fileID: 11400000, guid: e37071b5039e5ae46a6fa12ffde53b7d, type: 2}
+  - {fileID: 11400000, guid: ba5ac6bd1cc56d54e90d02682a25eed7, type: 2}
+  - {fileID: 11400000, guid: 976a1768a4490a84ab0eaa6abf825783, type: 2}
+  - {fileID: 11400000, guid: a2372446cd4dddb48b0ba0489fda30cb, type: 2}
+  - {fileID: 11400000, guid: 42246763350351040b9ca2919a3a4bb0, type: 2}
   keys:
   - {fileID: 11400000, guid: cb229497d3f9b0c49b2129a305730001, type: 2}
   - {fileID: 11400000, guid: 86c419cf20bc9234280ab58957867171, type: 2}

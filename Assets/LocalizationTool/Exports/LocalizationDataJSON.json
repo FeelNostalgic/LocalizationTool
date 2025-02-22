@@ -1,4 +1,19 @@
 {
+  "languages": [
+    "English",
+    "French",
+    "Spanish"
+  ],
+  "categories": [
+    "None",
+    "Main Menu",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "Options"
+  ],
   "dictionaryKeyCategoryLanguages": [
     {
       "key": "1",
@@ -42,7 +57,7 @@
       "languageValues": [
         {
           "Language": "English",
-          "Value": ""
+          "Value": "fdsfsd"
         },
         {
           "Language": "French",
@@ -110,7 +125,7 @@
     },
     {
       "key": "7",
-      "category": "None",
+      "category": "Options",
       "languageValues": [
         {
           "Language": "English",

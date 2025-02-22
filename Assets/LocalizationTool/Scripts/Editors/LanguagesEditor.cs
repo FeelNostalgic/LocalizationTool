@@ -200,7 +200,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private void DrawLanguageItem(int index, string languageName)
         {
-            var height = _feedbackList.ContainsKey(languageName) ? Height : GUILayout.Height(40 + 20);
+            var height = _feedbackList.ContainsKey(languageName) ? GUILayout.Height(40f + 20) : Height;
             GUI.backgroundColor = EditorGUIUtility.isProSkin ? Color.white : Colors.Alpha(Color.cyan, .1f);
             GUILayout.BeginVertical("box", height);
 

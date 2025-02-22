@@ -200,7 +200,7 @@ namespace LocalizationTool.Scripts.Editors
         private void DrawCategoryItem(int index, string categoryName)
         {
             var hasFeedback = _feedbackList.ContainsKey(categoryName);
-            var itemHeight = hasFeedback ? Height : GUILayout.Height(60);
+            var itemHeight = hasFeedback ? GUILayout.Height(60) : Height;
 
             GUI.backgroundColor = EditorGUIUtility.isProSkin ? Color.white : Colors.Alpha(Color.cyan, .1f);
             GUILayout.BeginVertical("box", itemHeight);

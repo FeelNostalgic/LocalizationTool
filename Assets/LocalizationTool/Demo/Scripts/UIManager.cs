@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace LocalizationTool.Demo.Scripts
 {
-    [DefaultExecutionOrder(100)]
+    [DefaultExecutionOrder(-999)]
     public class UIManager : MonoBehaviour
     {
         #region Inspector Variables

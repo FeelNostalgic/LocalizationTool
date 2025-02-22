@@ -59,6 +59,8 @@ namespace LocalizationTool.Scripts.Data
 
         public static void LoadCacheData()
         {
+            if (IsDataLoaded) return;
+            
             CreateOrLoadLocalizationData();
             
             UpdateLanguageCache();
@@ -71,6 +73,8 @@ namespace LocalizationTool.Scripts.Data
 
             if (LocalizationToolAPI.Instance.IsNotNull()) LocalizationToolAPI.ActiveLanguage = DefaultLanguage;
 
+            IsDataLoaded = true;
+            
             OnLocalizationToolDataInitialized?.Invoke();
         }
 
@@ -105,7 +109,6 @@ namespace LocalizationTool.Scripts.Data
             
             var tempLList = new List<LanguageDataSO>(LanguageCache);
             tempLList.ForEach(x => RemoveLanguage(x.languageName));
-            
             
             var tempCList = new List<CategoryDataSO>(CategoryCache);
             tempCList.ForEach(x => RemoveCategory(x.categoryName));
@@ -183,10 +186,10 @@ namespace LocalizationTool.Scripts.Data
         public static void InsertLanguage(string newLanguageName)
         {
             var newLanguage = ScriptableObject.CreateInstance<LanguageDataSO>();
-            AssetDatabase.CreateAsset(newLanguage, $"{LANGUAGES_PATH}/{newLanguageName}.asset");
             newLanguage.languageName = newLanguageName;
             newLanguage.displayOrder = localizationData.languages.Count + 1;
             if (localizationData.languages.Count == 0) newLanguage.isDefault = true;
+            AssetDatabase.CreateAsset(newLanguage, $"{LANGUAGES_PATH}/{newLanguageName}.asset");
 
             localizationData.languages.Add(newLanguage);
 
@@ -286,8 +289,8 @@ namespace LocalizationTool.Scripts.Data
         public static void UpdateLanguageName(string oldLanguageName, string newLanguageName)
         {
             var languageToUpdate = localizationData.LanguagesDictionary[oldLanguageName];
-            AssetDatabase.RenameAsset(GetPath(languageToUpdate), newLanguageName);
             languageToUpdate!.languageName = newLanguageName;
+            AssetDatabase.RenameAsset(GetPath(languageToUpdate), newLanguageName);
 
             SaveChanges();
         }
@@ -310,10 +313,10 @@ namespace LocalizationTool.Scripts.Data
         public static void InsertCategory(string newCategoryName)
         {
             var newCategory = ScriptableObject.CreateInstance<CategoryDataSO>();
-            AssetDatabase.CreateAsset(newCategory, $"{CATEGORIES_PATH}/{newCategoryName}.asset");
             newCategory.categoryName = newCategoryName;
             newCategory.displayOrder = localizationData.categories.Count + 1;
             if (localizationData.categories.Count == 0) newCategory.isDefault = true;
+            AssetDatabase.CreateAsset(newCategory, $"{CATEGORIES_PATH}/{newCategoryName}.asset");
 
             localizationData.categories.Add(newCategory);
             SaveChanges(newCategory);
@@ -403,8 +406,8 @@ namespace LocalizationTool.Scripts.Data
         public static void UpdateCategoryName(string oldCategoryName, string newCategoryName)
         {
             var categoryToUpdate = localizationData.CategoriesDictionary[oldCategoryName];
-            AssetDatabase.RenameAsset(GetPath(categoryToUpdate), newCategoryName);
             categoryToUpdate!.categoryName = newCategoryName;
+            AssetDatabase.RenameAsset(GetPath(categoryToUpdate), newCategoryName);
 
             SaveChanges();
         }

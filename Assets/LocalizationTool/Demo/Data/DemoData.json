@@ -1,9 +1,19 @@
 {
-  "DictionaryKeyCategoryLanguages": [
+  "languages": [
+    "Spanish",
+    "English",
+    "French"
+  ],
+  "categories": [
+    "None",
+    "Main_Menu",
+    "Options"
+  ],
+  "dictionaryKeyCategoryLanguages": [
     {
-      "Key": "Play_Button",
-      "Category": "Main_Menu",
-      "LanguageValues": [
+      "key": "Play_Button",
+      "category": "Main_Menu",
+      "languageValues": [
         {
           "Language": "Spanish",
           "Value": "Jugar"
@@ -19,9 +29,9 @@
       ]
     },
     {
-      "Key": "Exit_Button",
-      "Category": "Main_Menu",
-      "LanguageValues": [
+      "key": "Exit_Button",
+      "category": "Main_Menu",
+      "languageValues": [
         {
           "Language": "Spanish",
           "Value": "Salir"
@@ -37,9 +47,9 @@
       ]
     },
     {
-      "Key": "Options_Button",
-      "Category": "Main_Menu",
-      "LanguageValues": [
+      "key": "Options_Button",
+      "category": "Main_Menu",
+      "languageValues": [
         {
           "Language": "Spanish",
           "Value": "Opciones"
@@ -55,9 +65,9 @@
       ]
     },
     {
-      "Key": "Options_Title",
-      "Category": "Options",
-      "LanguageValues": [
+      "key": "Options_Title",
+      "category": "Options",
+      "languageValues": [
         {
           "Language": "Spanish",
           "Value": "Opciones"
@@ -73,9 +83,9 @@
       ]
     },
     {
-      "Key": "Volume_Label",
-      "Category": "Options",
-      "LanguageValues": [
+      "key": "Volume_Label",
+      "category": "Options",
+      "languageValues": [
         {
           "Language": "Spanish",
           "Value": "Volumen"
@@ -91,9 +101,9 @@
       ]
     },
     {
-      "Key": "Back_Button",
-      "Category": "Options",
-      "LanguageValues": [
+      "key": "Back_Button",
+      "category": "Options",
+      "languageValues": [
         {
           "Language": "Spanish",
           "Value": "Volver"

@@ -455,8 +455,12 @@ namespace LocalizationTool.Scripts.General
 
         public static string BuildSerializedData(ISerializerService serializer)
         {
-            var dataToSerialize = new DictionaryTemplate();
-            
+            var dataToSerialize = new DictionaryTemplate
+            {
+                categories = CacheDataSO.Categories,
+                languages = CacheDataSO.Languages
+            };
+
             foreach (var keyData in CacheDataSO.localizationData.keys)
             {
                 var key = keyData.keyName;
@@ -567,32 +571,38 @@ namespace LocalizationTool.Scripts.General
                 yield break;
             }
 
-            // Items count
-            var totalItems = data.dictionaryKeyCategoryLanguages[0].languageValues.Count + data.dictionaryKeyCategoryLanguages.Count;
+            // Items count = languages + categories + keys 
+            var totalItems = data.languages.Count + data.categories.Count + data.dictionaryKeyCategoryLanguages.Count;
             var itemCount = 0f;
 
             //Languages
             if (progressWindow.IsNotNull()) progressWindow.SetStatus(IMPORT_STATUS_LANGUAGES);
 
-            foreach (var languageValue in data.dictionaryKeyCategoryLanguages[0].languageValues)
+            foreach (var language in data.languages)
             {
-                ImportLanguage(languageValue.Language);
-                if (progressWindow.IsNotNull()) progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_LANGUAGE, languageValue.Language));
+                ImportLanguage(language);
+                if (progressWindow.IsNotNull()) progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_LANGUAGE, language));
                 if (progressWindow.IsNotNull()) progressWindow.SetProgress(itemCount++ / totalItems);
                 yield return null;
             }
 
-            var nKeys = 0;
-            var nCategories = 0;
+            
+            //Categories
+            if (progressWindow.IsNotNull()) progressWindow.SetStatus(IMPORT_STATUS_CATEGORIES);
+            
+            foreach (var category in data.categories)
+            {
+                ImportCategory(category);
+                if (progressWindow.IsNotNull()) progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_CATEGORY, category));
+                if (progressWindow.IsNotNull()) progressWindow.SetProgress(itemCount++ / totalItems);
+                yield return null;
+            }
 
             // Keys
             if (progressWindow.IsNotNull()) progressWindow.SetStatus(IMPORT_STATUS_KEYS);
 
             foreach (var keyCategoryLanguage in data.dictionaryKeyCategoryLanguages)
             {
-                nKeys++;
-                if (!ExistsCategory(keyCategoryLanguage.category)) nCategories++;
-
                 foreach (var (language, translation) in keyCategoryLanguage.languageValues)
                 {
                     ImportKey(keyCategoryLanguage.key, keyCategoryLanguage.category, language, translation);
@@ -605,9 +615,9 @@ namespace LocalizationTool.Scripts.General
 
             var sb = new StringBuilder();
             sb.AppendLine(IMPORT_RESULT_SUCCESS);
-            sb.AppendLine(string.Format(IMPORT_LANGUAGES_RESULT, data.dictionaryKeyCategoryLanguages[0].languageValues.Count));
-            sb.AppendLine(string.Format(IMPORT_CATEGORIES_RESULT, nCategories));
-            sb.AppendLine(string.Format(IMPORT_KEYS_RESULT, nKeys));
+            sb.AppendLine(string.Format(IMPORT_LANGUAGES_RESULT, data.languages.Count));
+            sb.AppendLine(string.Format(IMPORT_CATEGORIES_RESULT, data.categories.Count));
+            sb.AppendLine(string.Format(IMPORT_KEYS_RESULT,  data.dictionaryKeyCategoryLanguages.Count));
 
             if (progressWindow.IsNotNull()) progressWindow.Complete(sb.ToString());
         }
@@ -628,20 +638,27 @@ namespace LocalizationTool.Scripts.General
             }
 
             //Languages
-            foreach (var languageValue in data.dictionaryKeyCategoryLanguages[0].languageValues)
+            foreach (var language in data.languages)
             {
-                ImportLanguage(languageValue.Language, false);
+                ImportLanguage(language, true);
                 yield return null;
             }
 
+            //Categories
+            foreach (var category in data.categories)
+            {
+                ImportCategory(category, true);
+                yield return null;
+            }
+            
             // Keys
             foreach (var keyCategoryLanguage in data.dictionaryKeyCategoryLanguages)
             {
                 foreach (var (language, translation) in keyCategoryLanguage.languageValues)
                 {
-                    ImportKey(keyCategoryLanguage.key, keyCategoryLanguage.category, language, translation, false);
+                    ImportKey(keyCategoryLanguage.key, keyCategoryLanguage.category, language, translation, true);
+                    yield return null;
                 }
-
                 yield return null;
             }
 
@@ -650,6 +667,7 @@ namespace LocalizationTool.Scripts.General
 
         public static void ImportLanguage(string languageToImport, bool showLog = true)
         {
+            if (languageToImport.IsEmpty()) return;
             if (ExistsLanguage(languageToImport)) return;
 
             // Add language
@@ -657,13 +675,28 @@ namespace LocalizationTool.Scripts.General
 
             if (CacheDataSO.LanguageCache.Count == 1)
             {
-                ChangeDefaultLanguage(languageToImport);
                 CurrentLanguageInDictionarySection = languageToImport;
             }
 
             if (showLog) Log("Import", Colors.Magenta, string.Format(IMPORTED_LANGUAGE_LOG, languageToImport));
         }
+        
+        public static void ImportCategory(string categoryToImport, bool showLog = true)
+        {
+            if (categoryToImport.IsEmpty()) return;
+            if(ExistsCategory(categoryToImport)) return;
+            
+            CacheDataSO.InsertCategory(categoryToImport);
+            
+            if(showLog) Log("Import", Colors.Magenta, string.Format(IMPORTED_CATEGORY_LOG, categoryToImport));
+        }
 
+        /// <summary>
+        /// Used while importing by CSV
+        /// </summary>
+        /// <param name="keyToImport"></param>
+        /// <param name="category"></param>
+        /// <param name="values"></param>
         private static void ImportKey(string keyToImport, string category, Dictionary<string, string> values)
         {
             if (keyToImport.IsEmpty()) return;
@@ -697,12 +730,11 @@ namespace LocalizationTool.Scripts.General
                 }
             }
         }
-
+        
         public static void ImportKey(string keyToImport, string category, string language, string translation, bool showLog = true)
         {
-            if (keyToImport.Equals("")) return;
+            if (keyToImport.IsEmpty()) return;
             Log("Import", Colors.Magenta, string.Format(IMPORTED_KEY_SINGLE_LOG, keyToImport, category, language, translation));
-            ImportLanguage(language, showLog);
 
             if (ExistsKey(keyToImport))
             {

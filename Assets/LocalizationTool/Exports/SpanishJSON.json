@@ -2,13 +2,13 @@
   "Language": "Spanish",
   "Data": [
     {
-      "Key": "1",
-      "Category": "None",
+      "key": "1",
+      "category": "None",
       "Value": "Hola"
     },
     {
-      "Key": "3",
-      "Category": "Main Menu",
+      "key": "3",
+      "category": "Main Menu",
       "Value": "2"
     }
   ]

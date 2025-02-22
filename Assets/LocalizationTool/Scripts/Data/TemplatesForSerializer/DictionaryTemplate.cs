@@ -4,11 +4,16 @@ using UnityEngine.Serialization;
 
 namespace LocalizationTool.Scripts.Data.TemplatesForSerializer
 {
+    /// <summary>
+    /// Used to serialize data to JSON and XML
+    /// </summary>
     [Serializable]
     public class DictionaryTemplate
     {
+        public List<string> languages = new();
+        public List<string> categories = new();
         public List<KeyCategoryLanguageValues> dictionaryKeyCategoryLanguages = new();
-
+        
         [Serializable]
         public class KeyCategoryLanguageValues
         {

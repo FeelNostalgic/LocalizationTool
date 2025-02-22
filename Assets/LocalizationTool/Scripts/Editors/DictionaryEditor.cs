@@ -32,6 +32,7 @@ namespace LocalizationTool.Scripts.Editors
         private string _addCategoryValue;
 
         private Vector2 _scrollCenter;
+        private float _scrollCenterPreviousY;
         private Vector2 _scrollToolbar;
         private int _currentLanguageToolbarIndex;
 
@@ -314,6 +315,11 @@ namespace LocalizationTool.Scripts.Editors
         private void GenerateCenterScrollViewContent()
         {
             _scrollCenter = EditorGUILayout.BeginScrollView(_scrollCenter);
+            if (!Mathf.Approximately(_scrollCenter.y, _scrollCenterPreviousY)) // If there are no equals, scroll is moving => clear focus
+            {
+                _scrollCenterPreviousY = _scrollCenter.y;
+                GUI.FocusControl("");
+            }
 
             const float itemHeight = 40f;
             const int visibleItemsCount = 50;
