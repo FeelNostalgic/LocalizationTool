@@ -343,7 +343,7 @@ namespace LocalizationTool.Scripts.Editors
             }
             catch (Exception e)
             {
-                //if (e is not ExitGUIException) Debug.LogError(e);
+                if (e is not ExitGUIException) Debug.LogError(e);
             }
 
             EditorGUILayout.EndScrollView();
