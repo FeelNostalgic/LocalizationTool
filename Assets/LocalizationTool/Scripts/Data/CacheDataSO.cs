@@ -162,6 +162,7 @@ namespace LocalizationTool.Scripts.Data
         public static void UpdateKeyCategory(string key, string newCategory)
         {
             var keyToUpdate = localizationData.KeysDictionary[key];
+            Undo.RecordObject(keyToUpdate, $"Key {key} updated category to {newCategory}");
             keyToUpdate.category = localizationData.CategoriesDictionary[newCategory];
 
             SaveChanges();

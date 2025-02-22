@@ -118,11 +118,7 @@ MonoBehaviour:
   m_Name: 2
   m_EditorClassIdentifier: 
   keyName: 2
-  translationText: 'Hola que tal
-
-    Prueba 2
-
-    Creo?'
+  translationText: Hola que tal
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
