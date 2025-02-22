@@ -212,7 +212,7 @@ namespace LocalizationTool.Scripts.Editors
 
         protected void VerticalReDimensionalDivisionLine(float width)
         {
-            //TODO: VerticalReDimensionalDivisionLine
+            //FUTURE: VerticalReDimensionalDivisionLine
             // var dividerRect = new Rect(width, 0f, dividerWidth, position.height);
             // EditorGUIUtility.AddCursorRect(dividerRect, MouseCursor.ResizeHorizontal);
             // EditorGUI.DrawRect(dividerRect, Color.black);
@@ -221,7 +221,7 @@ namespace LocalizationTool.Scripts.Editors
 
         protected void RedimensionEvent(Rect dividerRect)
         {
-            //TODO: RedimensionEvent
+            //FUTURE: RedimensionEvent
             // isResizingDivider = Event.current.type switch
             // {
             //     EventType.MouseDown when dividerRect.Contains(Event.current.mousePosition) => true,

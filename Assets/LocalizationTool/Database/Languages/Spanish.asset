@@ -13,26 +13,12 @@ MonoBehaviour:
   m_Name: Spanish
   m_EditorClassIdentifier: 
   languageName: Spanish
-  displayOrder: 2
+  displayOrder: 3
   isDefault: 0
   translationKeys:
-  - {fileID: 5902700128377342711}
-  - {fileID: 6591490240712344451}
---- !u!114 &5902700128377342711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c74921811585e04a9816cbed79332e8, type: 3}
-  m_Name: 1
-  m_EditorClassIdentifier: 
-  keyName: 1
-  translationText: Hola
---- !u!114 &6591490240712344451
+  - {fileID: 8477532124086776118}
+  - {fileID: 4686529765980483377}
+--- !u!114 &4686529765980483377
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -45,4 +31,18 @@ MonoBehaviour:
   m_Name: 3
   m_EditorClassIdentifier: 
   keyName: 3
+  translationText: 
+--- !u!114 &8477532124086776118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c74921811585e04a9816cbed79332e8, type: 3}
+  m_Name: 1
+  m_EditorClassIdentifier: 
+  keyName: 1
   translationText: 

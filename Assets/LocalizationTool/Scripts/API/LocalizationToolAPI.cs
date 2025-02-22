@@ -6,7 +6,7 @@ using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.General;
 using TMPro;
 using UnityEngine;
-using Colors = CustomDebugPlugin.Colors;
+using Colors = CustomDebug.Colors;
 
 namespace LocalizationTool.Scripts.API
 {

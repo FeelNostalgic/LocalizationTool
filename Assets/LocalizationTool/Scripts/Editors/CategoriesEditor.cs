@@ -29,7 +29,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private const float LEFT_SECTION_WIDTH_PERCENT = 0.25f;
 
-        // FUTURE
+        // FUTURE: divider
         // private float _dividerPosition = 305f;
         // private const float dividerWidth = 5f;
         // private bool isResizingDivider = false;
@@ -53,7 +53,7 @@ namespace LocalizationTool.Scripts.Editors
             ShowLeftSection();
 
             ShowVerticalLine(5);
-            // TODO: VerticalReDimensionalDivisionLine(_leftSectionWidth);
+            // FUTURE: VerticalReDimensionalDivisionLine(_leftSectionWidth);
 
             ShowCenterSection();
 

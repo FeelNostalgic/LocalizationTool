@@ -81,7 +81,7 @@ namespace LocalizationTool.Scripts.Editors
             //
         }
 
-        //TODO: revisar cuando se repinta la interfaz
+        //FUTURE: revisar cuando se repinta la interfaz
         protected void RepaintGUI()
         {
             Repaint();

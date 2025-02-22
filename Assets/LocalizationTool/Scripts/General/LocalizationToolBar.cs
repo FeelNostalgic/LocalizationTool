@@ -1,5 +1,7 @@
 #if UNITY_EDITOR
 
+using System.Collections.Generic;
+using System.Linq;
 using LocalizationTool.Scripts.Addons;
 using LocalizationTool.Scripts.API;
 using LocalizationTool.Scripts.Commons;
@@ -15,9 +17,7 @@ namespace LocalizationTool.Scripts.General
 		[MenuItem("Tools/LocalizationTool/Install", false, -100)]
 		public static void Install(MenuCommand menuCommand)
 		{
-			// ReSharper disable once CoVariantArrayConversion
-			if (FindObjectsOfType<LocalizationToolAPI>().IsNull()) {
-#pragma warning restore CS0618
+			if (FindObjectOfType<LocalizationToolAPI>().IsNull()) {
 				EditorUtils.MenuItemNewObject<LocalizationToolAPI>(menuCommand, "LocalizationToolAPI");
 				LocalizationToolAPI.ActiveLanguage = CacheDataSO.DefaultLanguage;
 			} else {

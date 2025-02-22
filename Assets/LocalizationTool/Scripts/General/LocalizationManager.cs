@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using CustomDebugPlugin;
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.Addons;
 using LocalizationTool.Scripts.Commons;
@@ -17,10 +16,11 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using LocalizationTool.Scripts.Data;
+using LocalizationTool.Scripts.Data.ScriptableObjects;
 using LocalizationTool.Scripts.Data.TemplatesForSerializer;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 using static LocalizationTool.Scripts.Commons.EditorPaths;
-using Colors = CustomDebugPlugin.Colors;
+using Colors = CustomDebug.Colors;
 
 namespace LocalizationTool.Scripts.General
 {
@@ -428,65 +428,51 @@ namespace LocalizationTool.Scripts.General
 
         public static string BuildCSV(string separator)
         {
-            var serializer = new CSV_Serializer();
-            serializer.SetSeparator(separator);
+            var csvSerializer = new CSV_Serializer();
+            csvSerializer.SetSeparator(separator);
 
-            serializer.AddTitle(CacheDataSO.Languages);
-
-            var languageDictionary = new Dictionary<string, int>();
-            for (var i = 0; i < CacheDataSO.LanguageCache.Count; i++)
-            {
-                languageDictionary.Add(CacheDataSO.Languages[i], i);
-            }
-
-            //TODO
-            /*
-            var data = new Dictionary<string, CacheData.KeyData>(CacheData.DictionaryCache);
-
-            foreach (var (key, keyData) in data)
+            csvSerializer.AddTitle(CacheDataSO.Languages);
+            
+            foreach (var keyData in CacheDataSO.localizationData.keys)
             {
                 var items = new List<string>();
-                var category = keyData.Category;
 
-                items.Add(key);
+                var category = keyData.category.categoryName;
+                items.Add(keyData.keyName);
                 items.Add(category);
 
-                var auxArray = new string[languageDictionary.Count];
-                foreach (var (language, value) in keyData.TranslationData)
-                {
-                    auxArray[languageDictionary[language]] = value.Replace("\n", " ").Replace("\r", " ");
-                }
+                var valueList = CacheDataSO.LanguageCache
+                    .Select(language => language.TranslationDictionary[keyData.keyName].translationText)
+                    .Select(valueToAdd => valueToAdd.Replace("\n", " ").Replace("\r", " ")).ToList();
 
-                items.AddRange(auxArray);
-
-                serializer.AddLine(items);
+                items.AddRange(valueList);
+                
+                csvSerializer.AddLine(items);
             }
-            */
-
-            return serializer.File();
+            
+            return csvSerializer.File();
         }
 
         public static string BuildSerializedData(ISerializerService serializer)
         {
             var dataToSerialize = new DictionaryTemplate();
-
-            //TODO
-            /*
-            var data = new Dictionary<string, CacheData.KeyData>(CacheData.DictionaryCache);
-
-            foreach (var (key, keyData) in data)
+            
+            foreach (var keyData in CacheDataSO.localizationData.keys)
             {
-                var category = keyData.Category;
-                var languageValues = keyData.TranslationData.Select(item => new DictionaryTemplate.LanguageValue { Language = item.Key, Value = item.Value }).ToList()
-                    .OrderBy(x => CacheDataSO.LanguageCache.First(y => y.languageName.Equals(x.Language)).displayOrder).ToList();
-                dataToSerialize.DictionaryKeyCategoryLanguages.Add(new DictionaryTemplate.KeyCategoryLanguageValues
+                var key = keyData.keyName;
+                var category = keyData.category.categoryName;
+                
+                var languageValues = CacheDataSO.LanguageCache
+                    .Select(language => new DictionaryTemplate.LanguageValue { Language = language.languageName, Value = language.TranslationDictionary[key].translationText }).ToList();
+
+                dataToSerialize.dictionaryKeyCategoryLanguages.Add(new DictionaryTemplate.KeyCategoryLanguageValues
                 {
-                    Key = key,
-                    Category = category,
-                    LanguageValues = languageValues
+                    key = key,
+                    category = category,
+                    languageValues = languageValues
                 });
             }
-            */
+            
             return serializer.Serialize(dataToSerialize);
         }
 
@@ -575,20 +561,20 @@ namespace LocalizationTool.Scripts.General
             while (!awaiter.IsCompleted) yield return null;
             var data = awaiter.GetResult();
 
-            if (data.DictionaryKeyCategoryLanguages.IsEmpty())
+            if (data.dictionaryKeyCategoryLanguages.IsEmpty())
             {
                 progressWindow.Complete($"Selected file '{path}' IS NOT CORRECT or EMPTY");
                 yield break;
             }
 
             // Items count
-            var totalItems = data.DictionaryKeyCategoryLanguages[0].LanguageValues.Count + data.DictionaryKeyCategoryLanguages.Count;
+            var totalItems = data.dictionaryKeyCategoryLanguages[0].languageValues.Count + data.dictionaryKeyCategoryLanguages.Count;
             var itemCount = 0f;
 
             //Languages
             if (progressWindow.IsNotNull()) progressWindow.SetStatus(IMPORT_STATUS_LANGUAGES);
 
-            foreach (var languageValue in data.DictionaryKeyCategoryLanguages[0].LanguageValues)
+            foreach (var languageValue in data.dictionaryKeyCategoryLanguages[0].languageValues)
             {
                 ImportLanguage(languageValue.Language);
                 if (progressWindow.IsNotNull()) progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_LANGUAGE, languageValue.Language));
@@ -602,24 +588,24 @@ namespace LocalizationTool.Scripts.General
             // Keys
             if (progressWindow.IsNotNull()) progressWindow.SetStatus(IMPORT_STATUS_KEYS);
 
-            foreach (var keyCategoryLanguage in data.DictionaryKeyCategoryLanguages)
+            foreach (var keyCategoryLanguage in data.dictionaryKeyCategoryLanguages)
             {
                 nKeys++;
-                if (!ContainsCategory(keyCategoryLanguage.Category)) nCategories++;
+                if (!ContainsCategory(keyCategoryLanguage.category)) nCategories++;
 
-                foreach (var (language, translation) in keyCategoryLanguage.LanguageValues)
+                foreach (var (language, translation) in keyCategoryLanguage.languageValues)
                 {
-                    ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, language, translation);
+                    ImportKey(keyCategoryLanguage.key, keyCategoryLanguage.category, language, translation);
                 }
 
                 if (progressWindow.IsNotNull()) progressWindow.SetProgress(itemCount++ / totalItems);
-                if (progressWindow.IsNotNull()) progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_KEY_CATEGORY, keyCategoryLanguage.Key, keyCategoryLanguage.Category));
+                if (progressWindow.IsNotNull()) progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_KEY_CATEGORY, keyCategoryLanguage.key, keyCategoryLanguage.category));
                 yield return null;
             }
 
             var sb = new StringBuilder();
             sb.AppendLine(IMPORT_RESULT_SUCCESS);
-            sb.AppendLine(string.Format(IMPORT_LANGUAGES_RESULT, data.DictionaryKeyCategoryLanguages[0].LanguageValues.Count));
+            sb.AppendLine(string.Format(IMPORT_LANGUAGES_RESULT, data.dictionaryKeyCategoryLanguages[0].languageValues.Count));
             sb.AppendLine(string.Format(IMPORT_CATEGORIES_RESULT, nCategories));
             sb.AppendLine(string.Format(IMPORT_KEYS_RESULT, nKeys));
 
@@ -636,24 +622,24 @@ namespace LocalizationTool.Scripts.General
             while (!awaiter.IsCompleted) yield return null;
             var data = awaiter.GetResult();
 
-            if (data.DictionaryKeyCategoryLanguages.IsEmpty())
+            if (data.dictionaryKeyCategoryLanguages.IsEmpty())
             {
                 yield break;
             }
 
             //Languages
-            foreach (var languageValue in data.DictionaryKeyCategoryLanguages[0].LanguageValues)
+            foreach (var languageValue in data.dictionaryKeyCategoryLanguages[0].languageValues)
             {
                 ImportLanguage(languageValue.Language, false);
                 yield return null;
             }
 
             // Keys
-            foreach (var keyCategoryLanguage in data.DictionaryKeyCategoryLanguages)
+            foreach (var keyCategoryLanguage in data.dictionaryKeyCategoryLanguages)
             {
-                foreach (var (language, translation) in keyCategoryLanguage.LanguageValues)
+                foreach (var (language, translation) in keyCategoryLanguage.languageValues)
                 {
-                    ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, language, translation, false);
+                    ImportKey(keyCategoryLanguage.key, keyCategoryLanguage.category, language, translation, false);
                 }
 
                 yield return null;
@@ -772,11 +758,11 @@ namespace LocalizationTool.Scripts.General
 
             try
             {
-                if (_configurationData.showLogsInConsole) CustomDebug.Log(title, color, log);
+                if (_configurationData.showLogsInConsole) CustomDebug.CustomDebug.Log(title, color, log);
             }
             catch (Exception e)
             {
-                CustomDebug.LogError(title, color, e);
+                CustomDebug.CustomDebug.LogError(title, color, e);
             }
         }
 
@@ -800,11 +786,11 @@ namespace LocalizationTool.Scripts.General
 
             try
             {
-                if (_configurationData.showLogsInConsole) CustomDebug.LogWarning(title, color, log);
+                if (_configurationData.showLogsInConsole) CustomDebug.CustomDebug.LogWarning(title, color, log);
             }
             catch (Exception e)
             {
-                CustomDebug.LogWarning(title, color, e);
+                CustomDebug.CustomDebug.LogWarning(title, color, e);
             }
         }
 
@@ -828,11 +814,11 @@ namespace LocalizationTool.Scripts.General
 
             try
             {
-                if (_configurationData.showLogsInConsole) CustomDebug.LogError(title, color, log);
+                if (_configurationData.showLogsInConsole) CustomDebug.CustomDebug.LogError(title, color, log);
             }
             catch (Exception e)
             {
-                CustomDebug.LogError(title, color, e);
+                CustomDebug.CustomDebug.LogError(title, color, e);
             }
         }
 

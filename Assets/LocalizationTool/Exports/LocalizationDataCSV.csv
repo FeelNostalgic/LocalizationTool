@@ -1,4 +1,3 @@
-Key,Category,English,Spanish
-Test,MainMenu,,
-mainMenu,None,HOLA,
-Options_title,None,,
+Key;Category;English;Spanish;French
+1;None;Hello;Hola;Bonjour
+3;Main Menu;1;2;3

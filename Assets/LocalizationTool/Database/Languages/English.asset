@@ -31,8 +31,8 @@ MonoBehaviour:
   isDefault: 1
   translationKeys:
   - {fileID: -3684323171698742676}
-  - {fileID: 1986971017774504835}
---- !u!114 &1986971017774504835
+  - {fileID: 972559663039758306}
+--- !u!114 &972559663039758306
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
 namespace LocalizationTool.Scripts.Data.TemplatesForSerializer
 {
     [Serializable]
     public class DictionaryTemplate
     {
-        public List<KeyCategoryLanguageValues> DictionaryKeyCategoryLanguages = new();
+        public List<KeyCategoryLanguageValues> dictionaryKeyCategoryLanguages = new();
 
         [Serializable]
         public class KeyCategoryLanguageValues
         {
-            public string Key;
-            public string Category;
-            public List<LanguageValue> LanguageValues;
+            public string key;
+            public string category;
+            public List<LanguageValue> languageValues;
         }
         
         [Serializable]
@@ -21,7 +22,7 @@ namespace LocalizationTool.Scripts.Data.TemplatesForSerializer
         {
             public string Language;
             public string Value;
-
+    
             public void Deconstruct(out string language, out string value)
             {
                 language = Language;

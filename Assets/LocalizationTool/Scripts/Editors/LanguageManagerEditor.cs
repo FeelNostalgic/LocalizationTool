@@ -236,29 +236,26 @@ namespace LocalizationTool.Scripts.Editors
 
         private string BuildCSV()
         {
-            var serializer = new CSV_Serializer();
-            serializer.SetSeparator(CsvSeparators[_selectedCsvSeparatorIndexForExport]);
+            var serializerCsv = new CSV_Serializer();
+            serializerCsv.SetSeparator(CsvSeparators[_selectedCsvSeparatorIndexForExport]);
 
-            serializer.AddTitle(_language);
-
-            //TODO
-            /*
-            var data = new Dictionary<string, CacheData.KeyData>(CacheData.DictionaryCache);
-
-            foreach (var (key, keyData) in data)
+            serializerCsv.AddTitle(_language);
+            
+            foreach (var keyData in CacheDataSO.Keys)
             {
-                var items = new List<string>();
-                var category = keyData.Category;
-
-                items.Add(key);
-                items.Add(category);
-                items.Add(data[key].TranslationData[_language].Replace("\n", " ").Replace("\r", " "));
-
-                serializer.AddLine(items);
+                var line = new List<string>();
+                var key = keyData.keyName;
+                var category = keyData.CategoryName;
+                
+                line.Add(key);
+                line.Add(category);
+                var text = CacheDataSO.localizationData.LanguagesDictionary[_language].TranslationDictionary[key].translationText;
+                line.Add(text.Replace("\n", " ").Replace("\r", " "));
+                
+                serializerCsv.AddLine(line);
             }
-            */
-
-            return serializer.File();
+            
+            return serializerCsv.File();
         }
 
         private string BuildSerializedData(ISerializerService serializer)
@@ -267,21 +264,19 @@ namespace LocalizationTool.Scripts.Editors
             {
                 Language = _language
             };
-
-            // TODO
-            /*
-            var data = new Dictionary<string, CacheData.KeyData>(CacheData.DictionaryCache);
-            foreach (var (key, keyData) in data)
+            
+            foreach (var keyData in CacheDataSO.Keys)
             {
-                var category = keyData.Category;
+                var key = keyData.keyName;
+                var category = keyData.CategoryName;
+                
                 dataToSerialize.Data.Add(new LanguageTemplate.KeyCategoryLanguage
                 {
                     Key = key,
                     Category = category,
-                    Value = data[key].TranslationData[_language]
+                    Value = CacheDataSO.localizationData.LanguagesDictionary[_language].TranslationDictionary[key].translationText
                 });
             }
-            */
             
             return serializer.Serialize(dataToSerialize);
         }

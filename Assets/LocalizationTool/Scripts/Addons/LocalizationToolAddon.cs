@@ -38,7 +38,7 @@ namespace LocalizationTool.Scripts.Addons
 
         #region UNITY METHODS
 
-        //TODO: Instead of awake, maybe OnEnable is needed
+        // MAYBE: Instead of awake, might be OnEnable
         private void Awake()
         {
             _tmpText = GetComponent<TMP_Text>();

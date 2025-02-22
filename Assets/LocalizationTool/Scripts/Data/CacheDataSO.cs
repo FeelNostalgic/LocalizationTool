@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using LocalizationTool.Scripts.API;
 using LocalizationTool.Scripts.Commons;
@@ -11,13 +12,15 @@ using Object = UnityEngine.Object;
 
 namespace LocalizationTool.Scripts.Data
 {
-    public class CacheDataSO
+    public static class CacheDataSO
     {
         #region PUBLIC VARIABLES
 
         //public static CacheDataSO Instance => _instance ??= new CacheDataSO();
         public static bool IsDataLoaded { get; private set; }
 
+        public static List<KeyDataSO> Keys => localizationData.keys;
+        
         public static List<LanguageDataSO> LanguageCache { get; private set; }
         public static List<string> Languages => LanguageCache.Select(x => x.languageName).ToList();
         public static string DefaultLanguage => LanguageCache.FirstOrDefault(x => x.isDefault)?.languageName;
@@ -32,14 +35,14 @@ namespace LocalizationTool.Scripts.Data
 
         #region PRIVATE VARIABLES
 
-        private static CacheDataSO _instance;
+        //private static CacheDataSO _instance;
         public static LocalizationDataSO localizationData;
 
-        private const string FOLDER_PATH = "Assets/LocalizationTool/Database";
-        private const string LANGUAGES_PATH = FOLDER_PATH + "/Languages";
-        private const string CATEGORIES_PATH = FOLDER_PATH + "/Categories";
-        private const string KEYS_PATH = FOLDER_PATH + "/Keys";
-        private const string DATABASE_PATH = FOLDER_PATH + "/LocalizationData.asset";
+        private const string DATABASE_PATH = "Assets/LocalizationTool/Database";
+        private const string LANGUAGES_PATH = DATABASE_PATH + "/Languages";
+        private const string CATEGORIES_PATH = DATABASE_PATH + "/Categories";
+        private const string KEYS_PATH = DATABASE_PATH + "/Keys";
+        private const string LOCALIZATION_DATA_PATH = DATABASE_PATH + "/LocalizationData.asset";
 
         #endregion
 
@@ -105,7 +108,8 @@ namespace LocalizationTool.Scripts.Data
 
         public static void InsertKey(string keyName, string categoryName)
         {
-            //TODO: check if directory is created
+            CreateDirectory(KEYS_PATH);
+            
             var newKey = ScriptableObject.CreateInstance<KeyDataSO>();
             AssetDatabase.CreateAsset(newKey, $"{KEYS_PATH}/{keyName}.asset");
             newKey.keyName = keyName;
@@ -124,7 +128,7 @@ namespace LocalizationTool.Scripts.Data
 
             SaveChanges();
         }
-
+        
         public static void RemoveKey(string keyName)
         {
             var keyToRemove = localizationData.KeysDictionary[keyName];
@@ -402,11 +406,13 @@ namespace LocalizationTool.Scripts.Data
 
         private static void CreateLocalizationData()
         {
-            localizationData = AssetDatabase.LoadAssetAtPath<LocalizationDataSO>(DATABASE_PATH) ?? ScriptableObject.CreateInstance<LocalizationDataSO>();
+            CreateDirectory(DATABASE_PATH);
+            
+            localizationData = AssetDatabase.LoadAssetAtPath<LocalizationDataSO>(LOCALIZATION_DATA_PATH) ?? ScriptableObject.CreateInstance<LocalizationDataSO>();
         
             if (!AssetDatabase.Contains(localizationData))
             {
-                AssetDatabase.CreateAsset(localizationData, DATABASE_PATH);
+                AssetDatabase.CreateAsset(localizationData, LOCALIZATION_DATA_PATH);
                 Debug.Log("LocalizationData.asset created!");
             }
         
@@ -417,12 +423,18 @@ namespace LocalizationTool.Scripts.Data
 
         private static void InsertFirstLanguage()
         {
-            if(localizationData.languages.Count == 0) InsertLanguage("English");
+            if (localizationData.languages.IsNotEmpty()) return;
+            
+            CreateDirectory(LANGUAGES_PATH);
+            InsertLanguage("English");
         }
 
         private static void InsertFirstCategory()
         {
-            if(localizationData.categories.Count == 0) InsertCategory("None");
+            if (localizationData.categories.IsNotEmpty()) return;
+            
+            CreateDirectory(CATEGORIES_PATH);
+            InsertCategory("None");
         }
 
         private static void SaveChanges(Object obj = null)
@@ -442,6 +454,15 @@ namespace LocalizationTool.Scripts.Data
             }
         }
 
+        private static void CreateDirectory(string path)
+        {
+            if (Directory.Exists(path)) return;
+            
+            Directory.CreateDirectory(path);
+            AssetDatabase.Refresh();
+        }
+
+        
         private static string GetPath(Object asset)
         {
             return AssetDatabase.GetAssetPath(asset);

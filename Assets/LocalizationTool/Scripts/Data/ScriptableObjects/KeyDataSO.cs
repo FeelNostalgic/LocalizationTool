@@ -9,5 +9,7 @@ namespace LocalizationTool.Scripts.Data.ScriptableObjects
 		public string keyName;
 		public CategoryDataSO category;
 		public int displayOrder;
+		
+		public string CategoryName => category != null ? category.categoryName : string.Empty;
 	}
 }

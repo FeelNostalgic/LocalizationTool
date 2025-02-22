@@ -33,7 +33,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private const float LEFT_SECTION_WIDTH_PERCENT = 0.25f;
 
-        // FUTURE
+        // FUTURE: divider
         // private float _dividerPosition = 305f;
         // private const float dividerWidth = 5f;
         // private bool isResizingDivider = false;
@@ -57,7 +57,7 @@ namespace LocalizationTool.Scripts.Editors
             ShowLeftSection();
 
             ShowVerticalLine(5);
-            // TODO: VerticalReDimensionalDivisionLine(_leftSectionWidth);
+            // FUTURE: VerticalReDimensionalDivisionLine(_leftSectionWidth);
 
             ShowCenterSection();
 
@@ -155,7 +155,7 @@ namespace LocalizationTool.Scripts.Editors
             if (GUILayout.Button(GetGUIContent(RefreshIcon, RELOAD_BUTTON_TOOLTIP), GUILayout.MaxWidth(30), GUILayout.MaxHeight(30)))
             {
                 LocalizationManager.RefreshLanguagesData();
-                LocalizationManager.Log(LANGUAGES_LABEL, CustomDebugPlugin.Colors.Purple, LOADED_LOG);
+                LocalizationManager.Log(LANGUAGES_LABEL, CustomDebug.Colors.Purple, LOADED_LOG);
             }
 
             GUILayout.FlexibleSpace();
@@ -278,7 +278,7 @@ namespace LocalizationTool.Scripts.Editors
                 if (GUILayout.Button(GetGUIContent(StarIcon, string.Format(MAKE_LANGUAGE_FAVOURITE_BUTTON_TOOLTIP, languageName)), CustomStyles.GetStyle(Enums.CustomStyleName.BiggerCenteredButtonWithIcon)))
                 {
                     LocalizationManager.ChangeDefaultLanguage(languageName);
-                    LocalizationManager.Log(LANGUAGES_LABEL, CustomDebugPlugin.Colors.Purple, string.Format(LANGUAGE_FAVOURITE_LOG, languageName));
+                    LocalizationManager.Log(LANGUAGES_LABEL, CustomDebug.Colors.Purple, string.Format(LANGUAGE_FAVOURITE_LOG, languageName));
                 }
             }
 
@@ -357,13 +357,13 @@ namespace LocalizationTool.Scripts.Editors
         private static void DeleteLanguage(string languageName)
         {
             LocalizationManager.RemoveLanguage(languageName);
-            LocalizationManager.Log(LANGUAGES_LABEL, CustomDebugPlugin.Colors.Purple, string.Format(DELETED_LANGUAGE_LOG, languageName));
+            LocalizationManager.Log(LANGUAGES_LABEL, CustomDebug.Colors.Purple, string.Format(DELETED_LANGUAGE_LOG, languageName));
         }
 
         private static void EmptyLanguage(string languageName)
         {
             LocalizationManager.EmptyLanguage(languageName);
-            LocalizationManager.Log(LANGUAGES_LABEL, CustomDebugPlugin.Colors.Purple, string.Format(EMPTIED_LANGUAGE_LOG, languageName));
+            LocalizationManager.Log(LANGUAGES_LABEL, CustomDebug.Colors.Purple, string.Format(EMPTIED_LANGUAGE_LOG, languageName));
         }
         
         private void Feedback(string languageName)

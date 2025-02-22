@@ -1,5 +1,7 @@
 
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace LocalizationTool.Scripts.Commons
 { 
@@ -30,7 +32,7 @@ namespace LocalizationTool.Scripts.Commons
 		#region OBJECT
 
 		public static bool IsNull(this object obj) {
-			return obj == null;
+			return obj is null;
 		}
 		
 		public static bool IsNotNull(this object obj) {
@@ -39,6 +41,20 @@ namespace LocalizationTool.Scripts.Commons
 
 		#endregion
 
+		#region UNITY OBJECT
+
+		public static bool IsNull(this UnityEngine.Object obj)
+		{
+			return obj is null;
+		}
+
+		public static bool IsNotNull(this UnityEngine.Object obj)
+		{
+			return !obj.IsNull();
+		}
+
+		#endregion
+		
 		#region OBJECT[]
 
 		public static bool IsEmpty(this object[] obj) {
@@ -71,7 +87,7 @@ namespace LocalizationTool.Scripts.Commons
 		}
 		
 		public static bool IsNull(this string[] obj) {
-			return obj == null;
+			return obj is null;
 		}
 		
 		public static bool IsNotNull(this string[] obj) {
@@ -81,23 +97,52 @@ namespace LocalizationTool.Scripts.Commons
 		#endregion
 
 		#region ICOLLECTION
-
-		public static bool IsNull(this ICollection obj) {
-			return obj == null;
-		}
-
-		public static bool IsNotNull(this ICollection obj) {
-			return !obj.IsNull();
-		}
-
-		public static bool IsEmpty(this ICollection obj)
+		
+		public static bool IsEmpty<T>(this ICollection<T> collection)
 		{
-			return obj.Count <= 0;
+			return collection.Count == 0;
 		}
 
-		public static bool IsNotEmpty(this ICollection obj)
+		public static bool IsNull<T>(this ICollection<T> collection)
 		{
-			return obj.IsEmpty();
+			return collection is null;
+		}
+        
+		public static bool IsNotEmpty<T>(this ICollection<T> collection)
+		{
+			return !collection.IsEmpty();
+		}
+
+		public static bool IsNotNull<T>(this ICollection<T> collection)
+		{
+			return !collection.IsNull();
+		}
+
+		#endregion
+		
+		#region bool
+
+		public static bool Not(this bool b)
+		{
+			return !b;
+		}
+
+		#endregion
+		
+		#region Dictionary
+
+		public static void Print<T1,T2>(this Dictionary<T1,T2> dictionary)
+		{
+			Debug.Log($"---Dictionary<{dictionary.Types()}>---");
+			foreach (var (key,value) in dictionary)
+			{
+				Debug.Log($"{key} : {value}");
+			}
+		}
+
+		public static string Types<T1, T2>(this Dictionary<T1, T2> dictionary)
+		{
+			return $"{typeof(T1)},{typeof(T2)}";
 		}
 
 		#endregion
