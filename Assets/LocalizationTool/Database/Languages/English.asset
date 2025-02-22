@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Name: 1
   m_EditorClassIdentifier: 
   keyName: 1
-  translationText: 1
+  translationText: 1 pues si se guarda
 --- !u!114 &-5890781847892774533
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -118,7 +118,11 @@ MonoBehaviour:
   m_Name: 2
   m_EditorClassIdentifier: 
   keyName: 2
-  translationText: fsdfsd
+  translationText: 'Hola que tal
+
+    Prueba 2
+
+    Creo?'
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -247,12 +251,7 @@ MonoBehaviour:
   m_Name: 4
   m_EditorClassIdentifier: 
   keyName: 4
-  translationText: 'gjkhdfkghkjh bmkjdhfgkjdfghkjehrkjhcfkjbkjhdfg
-
-    fsdfsdlhsldkfgldfgdfgdfrgd
-
-
-'
+  translationText: gdgdfgdfg
 --- !u!114 &4840302397035033588
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -5,9 +5,11 @@ using System.Collections;
 using System.Reflection;
 using LocalizationTool.Data;
 using LocalizationTool.Scripts.Commons;
+using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.General;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
+using UnityEditor.TerrainTools;
 using UnityEngine;
 using ColorUtility = UnityEngine.ColorUtility;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
@@ -18,11 +20,11 @@ namespace LocalizationTool.Scripts.Editors
     public class RichTextEditor : EditorWindow
     {
         #region PUBLIC VARIABLES
-        
+
         public bool AddActionRunning { get; set; }
 
         #endregion
-        
+
         #region DIMENSION VARIABLES
 
         private static readonly Vector2 WindowSize = new(700, 650);
@@ -32,12 +34,13 @@ namespace LocalizationTool.Scripts.Editors
         #region PRIVATE VARIABLES
 
         private const int FONT_SIZE_TEXT_AREA = 12;
-        
-        // If you want more font size, just add them to this array
-        private readonly string[] _fontSizes = { "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "30", "32", "36", "40", "42", "44", "48", "50", "54", "58", "62", "68", "72", "100", "110" };
 
-        private string _richText = "";
-        private string _key;
+        // If you want more font size, just add them to this array
+        private readonly string[] _fontSizes =
+            { "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "30", "32", "36", "40", "42", "44", "48", "50", "54", "58", "62", "68", "72", "100", "110" };
+
+        private static string _richText = "";
+        private static string _key;
         private bool _showRichTextTags = true;
         private int _fontSizeIndex = 2;
         private int _zoom = 100;
@@ -46,10 +49,10 @@ namespace LocalizationTool.Scripts.Editors
 
         private string _tempValue;
         private EditorCoroutine _currentCoroutine;
-        
+
         private double _lastEditTime;
         private const float DELAY_TIME = 0.20f;
-        
+
         private static Action<string> _onTextChanged;
 
         #endregion
@@ -59,18 +62,18 @@ namespace LocalizationTool.Scripts.Editors
             var window = GetWindow<RichTextEditor>(RICH_TEXT_EDITOR_WINDOW_LABEL);
             window.minSize = WindowSize;
             window.maxSize = new Vector2(WindowSize.x, 100000);
-            window._key = key;
-            window._richText = initialText;
+            _key = key;
+            _richText = initialText;
             _onTextChanged = onTextChanged;
         }
-        
+
         public void ControlFeedbackLabel(string text)
         {
             AddActionRunning = true;
             if (_currentCoroutine != null) EditorCoroutineUtility.StopCoroutine(_currentCoroutine);
             _currentCoroutine = EditorCoroutineUtility.StartCoroutine(FeedbackLabelCoroutine(text, delegate(string s) { FeedbackLabel = s; }, 1.6f), this);
         }
-        
+
         private IEnumerator FeedbackLabelCoroutine(string text, Action<string> updateFeedbackLabel, float duration, Action onComplete = null)
         {
             updateFeedbackLabel?.Invoke(text);
@@ -88,6 +91,14 @@ namespace LocalizationTool.Scripts.Editors
             UpdateValue(_key, _tempValue);
         }
 
+        public static void RefreshTextBuffer()
+        {
+            _richText = CacheDataSO.localizationData.LanguagesDictionary[LocalizationManager.CurrentLanguageInDictionarySection].TranslationDictionary[_key].translationText;
+
+            // Forzar redibujado de la UI
+            EditorApplication.delayCall += () => GetWindow<RichTextEditor>().Repaint();
+        }
+
         #region PRIVATE METHODS
 
         private void OnGUI()
@@ -95,14 +106,14 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.BeginVertical();
 
             GUILayout.Space(5);
-            
+
             KeyTextField();
 
             EditorGUILayout.BeginHorizontal("box", GUILayout.Height(35));
 
             GUILayout.Space(3);
 
-            //FUTURE: HistoryButtons();
+            HistoryButtons();
 
             Separator();
 
@@ -135,7 +146,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private void KeyTextField()
         {
-            GUILayout.BeginVertical("box",GUILayout.Height(FeedbackLabel.IsNotEmpty() ? 60 : 35));
+            GUILayout.BeginVertical("box", GUILayout.Height(FeedbackLabel.IsNotEmpty() ? 60 : 35));
 
             GUI.SetNextControlName("VALUE");
             var temp = EditorGUILayout.DelayedTextField(_key, CustomStyles.GetStyle(Enums.CustomStyleName.RichTextEditorKeyTextField), GUILayout.Height(30));
@@ -151,7 +162,7 @@ namespace LocalizationTool.Scripts.Editors
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
             }
-            
+
             GUILayout.EndVertical();
         }
 
@@ -171,9 +182,9 @@ namespace LocalizationTool.Scripts.Editors
 
             GUILayout.BeginHorizontal("box");
             _scrollView = GUILayout.BeginScrollView(_scrollView, GUILayout.ExpandHeight(true));
-            
+
             _tempValue = EditorGUILayout.TextArea(_richText, richTextStyle, GUILayout.ExpandHeight(true));
-            
+
             if (_tempValue != _richText)
             {
                 _richText = _tempValue;
@@ -183,7 +194,7 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.EndScrollView();
             GUILayout.EndHorizontal();
             EditorGUILayout.EndHorizontal();
-            
+
             if (!(EditorApplication.timeSinceStartup - _lastEditTime > DELAY_TIME)) return;
             UpdateValue(_key, _richText);
             _lastEditTime = float.MaxValue;
@@ -195,7 +206,7 @@ namespace LocalizationTool.Scripts.Editors
             _showRichTextTags = ToggleLeft(_showRichTextTags, RICH_TEXT_EDITOR_TOGGLE_LABEL);
             EditorGUILayout.EndHorizontal();
         }
-        
+
         private static bool ToggleLeft(bool value, string label)
         {
             GUILayout.BeginHorizontal();
@@ -214,8 +225,8 @@ namespace LocalizationTool.Scripts.Editors
             GUI.backgroundColor = Color.clear;
             GUILayout.BeginHorizontal("box");
             GUI.backgroundColor = Colors.DEFAULT;
-            
-            if (GUILayout.Button(CLOSE_BUTTON_LABEL, CustomStyles.GetStyle(Enums.CustomStyleName.CloseRichTextEditorButton))) Close(); 
+
+            if (GUILayout.Button(CLOSE_BUTTON_LABEL, CustomStyles.GetStyle(Enums.CustomStyleName.CloseRichTextEditorButton))) Close();
 
             GUILayout.FlexibleSpace();
 
@@ -227,8 +238,8 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.FlexibleSpace();
             GUILayout.EndVertical();
         }
-        
-        private void HistoryButtons()
+
+        private static void HistoryButtons()
         {
             GUILayout.BeginVertical();
             GUILayout.FlexibleSpace();
@@ -236,12 +247,14 @@ namespace LocalizationTool.Scripts.Editors
 
             if (GUILayout.Button(GetGUIContent(UndoIcon, RICH_TEXT_EDITOR_UNDO_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
-                // Undo
+                Undo.PerformUndo();
+                GUIUtility.ExitGUI();
             }
 
             if (GUILayout.Button(GetGUIContent(RedoIcon, RICH_TEXT_EDITOR_REDO_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
-                // Redo
+                Undo.PerformRedo();
+                GUIUtility.ExitGUI();
             }
 
             GUILayout.EndHorizontal();
@@ -294,7 +307,7 @@ namespace LocalizationTool.Scripts.Editors
             {
                 ApplyStyle(Enums.RichTextStyle.FontSize);
             }
-            
+
             if (GUILayout.Button(GetGUIContent(AddEmptyIcon, RICH_TEXT_EDITOR_BIGGER_FONT_BUTTON_TOOLTIP), CustomStyles.GetStyle(Enums.CustomStyleName.OptionRichTextButton)))
             {
                 if (_fontSizeIndex < _fontSizes.Length - 1)

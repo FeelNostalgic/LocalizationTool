@@ -5,6 +5,7 @@ using System.Linq;
 using LocalizationTool.Scripts.API;
 using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.Data.ScriptableObjects;
+using LocalizationTool.Scripts.Editors;
 using LocalizationTool.Scripts.General;
 using UnityEditor;
 using UnityEngine;
@@ -168,9 +169,16 @@ namespace LocalizationTool.Scripts.Data
 
         public static void SetKeyTranslation(string key, string newTranslation, string language)
         {
-            localizationData.LanguagesDictionary[language].TranslationDictionary[key].translationText = newTranslation;
+            var translationToUpdate = localizationData.LanguagesDictionary[language].TranslationDictionary[key];
+            Undo.RecordObject(translationToUpdate, $"Changed translation {key} in {language} to {newTranslation}");
+            translationToUpdate.translationText = newTranslation;
 
             SaveChanges();
+            
+            Undo.undoRedoPerformed -= DictionaryEditor.RefreshTextBuffer;
+            Undo.undoRedoPerformed -= RichTextEditor.RefreshTextBuffer;
+            Undo.undoRedoPerformed += DictionaryEditor.RefreshTextBuffer;
+            Undo.undoRedoPerformed += RichTextEditor.RefreshTextBuffer;
         }
 
         public static void UpdateKeyName(string oldKeyName, string newKeyName)

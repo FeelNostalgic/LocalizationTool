@@ -40,7 +40,7 @@ namespace LocalizationTool.Scripts.Editors
         private readonly Dictionary<string, string> _currentKeyGroupDictionary = new();
         private readonly Dictionary<string, Vector2> _currentKeyScrollPosition = new();
         
-        private readonly Dictionary<string, string> _textBuffer = new();
+        private static readonly Dictionary<string, string> _textBuffer = new();
         private readonly Dictionary<string, double> _lastEditTime = new();
         private const float DELAY_TIME = 0.20f;
 
@@ -96,6 +96,19 @@ namespace LocalizationTool.Scripts.Editors
         {
             if (!LocalizationManager.Configuration.dictionaryClearAdd) return;
             base.ControlFocus(focus);
+        }
+        
+        public static void RefreshTextBuffer()
+        {
+            if (_textBuffer == null) return; 
+
+            foreach (var key in _textBuffer.Keys.ToList()) 
+            {
+                _textBuffer[key] = CacheDataSO.localizationData.LanguagesDictionary[LocalizationManager.CurrentLanguageInDictionarySection].TranslationDictionary[key].translationText;
+            }
+
+            // Forzar redibujado de la UI
+            RepaintGUI();
         }
 
         #endregion
