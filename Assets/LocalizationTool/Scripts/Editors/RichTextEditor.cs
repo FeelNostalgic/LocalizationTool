@@ -41,7 +41,7 @@ namespace LocalizationTool.Scripts.Editors
             { "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22", "24", "26", "28", "30", "32", "36", "40", "42", "44", "48", "50", "54", "58", "62", "68", "72", "100", "110" };
 
         private static string _richText = "";
-        private static string _key;
+        public static string key;
         private bool _showRichTextTags = true;
         private int _fontSizeIndex = 2;
         private int _zoom = 100;
@@ -63,7 +63,7 @@ namespace LocalizationTool.Scripts.Editors
             var window = GetWindow<RichTextEditor>(RICH_TEXT_EDITOR_WINDOW_LABEL);
             window.minSize = WindowSize;
             window.maxSize = new Vector2(WindowSize.x, 100000);
-            RichTextEditor._key = key;
+            RichTextEditor.key = key;
             _richText = initialText;
             _onTextChanged = onTextChanged;
         }
@@ -89,13 +89,18 @@ namespace LocalizationTool.Scripts.Editors
 
         protected void OnDestroy()
         {
-            UpdateValue(_key, _tempValue);
+            UpdateValue(key, _tempValue);
         }
 
         public static void RefreshTextArea()
         {
-            _richText = CacheDataSO.localizationData.LanguagesDictionary[LocalizationManager.CurrentLanguageInDictionarySection].TranslationDictionary[_key].translationText;
+            _richText = CacheDataSO.localizationData.LanguagesDictionary[LocalizationManager.CurrentLanguageInDictionarySection].TranslationDictionary[key].translationText;
             
+            Refresh();
+        }
+
+        public static void Refresh()
+        {
             EditorApplication.delayCall += () => GetWindow<RichTextEditor>().Repaint();
         }
         
@@ -149,8 +154,8 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.BeginVertical("box", GUILayout.Height(FeedbackLabel.IsNotEmpty() ? 60 : 35));
 
             GUI.SetNextControlName("VALUE");
-            var temp = EditorGUILayout.DelayedTextField(_key, CustomStyles.GetStyle(Enums.CustomStyleName.RichTextEditorKeyTextField), GUILayout.Height(30));
-            UpdateKey(_key, temp);
+            var temp = EditorGUILayout.DelayedTextField(key, CustomStyles.GetStyle(Enums.CustomStyleName.RichTextEditorKeyTextField), GUILayout.Height(30));
+            UpdateKey(key, temp);
 
             if (FeedbackLabel.IsNotEmpty())
             {
@@ -196,7 +201,7 @@ namespace LocalizationTool.Scripts.Editors
             EditorGUILayout.EndHorizontal();
 
             if (!(EditorApplication.timeSinceStartup - _lastEditTime > DELAY_TIME)) return;
-            UpdateValue(_key, _richText);
+            UpdateValue(key, _richText);
             _lastEditTime = float.MaxValue;
         }
 
@@ -541,7 +546,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private void UpdateKey(string oldKey, string newKey)
         {
-            _key = LocalizationManager.ChangeKey(oldKey, newKey, this);
+            key = LocalizationManager.ChangeKey(oldKey, newKey, this);
         }
 
         #endregion

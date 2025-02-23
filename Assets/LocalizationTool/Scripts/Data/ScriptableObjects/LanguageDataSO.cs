@@ -29,7 +29,7 @@ namespace LocalizationTool.Scripts.Data.ScriptableObjects
                 return _cacheDictionary;
             }
         }
-
+        
         private void BuildDictionary()
         {
             _cacheDictionary = translationKeys.ToDictionary(x => x.keyData.keyName, x => x);

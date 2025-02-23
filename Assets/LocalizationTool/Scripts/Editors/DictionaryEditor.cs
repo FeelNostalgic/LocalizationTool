@@ -38,7 +38,7 @@ namespace LocalizationTool.Scripts.Editors
 
         private static readonly Dictionary<string, string> _textBuffer = new();
         private readonly Dictionary<string, double> _lastEditTime = new();
-        private const float DELAY_TIME = 0.20f;
+        private const float DELAY_TIME = 0.30f;
 
         #endregion
 
@@ -98,7 +98,7 @@ namespace LocalizationTool.Scripts.Editors
 
         public static void RefreshTextBuffer()
         {
-            if (_textBuffer == null) return;
+            if (_textBuffer.IsNull()) return;
 
             foreach (var key in _textBuffer.Keys.ToList())
             {

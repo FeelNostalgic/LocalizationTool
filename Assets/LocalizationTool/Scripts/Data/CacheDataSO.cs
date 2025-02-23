@@ -50,6 +50,7 @@ namespace LocalizationTool.Scripts.Data
         
         // Undo Tracker
         
+        private static readonly Stack<(string, string)> UndoRenameKeyTracker = new();
         private static readonly Stack<(string, string)> UndoRenameCategoryTracker = new();
         private static readonly Stack<(string, string)> UndoRenameLanguageTracker = new();
         
@@ -144,7 +145,6 @@ namespace LocalizationTool.Scripts.Data
             foreach (var languageData in LanguageCache)
             {
                 var translation = ScriptableObject.CreateInstance<TranslationKeyDataSO>();
-                translation.name = keyName;
                 translation.keyData = newKeyData;
                 languageData.translationKeys.Add(translation);
                 AssetDatabase.AddObjectToAsset(translation, languageData);
@@ -155,6 +155,7 @@ namespace LocalizationTool.Scripts.Data
 
         public static void RemoveKey(string keyName)
         {
+            // FUTURE: ADD UNDO
             var keyToRemove = localizationData.KeysDictionary[keyName];
             localizationData.keys.Remove(keyToRemove);
             RemoveAsset(keyToRemove);
@@ -179,14 +180,15 @@ namespace LocalizationTool.Scripts.Data
             SaveChanges();
         }
 
-        public static void SetKeyTranslation(string key, string newTranslation, string language)
+        public static void SetKeyTranslation(string key, string newTranslation, string language, bool performUndo = true)
         {
             var translationToUpdate = localizationData.LanguagesDictionary[language].TranslationDictionary[key];
-            Undo.RecordObject(translationToUpdate, $"Changed translation {key} in {language} to {newTranslation}");
+            Undo.RecordObject(translationToUpdate, $"Change translation {key} in {language} to {newTranslation}");
             translationToUpdate.translationText = newTranslation;
             
             SaveChanges();
             
+            if (!performUndo) return;
             Undo.undoRedoPerformed -= DictionaryEditor.RefreshTextBuffer;
             Undo.undoRedoPerformed += DictionaryEditor.RefreshTextBuffer;
             Undo.undoRedoPerformed -= RichTextEditor.RefreshTextArea;
@@ -196,20 +198,30 @@ namespace LocalizationTool.Scripts.Data
         public static void UpdateKeyName(string oldKeyName, string newKeyName)
         {
             var keyToUpdate = localizationData.keys.FirstOrDefault(x => x.keyName.Equals(oldKeyName));
-            // FUTURE: Undo.RecordObject(keyToUpdate, $"Rename Key '{oldKeyName}' to '{newKeyName}'");
+            Undo.RecordObject(keyToUpdate, $"Rename Key '{oldKeyName}' to '{newKeyName}'");
+            UndoRenameKeyTracker.Push((oldKeyName, newKeyName));
+            
             keyToUpdate!.keyName = newKeyName;
             EditorUtility.SetDirty(keyToUpdate);
             AssetDatabase.RenameAsset(GetPath(keyToUpdate), newKeyName);
             
-            foreach (var language in LanguageCache)
-            {
-                if (!language.TranslationDictionary.TryGetValue(oldKeyName, out var translationToUpdate)) continue;
+            SaveChanges();
 
-                // FUTURE: Undo.RecordObject(translationToUpdate, $"Rename Translation Key '{oldKeyName}' to '{newKeyName}'");
-                translationToUpdate.name = newKeyName;
-                EditorUtility.SetDirty(translationToUpdate);
-            }
+            Undo.undoRedoPerformed -= HandleUndoRedoUpdateKeyName;
+            Undo.undoRedoPerformed += HandleUndoRedoUpdateKeyName;
+        }
 
+        private static void HandleUndoRedoUpdateKeyName()
+        {
+            if (UndoRenameKeyTracker.IsEmpty()) return;
+            var previousCurrentName = UndoRenameKeyTracker.Pop();
+            
+            var assetPath = $"{KEYS_PATH}/{previousCurrentName.Item2}.asset";
+            if (AssetDatabase.LoadAssetAtPath<Object>(assetPath).IsNull()) return;
+            AssetDatabase.RenameAsset(assetPath, previousCurrentName.Item1);
+            
+            RichTextEditor.key = previousCurrentName.Item1;
+            RichTextEditor.Refresh();
             SaveChanges();
         }
 

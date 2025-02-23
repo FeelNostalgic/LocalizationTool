@@ -18,6 +18,7 @@ using UnityEngine.SceneManagement;
 using LocalizationTool.Scripts.Data;
 using LocalizationTool.Scripts.Data.ScriptableObjects;
 using LocalizationTool.Scripts.Data.TemplatesForSerializer;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using static LocalizationTool.Scripts.Commons.EditorStrings;
 using static LocalizationTool.Scripts.Commons.EditorPaths;
@@ -124,7 +125,7 @@ namespace LocalizationTool.Scripts.General
         public static void ChangeValue(string key, string newTranslation)
         {
             if (!ExistsKey(key)) return;
-            if (CacheDataSO.localizationData.LanguagesDictionary[CurrentLanguageInDictionarySection].TranslationDictionary[key].Equals(newTranslation)) return;
+            if (CacheDataSO.localizationData.LanguagesDictionary[CurrentLanguageInDictionarySection].TranslationDictionary[key].translationText.Equals(newTranslation)) return;
 
             // Update database
             CacheDataSO.SetKeyTranslation(key, newTranslation, CurrentLanguageInDictionarySection);
@@ -607,7 +608,7 @@ namespace LocalizationTool.Scripts.General
 
                 if (progressWindow.IsNotNull()) progressWindow.SetProgress(itemCount++ / totalItems);
                 if (progressWindow.IsNotNull()) progressWindow.SetProgressInfo(string.Format(IMPORT_PROGRESS_KEY_CATEGORY, keyCategoryLanguage.key, keyCategoryLanguage.category));
-                yield return null;
+                yield return new EditorWaitForSeconds(0.2f);
             }
 
             foreach (var keyCategoryLanguage in data.dictionaryKeyCategoryLanguages)
@@ -725,7 +726,7 @@ namespace LocalizationTool.Scripts.General
                 //Update values
                 foreach (var (language, translation) in values)
                 {
-                    CacheDataSO.SetKeyTranslation(keyToImport, translation, language);
+                    CacheDataSO.SetKeyTranslation(keyToImport, translation, language, false);
                 }
             }
             else
@@ -736,7 +737,7 @@ namespace LocalizationTool.Scripts.General
                 CacheDataSO.InsertKey(keyToImport, category);
                 foreach (var (language, translation) in values)
                 {
-                    CacheDataSO.SetKeyTranslation(keyToImport, translation, language);
+                    CacheDataSO.SetKeyTranslation(keyToImport, translation, language, false);
                 }
             }
         }
@@ -763,7 +764,7 @@ namespace LocalizationTool.Scripts.General
         public static void ImportKeyTranslation(string keyToImport, string language, string translation)
         {
             if (keyToImport.IsEmpty()) return;
-            CacheDataSO.SetKeyTranslation(keyToImport, translation, language);
+            CacheDataSO.SetKeyTranslation(keyToImport, translation, language, false);
         }
 
         public static void ImportKey(string keyToImport, string category, string language, string translation, bool showLog = true)
@@ -783,7 +784,7 @@ namespace LocalizationTool.Scripts.General
                 }
 
                 //Update value
-                CacheDataSO.SetKeyTranslation(keyToImport, translation, language);
+                CacheDataSO.SetKeyTranslation(keyToImport, translation, language, false);
             }
             else
             {
@@ -791,7 +792,7 @@ namespace LocalizationTool.Scripts.General
                 if (!ExistsCategory(category)) AddNewCategory(category.IsEmpty() ? CacheDataSO.DefaultCategory : category, null, false);
 
                 CacheDataSO.InsertKey(keyToImport, category);
-                CacheDataSO.SetKeyTranslation(keyToImport, translation, language);
+                CacheDataSO.SetKeyTranslation(keyToImport, translation, language, false);
             }
         }
 
