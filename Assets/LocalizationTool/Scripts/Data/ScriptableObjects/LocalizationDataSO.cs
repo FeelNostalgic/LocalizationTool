@@ -43,7 +43,7 @@ namespace LocalizationTool.Scripts.Data.ScriptableObjects
 				return _keyCacheDictionary;
 			}
 		}
-		
+
 		private void BuildLanguagesDictionary()
 		{
 			_languageCacheDictionary = languages.ToDictionary(x => x.languageName, x => x);
