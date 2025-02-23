@@ -237,18 +237,19 @@ namespace LocalizationTool.Scripts.Data
         {
             // Remove old default
             var currentDefault = LanguageCache[0];
-            System.Diagnostics.Debug.Assert(currentDefault, nameof(currentDefault) + " != null");
+            Undo.RecordObject(currentDefault, $"Change default language to {newDefaultLanguage}");
             currentDefault.isDefault = false;
 
             // Set new default
             var newDefault = localizationData.LanguagesDictionary[newDefaultLanguage];
-            System.Diagnostics.Debug.Assert(newDefault, nameof(newDefault) + " != null");
+            Undo.RecordObject(newDefault, $"Change default language to {newDefaultLanguage}");
             newDefault.isDefault = true;
 
             // Reorder languages
             var newDefaultOrder = newDefault.displayOrder;
             foreach (var language in localizationData.languages.Where(language => language.displayOrder < newDefaultOrder))
             {
+                Undo.RecordObject(language, $"Change default language to {newDefaultLanguage}");
                 language.displayOrder++; // Shift languages above the new default
             }
 
@@ -256,6 +257,9 @@ namespace LocalizationTool.Scripts.Data
 
             UpdateLanguageCache();
             SaveChanges();
+            
+            Undo.undoRedoPerformed -= UpdateLanguagesCacheAndRepaint;
+            Undo.undoRedoPerformed += UpdateLanguagesCacheAndRepaint;
         }
 
         public static void RemoveLanguage(string languageNameToRemove)
@@ -366,6 +370,7 @@ namespace LocalizationTool.Scripts.Data
             var languageToUpdate = localizationData.LanguagesDictionary[languageToEmpty];
             foreach (var translationKeyData in languageToUpdate.translationKeys)
             {
+                Undo.RecordObject(translationKeyData, $"Empty language {languageToEmpty}");
                 translationKeyData.translationText = "";
             }
 
@@ -393,18 +398,19 @@ namespace LocalizationTool.Scripts.Data
         {
             // Remove old default
             var currentDefault = CategoryCache[0];
-            Debug.Assert(currentDefault, nameof(currentDefault) + " != null");
+            Undo.RecordObject(currentDefault, $"Change default category to {newDefaultCategory}");
             currentDefault.isDefault = false;
 
             // Set new default
             var newDefault = localizationData.CategoriesDictionary[newDefaultCategory];
-            Debug.Assert(newDefault, nameof(newDefault) + " != null");
+            Undo.RecordObject(newDefault, $"Change default category to {newDefaultCategory}");
             newDefault.isDefault = true;
 
             // Reorder categories
             var newDefaultOrder = newDefault.displayOrder;
             foreach (var category in localizationData.categories.Where(category => category.displayOrder < newDefaultOrder))
             {
+                Undo.RecordObject(category, $"Change default category to {newDefaultCategory}");
                 category.displayOrder++; // Shift categories above the new default
             }
 
@@ -412,6 +418,9 @@ namespace LocalizationTool.Scripts.Data
 
             UpdateCategoriesCache();
             SaveChanges();
+            
+            Undo.undoRedoPerformed -= UpdateCategoriesCacheAndRepaint;
+            Undo.undoRedoPerformed += UpdateCategoriesCacheAndRepaint;
         }
 
         public static void RemoveCategory(string categoryName)

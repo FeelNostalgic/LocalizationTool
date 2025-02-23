@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: 8
   m_EditorClassIdentifier: 
   keyData: {fileID: 11400000, guid: 6f56ecfd3794c94458405fd863ea3e9e, type: 2}
-  translationText: 
+  translationText: dfgfsdf
 --- !u!114 &-7270486084700228690
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27,7 +27,7 @@ MonoBehaviour:
   m_Name: 3
   m_EditorClassIdentifier: 
   keyData: {fileID: 11400000, guid: e9587b3350fb7e84cbc947fbf73abad9, type: 2}
-  translationText: 
+  translationText: 1
 --- !u!114 &-7002751346617848024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143,7 +143,7 @@ MonoBehaviour:
   m_Name: 2
   m_EditorClassIdentifier: 
   keyData: {fileID: 11400000, guid: faf64e7bf314d2a458a24f85e4d2e3e8, type: 2}
-  translationText: 
+  translationText: fdsfsd
 --- !u!114 &3660524089608867616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,7 +213,7 @@ MonoBehaviour:
   m_Name: 1
   m_EditorClassIdentifier: 
   keyData: {fileID: 11400000, guid: 6d634a224106b12468955392b2d32001, type: 2}
-  translationText: 
+  translationText: Hello
 --- !u!114 &8249983623333689361
 MonoBehaviour:
   m_ObjectHideFlags: 0
