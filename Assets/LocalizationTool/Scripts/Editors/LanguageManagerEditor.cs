@@ -350,7 +350,6 @@ namespace LocalizationTool.Scripts.Editors
             var totalItems = data.Data.Count;
             var itemCount = 0f;
 
-
             LocalizationManager.ImportLanguage(data.Language);
 
             progressWindow.SetStatus(IMPORT_STATUS_KEYS);

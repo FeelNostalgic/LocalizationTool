@@ -1,12 +1,15 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using LocalizationTool.Scripts.API;
 using LocalizationTool.Scripts.Commons;
 using LocalizationTool.Scripts.Data.ScriptableObjects;
+using LocalizationTool.Scripts.Data.TemplatesForSerializer;
 using LocalizationTool.Scripts.Editors;
 using LocalizationTool.Scripts.General;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -50,6 +53,7 @@ namespace LocalizationTool.Scripts.Data
         private static readonly Stack<(string, string)> UndoRenameCategoryTracker = new();
         private static readonly Stack<(string, string)> UndoRenameLanguageTracker = new();
         
+        private static readonly Stack<(int, LanguageTemplate)> UndoRemoveLanguageTracker = new(); 
         private static readonly Stack<(CategoryDataSO, List<KeyDataSO>)> UndoRemoveCategoryTracker = new(); 
 
         #endregion
@@ -270,6 +274,12 @@ namespace LocalizationTool.Scripts.Data
             var languageToRemove = localizationData.LanguagesDictionary[languageNameToRemove];
             var removedDisplayOrder = languageToRemove!.displayOrder;
 
+            // FUTURE: Undo removed language
+            // var undoGroup = Undo.GetCurrentGroup();
+            // Undo.SetCurrentGroupName($"Remove language {languageToRemove.languageName}");
+            
+            // UndoRemoveLanguageTracker.Push((languageToRemove.displayOrder, CreateLanguageCopy(languageToRemove)));
+            
             // Update display order
             foreach (var language in localizationData.languages.Where(language => language.displayOrder > removedDisplayOrder))
             {
@@ -285,7 +295,10 @@ namespace LocalizationTool.Scripts.Data
             }
 
             RemoveAsset(languageToRemove);
-
+            
+            // FUTURE: Undo removed language
+            // Undo.CollapseUndoOperations(undoGroup);
+            
             UpdateLanguageCache();
             SaveChanges();
 
@@ -293,7 +306,66 @@ namespace LocalizationTool.Scripts.Data
             {
                 LocalizationManager.CurrentLanguageInDictionarySection = DefaultLanguage;
             }
+            
+            // FUTURE: Undo removed language
+            // Undo.undoRedoPerformed -= HandleUndoRedoRemovedLanguage;
+            // Undo.undoRedoPerformed += HandleUndoRedoRemovedLanguage;
         }
+
+        // FUTURE: Undo removed language
+        // private static LanguageTemplate CreateLanguageCopy(LanguageDataSO languageToCopy)
+        // {
+        //     var copiedData = new LanguageTemplate
+        //     {
+        //         Language = languageToCopy.languageName
+        //     };
+        //     
+        //     foreach (var keyData in Keys)
+        //     {
+        //         var key = keyData.keyName;
+        //         var category = keyData.CategoryName;
+        //         
+        //         copiedData.Data.Add(new LanguageTemplate.KeyCategoryLanguage
+        //         {
+        //             Key = key,
+        //             Category = category,
+        //             Value = languageToCopy.TranslationDictionary[key].translationText
+        //         });
+        //     }
+        //     
+        //     return copiedData;
+        // }
+        //
+        // private static void LoadSavedLanguage(LanguageTemplate languageToLoad)
+        // {
+        //     LocalizationManager.ImportLanguage(languageToLoad.Language);
+        //     
+        //     foreach (var keyCategoryLanguage in languageToLoad.Data)
+        //     {
+        //         LocalizationManager.ImportKey(keyCategoryLanguage.Key, keyCategoryLanguage.Category, languageToLoad.Language, keyCategoryLanguage.Value);
+        //         //yield return null;
+        //     }
+        // }
+        //
+        // private static void HandleUndoRedoRemovedLanguage()
+        // {
+        //     if (UndoRemoveLanguageTracker.IsEmpty()) return;
+        //     var removedLanguage = UndoRemoveLanguageTracker.Pop();
+        //     // EditorCoroutineUtility.StartCoroutineOwnerless(LoadSavedLanguage(removedLanguage.Item2));
+        //     LoadSavedLanguage(removedLanguage.Item2);
+        //     
+        //     // TODO: Check before create if there is a language with name already created
+        //     UpdateLanguageDisplayOrder(removedLanguage.Item2.Language, localizationData.languages.Count, removedLanguage.Item1);
+        //     
+        //     // foreach (var languageData in localizationData.languages.Where(x=> x.displayOrder >= removedLanguage.Item1))
+        //     // {
+        //     //     languageData.displayOrder = Math.Clamp(languageData.displayOrder+1, 0, localizationData.languages.Count+1);
+        //     // }
+        //     
+        //     UpdateLanguageCache();
+        //     LocalizationMainEditor.Instance.Repaint();
+        //     SaveChanges();
+        // }
 
         public static void UpdateLanguageDisplayOrder(string languageName, int oldDisplayOrder, int newDisplayOrder)
         {
@@ -471,7 +543,7 @@ namespace LocalizationTool.Scripts.Data
             Undo.undoRedoPerformed -= HandleUndoRedoRemovedCategory;
             Undo.undoRedoPerformed += HandleUndoRedoRemovedCategory;
         }
-
+        
         private static void HandleUndoRedoRemovedCategory()
         {
             if (UndoRemoveCategoryTracker.IsEmpty()) return;
