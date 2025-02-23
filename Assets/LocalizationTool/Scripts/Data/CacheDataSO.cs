@@ -46,8 +46,10 @@ namespace LocalizationTool.Scripts.Data
         private const string LOCALIZATION_DATA_PATH = DATABASE_PATH + "/LocalizationData.asset";
         
         // Undo Tracker
-        private static Stack<(string, string)> _undoRenameCategoryTracker = new();
-        private static Stack<(string, string)> _undoRenameLanguageTracker = new();
+        private static readonly Stack<(string, string)> UndoRenameCategoryTracker = new();
+        private static readonly Stack<(string, string)> UndoRenameLanguageTracker = new();
+        
+        private static Stack<(CategoryDataSO, List<KeyDataSO>)> _undoRemoveCategoryTracker = new(); 
 
         #endregion
 
@@ -341,7 +343,7 @@ namespace LocalizationTool.Scripts.Data
             var languageToUpdate = localizationData.LanguagesDictionary[oldLanguageName];
             
             Undo.RecordObject(languageToUpdate, $"Change Language {oldLanguageName} Name to {newLanguageName}");
-            _undoRenameLanguageTracker.Push((oldLanguageName, newLanguageName));
+            UndoRenameLanguageTracker.Push((oldLanguageName, newLanguageName));
             
             languageToUpdate!.languageName = newLanguageName;
             EditorUtility.SetDirty(languageToUpdate);
@@ -355,8 +357,8 @@ namespace LocalizationTool.Scripts.Data
         
         private static void HandleUpdateLanguageNameUndoRedo()
         {
-            if (_undoRenameLanguageTracker.IsEmpty()) return;
-            var previousCurrentName = _undoRenameLanguageTracker.Pop();
+            if (UndoRenameLanguageTracker.IsEmpty()) return;
+            var previousCurrentName = UndoRenameLanguageTracker.Pop();
             
             var assetPath = $"{LANGUAGES_PATH}/{previousCurrentName.Item2}.asset";
             if (AssetDatabase.LoadAssetAtPath<Object>(assetPath).IsNull()) return;
@@ -428,6 +430,10 @@ namespace LocalizationTool.Scripts.Data
             var categoryToRemove = localizationData.CategoriesDictionary[categoryName];
             var removedDisplayOrder = categoryToRemove!.displayOrder;
 
+            var affectedKeys = localizationData.keys.Where(x => x.category.categoryName.Equals(categoryName)).ToList();
+            
+            _undoRemoveCategoryTracker.Push((Object.Instantiate(categoryToRemove), affectedKeys));
+            
             // Update keys that use the categoryToRemove to default category
             foreach (var key in localizationData.keys.Where(x => x.category.categoryName.Equals(categoryName)))
             {
@@ -437,6 +443,7 @@ namespace LocalizationTool.Scripts.Data
             // Update display order
             foreach (var category in localizationData.categories.Where(category => category.displayOrder > removedDisplayOrder))
             {
+                Undo.RecordObject(category, $"Remove category {categoryToRemove.categoryName}");
                 category.displayOrder--;
             }
 
@@ -445,6 +452,29 @@ namespace LocalizationTool.Scripts.Data
             RemoveAsset(categoryToRemove);
 
             UpdateCategoriesCache();
+            SaveChanges();
+            
+            Undo.undoRedoPerformed -= HandleUndoRedoRemovedCategory;
+            Undo.undoRedoPerformed += HandleUndoRedoRemovedCategory;
+        }
+
+        private static void HandleUndoRedoRemovedCategory()
+        {
+            if (_undoRemoveCategoryTracker.IsEmpty()) return;
+            var removedCategory = _undoRemoveCategoryTracker.Pop();
+            
+            // TODO: Check before create if there is a category with name already created
+            
+            AssetDatabase.CreateAsset(removedCategory.Item1, $"{CATEGORIES_PATH}/{removedCategory.Item1.categoryName}.asset");
+            localizationData.categories.Add(removedCategory.Item1);
+            
+            foreach (var keyData in removedCategory.Item2)
+            {
+                keyData.category = removedCategory.Item1;
+            }
+            
+            UpdateCategoriesCache();
+            LocalizationMainEditor.Instance.Repaint();
             SaveChanges();
         }
 
@@ -497,7 +527,7 @@ namespace LocalizationTool.Scripts.Data
             var categoryToUpdate = localizationData.CategoriesDictionary[oldCategoryName];
             
             Undo.RecordObject(categoryToUpdate, $"Change Category {oldCategoryName} Name to {newCategoryName}");
-            _undoRenameCategoryTracker.Push((oldCategoryName, newCategoryName));
+            UndoRenameCategoryTracker.Push((oldCategoryName, newCategoryName));
             
             categoryToUpdate!.categoryName = newCategoryName;
             EditorUtility.SetDirty(categoryToUpdate);
@@ -505,14 +535,14 @@ namespace LocalizationTool.Scripts.Data
 
             SaveChanges();
             
-            Undo.undoRedoPerformed -= HandleUpdateCategoryNameUndoRedo;
-            Undo.undoRedoPerformed += HandleUpdateCategoryNameUndoRedo;
+            Undo.undoRedoPerformed -= HandleUndoRedoUpdateCategoryName;
+            Undo.undoRedoPerformed += HandleUndoRedoUpdateCategoryName;
         }
         
-        private static void HandleUpdateCategoryNameUndoRedo()
+        private static void HandleUndoRedoUpdateCategoryName()
         {
-            if (_undoRenameCategoryTracker.IsEmpty()) return;
-            var previousCurrentName = _undoRenameCategoryTracker.Pop();
+            if (UndoRenameCategoryTracker.IsEmpty()) return;
+            var previousCurrentName = UndoRenameCategoryTracker.Pop();
             
             var assetPath = $"{CATEGORIES_PATH}/{previousCurrentName.Item2}.asset";
             if (AssetDatabase.LoadAssetAtPath<Object>(assetPath).IsNull()) return;
