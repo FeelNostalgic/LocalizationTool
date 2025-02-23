@@ -17,10 +17,6 @@ namespace LocalizationTool.Scripts.Editors
 {
     public class DictionaryEditor : EditorWindowAbstract
     {
-        #region PUBLIC VARIABLES
-
-        #endregion
-
         #region PRIVATE VARIABLES
 
         #region EDITOR VARIABLES
@@ -39,7 +35,7 @@ namespace LocalizationTool.Scripts.Editors
         //private readonly Dictionary<string, string> _currentKeyValueDictionary = new();
         private readonly Dictionary<string, string> _currentKeyGroupDictionary = new();
         private readonly Dictionary<string, Vector2> _currentKeyScrollPosition = new();
-        
+
         private static readonly Dictionary<string, string> _textBuffer = new();
         private readonly Dictionary<string, double> _lastEditTime = new();
         private const float DELAY_TIME = 0.20f;
@@ -65,11 +61,13 @@ namespace LocalizationTool.Scripts.Editors
         public override void OnEnable()
         {
             LocalizationManager.Instance.OnDefaultCategoryUpdate += OnDefaultCategoryUpdate;
+            // LocalizationManager.Instance.OnLanguageDelete += OnLanguageDelete;
         }
 
         public override void OnDisable()
         {
             LocalizationManager.Instance.OnDefaultCategoryUpdate -= OnDefaultCategoryUpdate;
+            // LocalizationManager.Instance.OnLanguageDelete -= OnLanguageDelete;
         }
 
         public override void ShowLayout()
@@ -97,12 +95,12 @@ namespace LocalizationTool.Scripts.Editors
             if (!LocalizationManager.Configuration.dictionaryClearAdd) return;
             base.ControlFocus(focus);
         }
-        
+
         public static void RefreshTextBuffer()
         {
-            if (_textBuffer == null) return; 
+            if (_textBuffer == null) return;
 
-            foreach (var key in _textBuffer.Keys.ToList()) 
+            foreach (var key in _textBuffer.Keys.ToList())
             {
                 _textBuffer[key] = CacheDataSO.localizationData.LanguagesDictionary[LocalizationManager.CurrentLanguageInDictionarySection].TranslationDictionary[key].translationText;
             }
@@ -219,6 +217,7 @@ namespace LocalizationTool.Scripts.Editors
                     if (LocalizationManager.CurrentLanguageInDictionarySection != CacheDataSO.Languages[_currentLanguageToolbarIndex])
                     {
                         LocalizationManager.CurrentLanguageInDictionarySection = CacheDataSO.Languages[_currentLanguageToolbarIndex];
+                        _textBuffer.Clear();
                         GUI.FocusControl(null);
                     }
                 }
@@ -327,7 +326,6 @@ namespace LocalizationTool.Scripts.Editors
 
             return filteredDicToIterate;
         }
-
 
         private void GenerateCenterScrollViewContent()
         {
@@ -439,11 +437,11 @@ namespace LocalizationTool.Scripts.Editors
             GUILayout.BeginHorizontal(CustomStyles.GetStyle(Enums.CustomStyleName.ValueEditorPreviewBox));
 
             _currentKeyScrollPosition[key] = EditorGUILayout.BeginScrollView(_currentKeyScrollPosition[key], GUILayout.ExpandWidth(true), GUILayout.Height(40));
-            
+
             _textBuffer.TryAdd(key, value);
-            
+
             var tempValue = EditorGUILayout.TextArea(_textBuffer[key], CustomStyles.GetStyle(Enums.CustomStyleName.ValueEditorPreviewTextArea), GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
-            
+
             if (tempValue != _textBuffer[key])
             {
                 _textBuffer[key] = tempValue;
@@ -452,7 +450,7 @@ namespace LocalizationTool.Scripts.Editors
 
             EditorGUILayout.EndScrollView();
             GUILayout.EndHorizontal();
-            
+
             if (_lastEditTime.ContainsKey(key) && EditorApplication.timeSinceStartup - _lastEditTime[key] > DELAY_TIME)
             {
                 if (value != _textBuffer[key])

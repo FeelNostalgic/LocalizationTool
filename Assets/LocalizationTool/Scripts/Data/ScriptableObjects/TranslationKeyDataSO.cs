@@ -7,7 +7,7 @@ namespace LocalizationTool.Scripts.Data.ScriptableObjects
 	[Serializable]
 	public class TranslationKeyDataSO : ScriptableObject
 	{
-		public string keyName;
+		public KeyDataSO keyData;
 		public string translationText;
 	}
 }

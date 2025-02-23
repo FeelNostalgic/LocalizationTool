@@ -510,7 +510,7 @@ namespace LocalizationTool.Scripts.Editors
             }
         }
 
-        private void AddTags(string selectedText, int startIndex, int length, string openingTag, string closingTag)
+        private static void AddTags(string selectedText, int startIndex, int length, string openingTag, string closingTag)
         {
             var styledText =
                 //Add Tags

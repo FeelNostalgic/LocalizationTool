@@ -342,15 +342,14 @@ namespace LocalizationTool.Scripts.Editors
         private void Feedback(string category)
         {
             //Feedback
-            if (_feedbackList.ContainsKey(category) && _feedbackList[category].IsNotEmpty())
-            {
-                GUILayout.BeginHorizontal(GUILayout.Height(20));
-                GUILayout.FlexibleSpace();
-                GUILayout.Label(WarningIcon, GUILayout.Width(20));
-                GUILayout.Label(_feedbackList[category], CustomStyles.GetStyle(Enums.CustomStyleName.RichTextEditorFeedbackLabel));
-                GUILayout.FlexibleSpace();
-                GUILayout.EndHorizontal();
-            }
+            if (!_feedbackList.ContainsKey(category) || !_feedbackList[category].IsNotEmpty()) return;
+            
+            GUILayout.BeginHorizontal(GUILayout.Height(20));
+            GUILayout.FlexibleSpace();
+            GUILayout.Label(WarningIcon, GUILayout.Width(20));
+            GUILayout.Label(_feedbackList[category], CustomStyles.GetStyle(Enums.CustomStyleName.RichTextEditorFeedbackLabel));
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
         }
 
         #endregion
@@ -361,6 +360,7 @@ namespace LocalizationTool.Scripts.Editors
         {
             LocalizationManager.RemoveCategory(category);
             LocalizationManager.Log(CATEGORIES_LABEL, CustomDebug.Colors.Green, string.Format(DELETED_CATEGORY_LOG, category));
+            GUIUtility.ExitGUI();
         }
 
         private void UpdateCategory(string oldCategory, string newCategory)

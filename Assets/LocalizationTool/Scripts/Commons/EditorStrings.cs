@@ -64,9 +64,10 @@ namespace LocalizationTool.Scripts.Commons
         public const string IMPORT_STATUS_KEYS = "Importing keys...";
         public const string IMPORT_RESULT_SUCCESS = "File has been imported successfully!";
         public const string IMPORT_LANGUAGES_RESULT = "{0} language imported";
-        public const string IMPORT_CATEGORIES_RESULT = "{0} new categories imported";
+        public const string IMPORT_CATEGORIES_RESULT = "{0} categories imported";
         public const string IMPORT_KEYS_RESULT = "{0} keys imported";
         public const string IMPORT_PROGRESS_KEY_CATEGORY = "Key '{0}' - '{1}' imported";
+        public const string IMPORT_PROGRESS_KEY_TRANSLATION = "Key '{0}' - '{1}': '{2}' imported";
         public const string IMPORT_PROGRESS_LANGUAGE = "Language '{0}' imported";
         public const string IMPORT_PROGRESS_CATEGORY = "Category '{0}' imported";
 
@@ -211,6 +212,7 @@ namespace LocalizationTool.Scripts.Commons
         public const string IMPORTED_CATEGORY_LOG = "Category {0} imported";
         public const string IMPORTED_KEY_LOG = "Key '{0}' - '{1}' : {2} imported";
         public const string IMPORTED_KEY_SINGLE_LOG = "Key '{0}' - '{1}' - '{2}' : '{3}' imported";
+        public const string IMPORTED_KEY_CATEGORY_LOG = "Key '{0}' - '{1}' imported";
 
         public const string TOOL_INITIALIZED_LOG = "Initialized";
 

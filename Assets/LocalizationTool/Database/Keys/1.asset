@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 18ee5685c0106b445bd5f66cf9aad802, type: 3}
-  m_Name: a
+  m_Name: 1
   m_EditorClassIdentifier: 
-  keyName: b
-  category: {fileID: 11400000, guid: a54e1664308c30148800f6eb8a0b7725, type: 2}
-  displayOrder: 2
+  keyName: 
+  category: {fileID: 0}
+  displayOrder: 0

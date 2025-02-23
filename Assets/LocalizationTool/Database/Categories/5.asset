@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18ee5685c0106b445bd5f66cf9aad802, type: 3}
-  m_Name: 777
+  m_Script: {fileID: 11500000, guid: 8ec3a2ff2463c0148ac836764d54c4e9, type: 3}
+  m_Name: 5
   m_EditorClassIdentifier: 
-  keyName: 7
-  category: {fileID: 11400000, guid: 42246763350351040b9ca2919a3a4bb0, type: 2}
+  categoryName: 5
   displayOrder: 7
+  isDefault: 0

@@ -376,6 +376,7 @@ namespace LocalizationTool.Scripts.Editors
         {
             LocalizationManager.RemoveLanguage(languageName);
             LocalizationManager.Log(LANGUAGES_LABEL, CustomDebug.Colors.Purple, string.Format(DELETED_LANGUAGE_LOG, languageName));
+            GUIUtility.ExitGUI();
         }
 
         private static void EmptyLanguage(string languageName)
@@ -387,15 +388,14 @@ namespace LocalizationTool.Scripts.Editors
         private void Feedback(string languageName)
         {
             //Feedback
-            if (_feedbackList.ContainsKey(languageName) && _feedbackList[languageName].IsNotEmpty())
-            {
-                GUILayout.BeginHorizontal(GUILayout.Height(20));
-                GUILayout.FlexibleSpace();
-                GUILayout.Label(WarningIcon, GUILayout.Width(20));
-                GUILayout.Label(_feedbackList[languageName], CustomStyles.GetStyle(Enums.CustomStyleName.RichTextEditorFeedbackLabel));
-                GUILayout.FlexibleSpace();
-                GUILayout.EndHorizontal();
-            }
+            if (!_feedbackList.ContainsKey(languageName) || !_feedbackList[languageName].IsNotEmpty()) return;
+            
+            GUILayout.BeginHorizontal(GUILayout.Height(20));
+            GUILayout.FlexibleSpace();
+            GUILayout.Label(WarningIcon, GUILayout.Width(20));
+            GUILayout.Label(_feedbackList[languageName], CustomStyles.GetStyle(Enums.CustomStyleName.RichTextEditorFeedbackLabel));
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
         }
 
         #endregion

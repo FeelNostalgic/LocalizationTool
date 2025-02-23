@@ -123,18 +123,18 @@ namespace LocalizationTool.Scripts.Data
         {
             CreateDirectoryIfNotExist(KEYS_PATH);
 
-            var newKey = ScriptableObject.CreateInstance<KeyDataSO>();
-            AssetDatabase.CreateAsset(newKey, $"{KEYS_PATH}/{keyName}.asset");
-            newKey.keyName = keyName;
-            newKey.displayOrder = localizationData.keys.Count + 1;
-            newKey.category = CategoryCache.FirstOrDefault(x => x.categoryName.Equals(categoryName));
-            localizationData.keys.Add(newKey);
+            var newKeyData = ScriptableObject.CreateInstance<KeyDataSO>();
+            AssetDatabase.CreateAsset(newKeyData, $"{KEYS_PATH}/{keyName}.asset");
+            newKeyData.keyName = keyName;
+            newKeyData.displayOrder = localizationData.keys.Count + 1;
+            newKeyData.category = CategoryCache.FirstOrDefault(x => x.categoryName.Equals(categoryName));
+            localizationData.keys.Add(newKeyData);
 
             foreach (var languageData in LanguageCache)
             {
                 var translation = ScriptableObject.CreateInstance<TranslationKeyDataSO>();
                 translation.name = keyName;
-                translation.keyName = keyName;
+                translation.keyData = newKeyData;
                 languageData.translationKeys.Add(translation);
                 AssetDatabase.AddObjectToAsset(translation, languageData);
             }
@@ -173,9 +173,9 @@ namespace LocalizationTool.Scripts.Data
             var translationToUpdate = localizationData.LanguagesDictionary[language].TranslationDictionary[key];
             Undo.RecordObject(translationToUpdate, $"Changed translation {key} in {language} to {newTranslation}");
             translationToUpdate.translationText = newTranslation;
-
+            
             SaveChanges();
-
+            
             Undo.undoRedoPerformed -= DictionaryEditor.RefreshTextBuffer;
             Undo.undoRedoPerformed -= RichTextEditor.RefreshTextArea;
             Undo.undoRedoPerformed += DictionaryEditor.RefreshTextBuffer;
@@ -195,7 +195,6 @@ namespace LocalizationTool.Scripts.Data
                 if (!language.TranslationDictionary.TryGetValue(oldKeyName, out var translationToUpdate)) continue;
 
                 // FUTURE: Undo.RecordObject(translationToUpdate, $"Rename Translation Key '{oldKeyName}' to '{newKeyName}'");
-                translationToUpdate.keyName = newKeyName;
                 translationToUpdate.name = newKeyName;
                 EditorUtility.SetDirty(translationToUpdate);
             }
@@ -221,7 +220,7 @@ namespace LocalizationTool.Scripts.Data
             {
                 var translation = ScriptableObject.CreateInstance<TranslationKeyDataSO>();
                 translation.name = keyData.keyName;
-                translation.keyName = keyData.keyName;
+                translation.keyData = keyData;
                 newLanguage.translationKeys.Add(translation);
                 AssetDatabase.AddObjectToAsset(translation, newLanguage);
             }
@@ -255,9 +254,9 @@ namespace LocalizationTool.Scripts.Data
             SaveChanges();
         }
 
-        public static void RemoveLanguage(string languageName)
+        public static void RemoveLanguage(string languageNameToRemove)
         {
-            var languageToRemove = localizationData.LanguagesDictionary[languageName];
+            var languageToRemove = localizationData.LanguagesDictionary[languageNameToRemove];
             var removedDisplayOrder = languageToRemove!.displayOrder;
 
             // Update display order
@@ -278,6 +277,11 @@ namespace LocalizationTool.Scripts.Data
 
             UpdateLanguageCache();
             SaveChanges();
+
+            if (LocalizationManager.CurrentLanguageInDictionarySection.Equals(languageNameToRemove))
+            {
+                LocalizationManager.CurrentLanguageInDictionarySection = DefaultLanguage;
+            }
         }
 
         public static void UpdateLanguageDisplayOrder(string languageName, int oldDisplayOrder, int newDisplayOrder)
