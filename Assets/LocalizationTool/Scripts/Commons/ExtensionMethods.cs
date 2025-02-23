@@ -103,25 +103,45 @@ namespace LocalizationTool.Scripts.Commons
 
 		#region ICOLLECTION
 		
-		public static bool IsEmpty<T>(this ICollection<T> collection)
+		public static bool IsEmpty(this ICollection collection)
 		{
 			return collection.Count == 0;
 		}
 
-		public static bool IsNull<T>(this ICollection<T> collection)
+		public static bool IsNull(this ICollection collection)
 		{
 			return collection is null;
 		}
         
-		public static bool IsNotEmpty<T>(this ICollection<T> collection)
+		public static bool IsNotEmpty(this ICollection collection)
 		{
 			return !collection.IsEmpty();
 		}
 
-		public static bool IsNotNull<T>(this ICollection<T> collection)
+		public static bool IsNotNull(this ICollection collection)
 		{
 			return !collection.IsNull();
 		}
+		
+		// public static bool IsEmpty<T>(this ICollection<T> collection)
+		// {
+		// 	return collection.Count == 0;
+		// }
+		//
+		// public static bool IsNull<T>(this ICollection<T> collection)
+		// {
+		// 	return collection is null;
+		// }
+  //       
+		// public static bool IsNotEmpty<T>(this ICollection<T> collection)
+		// {
+		// 	return !collection.IsEmpty();
+		// }
+		//
+		// public static bool IsNotNull<T>(this ICollection<T> collection)
+		// {
+		// 	return !collection.IsNull();
+		// }
 
 		#endregion
 		

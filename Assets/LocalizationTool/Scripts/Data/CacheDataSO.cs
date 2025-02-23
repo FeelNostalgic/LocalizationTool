@@ -44,6 +44,10 @@ namespace LocalizationTool.Scripts.Data
         private const string CATEGORIES_PATH = DATABASE_PATH + "/Categories";
         private const string KEYS_PATH = DATABASE_PATH + "/Keys";
         private const string LOCALIZATION_DATA_PATH = DATABASE_PATH + "/LocalizationData.asset";
+        
+        // Undo Tracker
+        private static Stack<(string, string)> _undoRenameCategoryTracker = new();
+        private static Stack<(string, string)> _undoRenameLanguageTracker = new();
 
         #endregion
 
@@ -288,6 +292,8 @@ namespace LocalizationTool.Scripts.Data
         {
             // Find the category to update
             var languageToUpdate = localizationData.LanguagesDictionary[languageName];
+            
+            Undo.RecordObject(languageToUpdate, "Changed language display order");
 
             // Reorder categories
             if (oldDisplayOrder < newDisplayOrder)
@@ -295,6 +301,7 @@ namespace LocalizationTool.Scripts.Data
                 // Scroll down elements between oldIndex and newIndex
                 foreach (var language in localizationData.languages.Where(language => language.displayOrder > oldDisplayOrder && language.displayOrder <= newDisplayOrder))
                 {
+                    Undo.RecordObject(language, "Changed language display order");
                     language.displayOrder--; // Shift down
                 }
             }
@@ -303,24 +310,54 @@ namespace LocalizationTool.Scripts.Data
                 // Scroll up elements between oldIndex and newIndex
                 foreach (var language in localizationData.languages.Where(language => language.displayOrder >= newDisplayOrder && language.displayOrder < oldDisplayOrder))
                 {
+                    Undo.RecordObject(language, "Changed language display order");
                     language.displayOrder++; // Shift up
                 }
             }
-
+            
             // Update the target's display order
             languageToUpdate!.displayOrder = newDisplayOrder;
 
             UpdateLanguageCache();
+            SaveChanges();
+
+            Undo.undoRedoPerformed -= UpdateLanguagesCacheAndRepaint;
+            Undo.undoRedoPerformed += UpdateLanguagesCacheAndRepaint;
+        }
+
+        private static void UpdateLanguagesCacheAndRepaint()
+        {
+            UpdateLanguageCache();
+            LocalizationMainEditor.Instance.Repaint();
             SaveChanges();
         }
 
         public static void UpdateLanguageName(string oldLanguageName, string newLanguageName)
         {
             var languageToUpdate = localizationData.LanguagesDictionary[oldLanguageName];
+            
+            Undo.RecordObject(languageToUpdate, $"Change Language {oldLanguageName} Name to {newLanguageName}");
+            _undoRenameLanguageTracker.Push((oldLanguageName, newLanguageName));
+            
             languageToUpdate!.languageName = newLanguageName;
             EditorUtility.SetDirty(languageToUpdate);
             AssetDatabase.RenameAsset(GetPath(languageToUpdate), newLanguageName);
 
+            SaveChanges();
+            
+            Undo.undoRedoPerformed -= HandleUpdateLanguageNameUndoRedo;
+            Undo.undoRedoPerformed += HandleUpdateLanguageNameUndoRedo;
+        }
+        
+        private static void HandleUpdateLanguageNameUndoRedo()
+        {
+            if (_undoRenameLanguageTracker.IsEmpty()) return;
+            var previousCurrentName = _undoRenameLanguageTracker.Pop();
+            
+            var assetPath = $"{LANGUAGES_PATH}/{previousCurrentName.Item2}.asset";
+            if (AssetDatabase.LoadAssetAtPath<Object>(assetPath).IsNull()) return;
+            AssetDatabase.RenameAsset(assetPath, previousCurrentName.Item1);
+            
             SaveChanges();
         }
 
@@ -407,12 +444,15 @@ namespace LocalizationTool.Scripts.Data
             // Find the category to update
             var categoryToUpdate = localizationData.CategoriesDictionary[categoryName];
 
+            Undo.RecordObject(categoryToUpdate, "Changed category display order");
+            
             // Reorder categories
             if (oldCategoryDisplayOrder < newCategoryDisplayOrder)
             {
                 // Scroll down elements between oldIndex and newIndex
                 foreach (var category in localizationData.categories.Where(category => category.displayOrder > oldCategoryDisplayOrder && category.displayOrder <= newCategoryDisplayOrder))
                 {
+                    Undo.RecordObject(category, "Changed category display order");
                     category.displayOrder--; // Shift categories down
                 }
             }
@@ -421,6 +461,7 @@ namespace LocalizationTool.Scripts.Data
                 // Scroll up elements between oldIndex and newIndex
                 foreach (var category in localizationData.categories.Where(category => category.displayOrder >= newCategoryDisplayOrder && category.displayOrder < oldCategoryDisplayOrder))
                 {
+                    Undo.RecordObject(category, "Changed category display order");
                     category.displayOrder++; // Shift categories up
                 }
             }
@@ -430,15 +471,44 @@ namespace LocalizationTool.Scripts.Data
 
             UpdateCategoriesCache();
             SaveChanges();
+
+            Undo.undoRedoPerformed -= UpdateCategoriesCacheAndRepaint;
+            Undo.undoRedoPerformed += UpdateCategoriesCacheAndRepaint;
         }
 
+        private static void UpdateCategoriesCacheAndRepaint()
+        {
+            UpdateCategoriesCache();
+            LocalizationMainEditor.Instance.Repaint();
+            SaveChanges();
+        }
+        
         public static void UpdateCategoryName(string oldCategoryName, string newCategoryName)
         {
             var categoryToUpdate = localizationData.CategoriesDictionary[oldCategoryName];
+            
+            Undo.RecordObject(categoryToUpdate, $"Change Category {oldCategoryName} Name to {newCategoryName}");
+            _undoRenameCategoryTracker.Push((oldCategoryName, newCategoryName));
+            
             categoryToUpdate!.categoryName = newCategoryName;
             EditorUtility.SetDirty(categoryToUpdate);
             AssetDatabase.RenameAsset(GetPath(categoryToUpdate), newCategoryName);
 
+            SaveChanges();
+            
+            Undo.undoRedoPerformed -= HandleUpdateCategoryNameUndoRedo;
+            Undo.undoRedoPerformed += HandleUpdateCategoryNameUndoRedo;
+        }
+        
+        private static void HandleUpdateCategoryNameUndoRedo()
+        {
+            if (_undoRenameCategoryTracker.IsEmpty()) return;
+            var previousCurrentName = _undoRenameCategoryTracker.Pop();
+            
+            var assetPath = $"{CATEGORIES_PATH}/{previousCurrentName.Item2}.asset";
+            if (AssetDatabase.LoadAssetAtPath<Object>(assetPath).IsNull()) return;
+            AssetDatabase.RenameAsset(assetPath, previousCurrentName.Item1);
+            
             SaveChanges();
         }
 

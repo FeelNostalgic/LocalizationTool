@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Options
   m_EditorClassIdentifier: 
   categoryName: Options
-  displayOrder: 8
+  displayOrder: 4
   isDefault: 0

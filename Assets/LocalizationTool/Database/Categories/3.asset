@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: 3
   m_EditorClassIdentifier: 
   categoryName: 3
-  displayOrder: 5
+  displayOrder: 6
   isDefault: 0
